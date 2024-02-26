@@ -22,7 +22,9 @@ function TopNavbar({ highlightLink }: TopNavbarProps) {
   return (
     <Navbar isBordered shouldHideOnScroll>
       <NavbarBrand>
-        <Link href="/" className="font-bold text-inherit">LOGO</Link>
+        <Link href="/" className="font-bold text-inherit">
+          LOGO
+        </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {Object.values(Pages).map((item) => (

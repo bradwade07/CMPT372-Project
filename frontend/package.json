@@ -11,12 +11,15 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
+    "@tanstack/react-query": "^5.24.1",
     "framer-motion": "^11.0.6",
     "next": "14.1.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-horizontal-scrolling-menu": "^6.0.2"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.20.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
