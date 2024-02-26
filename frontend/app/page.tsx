@@ -1,5 +1,6 @@
 import ItemCard from "@/components/ItemCard/ItemCard";
 import TopNavbar from "@/components/TopNavbar/TopNavbar";
+import Link from "next/link";
 
 function Home() {
   return (
@@ -18,6 +19,7 @@ function Home() {
           <ItemCard />
           <ItemCard />
         </div>
+        <Link className="flex justify-center text-blue-400 mt-4" href={"/scrolltest"}>Click for horizontal card scroll sample</Link>
       </main>
     </>
   );

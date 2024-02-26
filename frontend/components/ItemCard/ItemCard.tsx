@@ -1,12 +1,18 @@
 import React from "react";
 import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 
+// Props for this will be fixed once I have a better idea of how we're going to retrieve info from DB
 type ItemCardProps = {
   name: string;
   imgSrc: string;
 };
 
-function ItemCard() {
+type ScrollMenuTestProps = {
+  itemId?: string;
+  key?: string;
+}
+
+function ItemCard({itemId, key}: ScrollMenuTestProps) {
   return (
     <Card className="py-2 w-60" isPressable>
       <CardHeader className="py-2 px-4 flex-col items-start">
