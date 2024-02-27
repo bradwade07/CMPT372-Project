@@ -24,8 +24,8 @@ function TopNavbar({ highlightLink }: TopNavbarProps) {
     <Navbar isBordered shouldHideOnScroll>
       <NavbarBrand>
         <Link href="/" className="font-bold text-inherit">
-          <Image src={"/vercel.svg"} alt={"Logo Icon"} width={50} height={50}/>
-          <h3 className="ml-2 text-large">BRAND</h3>
+          <Image src={"/logo.jpg"} alt={"Logo Icon"} width={50} height={50} />
+          <h3 className="ml-2 text-large">NAME</h3>
         </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">

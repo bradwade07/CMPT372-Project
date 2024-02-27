@@ -1,7 +1,7 @@
 // documentation for ScrollMenu at https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import "react-horizontal-scrolling-menu/dist/styles.css";
 
@@ -13,14 +13,25 @@ import ItemCard from "@/components/ItemCard/ItemCard";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
-// TODO: swap type of contents to an actual type
+// TODO: decide what to do about contents: fetch function uses a body to specify what it wants or separate fetch functions
 type ItemScrollMenuProps = {
   header: string;
-  contents: { id: string }[];
+  contents?: { productId: number }[];
 };
 
 function ItemScrollMenu({ header, contents }: ItemScrollMenuProps) {
-  const [items] = React.useState(contents);
+  const [items, setItems] = useState([
+    { productId: 1 },
+    { productId: 2 },
+    { productId: 3 },
+    { productId: 4 },
+    { productId: 5 },
+    { productId: 6 },
+    { productId: 7 },
+    { productId: 8 },
+    { productId: 9 },
+    { productId: 10 },
+  ]);
   const { disableScroll, enableScroll } = usePreventBodyScroll();
 
   return (
@@ -36,8 +47,8 @@ function ItemScrollMenu({ header, contents }: ItemScrollMenuProps) {
             onWheel={onWheel}
           >
             {items.map((item) => (
-              <div key={item.id}>
-                <ItemCard productId={item.id} />
+              <div key={item.productId}>
+                <ItemCard productId={item.productId} />
               </div>
             ))}
           </ScrollMenu>
