@@ -7,6 +7,7 @@ import {
   Link,
   Button,
 } from "@nextui-org/react";
+import Image from "next/image";
 
 export enum Pages {
   Electronics = "Electronics",
@@ -23,7 +24,8 @@ function TopNavbar({ highlightLink }: TopNavbarProps) {
     <Navbar isBordered shouldHideOnScroll>
       <NavbarBrand>
         <Link href="/" className="font-bold text-inherit">
-          LOGO
+          <Image src={"/vercel.svg"} alt={"Logo Icon"} width={50} height={50}/>
+          <h3 className="ml-2 text-large">BRAND</h3>
         </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">

@@ -1,6 +1,5 @@
 // documentation for ScrollMenu at https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
-
-"use client"
+"use client";
 
 import React from "react";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
@@ -11,47 +10,43 @@ import usePreventBodyScroll from "./usePreventBodyScroll";
 
 import "./hideScrollbar.css";
 import ItemCard from "@/components/ItemCard/ItemCard";
-import Link from "next/link";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
-const elemPrefix = "test";
-const getId = (index: number) => `${elemPrefix}${index}`;
+// TODO: swap type of contents to an actual type
+type ItemScrollMenuProps = {
+  header: string;
+  contents: { id: string }[];
+};
 
-const getItems = () =>
-  Array(20)
-    .fill(0)
-    .map((_, index) => ({ id: getId(index) }));
-
-function App() {
-  const [items] = React.useState(getItems);
+function ItemScrollMenu({ header, contents }: ItemScrollMenuProps) {
+  const [items] = React.useState(contents);
   const { disableScroll, enableScroll } = usePreventBodyScroll();
 
   return (
     <>
-      <div className="example" style={{ paddingTop: "100px" }}>
+      <div className="w-full">
+        <h3 className="text-large font-bold uppercase">{header}</h3>
         <div onMouseEnter={disableScroll} onMouseLeave={enableScroll}>
           <ScrollMenu
-            Header={<div className="flex justify-center mb-4">HEADER</div>}
-            Footer={<div className="flex justify-center mt-4">FOOTER</div>}
+            separatorClassName="mx-1"
+            scrollContainerClassName="p-3"
             LeftArrow={LeftArrow}
             RightArrow={RightArrow}
             onWheel={onWheel}
           >
-            {items.map(({ id }) => (
-              <ItemCard
-                itemId={id} // NOTE: itemId is required for track items
-                key={id}
-              />
+            {items.map((item) => (
+              <div key={item.id}>
+                <ItemCard productId={item.id} />
+              </div>
             ))}
           </ScrollMenu>
         </div>
       </div>
-      <Link className="flex justify-center text-blue-400 mt-4" href={"/"}>HOME</Link>
     </>
   );
 }
-export default App;
+export default ItemScrollMenu;
 
 function onWheel(apiObj: scrollVisibilityApiType, ev: React.WheelEvent): void {
   const isThouchpad = Math.abs(ev.deltaX) !== 0 || Math.abs(ev.deltaY) < 15;

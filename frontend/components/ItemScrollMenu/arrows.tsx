@@ -2,7 +2,6 @@ import React from "react";
 import { FaArrowCircleLeft } from "react-icons/fa";
 import { FaArrowCircleRight } from "react-icons/fa";
 
-
 import {
   VisibilityContext,
   publicApiType,
@@ -17,7 +16,7 @@ export function LeftArrow() {
       disabled={isFirstItemVisible}
       onClick={() => visibility.scrollPrev()}
     >
-      <FaArrowCircleLeft size={50}/>
+      <FaArrowCircleLeft size={50} />
     </Arrow>
   );
 }
@@ -28,7 +27,7 @@ export function RightArrow() {
 
   return (
     <Arrow disabled={isLastItemVisible} onClick={() => visibility.scrollNext()}>
-      <FaArrowCircleRight size={50}/>
+      <FaArrowCircleRight size={50} />
     </Arrow>
   );
 }
