@@ -33,7 +33,7 @@ function TopNavbar({ highlightLink }: TopNavbarProps) {
           <NavbarItem key={item}>
             <Link
               color={highlightLink == item ? "primary" : "foreground"}
-              href={item.toLocaleLowerCase()}
+              href={`/${item.toLocaleLowerCase()}`}
               aria-current={highlightLink == item}
             >
               {item}
