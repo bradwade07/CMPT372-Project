@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Card, CardHeader, CardBody, Image } from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
-import { Product } from '@/api/product.types';
+import React, { useEffect } from "react";
+import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import { Product } from "@/api/product.types";
 
 type ItemCardProps = {
 	isLoading: boolean;
@@ -15,7 +15,7 @@ function ItemCard({ isLoading, error, product }: ItemCardProps) {
 
 	return (
 		<Card
-			className='py-2 w-60'
+			className="py-2 w-60"
 			isPressable
 			onClick={() => {
 				if (!error && !isLoading) {
@@ -23,13 +23,13 @@ function ItemCard({ isLoading, error, product }: ItemCardProps) {
 				}
 			}}
 		>
-			<CardHeader className='py-2 px-4 flex-col items-start'>
-				<h4 className='font-bold text-xl'>{product && product.name}</h4>
+			<CardHeader className="py-2 px-4 flex-col items-start">
+				<h4 className="font-bold text-xl">{product && product.name}</h4>
 			</CardHeader>
-			<CardBody className='overflow-visible py-2'>
+			<CardBody className="overflow-visible py-2">
 				<Image
-					alt='Card background'
-					className='object-cover rounded-xl pb-2'
+					alt="Card background"
+					className="object-cover rounded-xl pb-2"
 					src={product && product.imgSrc}
 					width={270}
 				/>
