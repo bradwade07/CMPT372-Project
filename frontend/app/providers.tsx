@@ -1,6 +1,7 @@
 "use client";
 
 import { NextUIProvider } from "@nextui-org/react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -19,8 +20,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <NextUIProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </NextUIProvider>
+    <GoogleOAuthProvider clientId={process.env.CLIENT_ID || ""}>
+      <NextUIProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </NextUIProvider>
+    </GoogleOAuthProvider>
   );
 }

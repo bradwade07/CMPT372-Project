@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  env: {
+    CLIENT_ID: process.env.CLIENT_ID,
+  },
+};
 
 export default nextConfig;
