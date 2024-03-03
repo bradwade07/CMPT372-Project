@@ -1,3 +1,6 @@
+"use client";
+
+import { getNewProducts, getSaleProducts } from "@/api/product";
 import ItemScrollMenu from "@/components/ItemScrollMenu/ItemScrollMenu";
 import TopNavbar from "@/components/TopNavbar/TopNavbar";
 
@@ -11,11 +14,10 @@ function Home() {
         </div>
         <div className="p-4 w-full">
           <div className="flex justify-center items-center mb-10">
-            {/* TODO: pass a function or something to ItemScrollMenu that it uses to get its content */}
-            <ItemScrollMenu header={"SALES"} />
+            <ItemScrollMenu header={"SALES"} getContents={getSaleProducts} />
           </div>
           <div className="flex justify-center items-center mb-10">
-            <ItemScrollMenu header={"NEW ITEMS"} />
+            <ItemScrollMenu header={"NEW ITEMS"} getContents={getNewProducts} />
           </div>
         </div>
       </main>

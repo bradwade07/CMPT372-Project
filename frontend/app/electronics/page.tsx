@@ -14,17 +14,20 @@ function page() {
   return (
     <>
       <TopNavbar highlightLink={Pages.Electronics} />
-      <main className="flex flex-col items-center">
+      <main className="flex flex-col items-center mb-16">
         <div className="flex justify-center items-center text-center w-full h-60 border border-blue-500">
           Representative image
         </div>
-        <div className="flex flex-1 w-full">
-          <div className="flex justify-center items-center text-center border border-blue-500 w-80">
+        <div className="flex flex-1 w-full mb-10">
+          <div className="flex justify-center items-center text-center border border-blue-500 w-80" style={{height: "800px"}}>
             Filters
           </div>
           <div className="grid grid-flow-row xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-y-8 flex-1 justify-items-center items-center border border-blue-500">
             <RepeatElement times={23} />
           </div>
+        </div>
+        <div className="flex justify-center items-center text-center w-96 h-12 border border-blue-500">
+          Pagination
         </div>
       </main>
     </>

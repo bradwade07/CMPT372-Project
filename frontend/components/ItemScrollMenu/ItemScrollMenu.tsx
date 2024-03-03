@@ -10,29 +10,30 @@ import usePreventBodyScroll from "./usePreventBodyScroll";
 
 import "./hideScrollbar.css";
 import ItemCard from "@/components/ItemCard/ItemCard";
+import { Product } from "@/api/product.types";
+import { useQuery } from "@tanstack/react-query";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
-// TODO: decide what to do about contents: fetch function uses a body to specify what it wants or separate fetch functions
 type ItemScrollMenuProps = {
   header: string;
-  contents?: { productId: number }[];
+  getContents: () => Promise<Product[]>;
 };
 
-function ItemScrollMenu({ header, contents }: ItemScrollMenuProps) {
-  const [items, setItems] = useState([
-    { productId: 1 },
-    { productId: 2 },
-    { productId: 3 },
-    { productId: 4 },
-    { productId: 5 },
-    { productId: 6 },
-    { productId: 7 },
-    { productId: 8 },
-    { productId: 9 },
-    { productId: 10 },
-  ]);
+function ItemScrollMenu({ header, getContents }: ItemScrollMenuProps) {
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["products", getContents],
+    queryFn: getContents,
+  });
+
+  const [items, setItems] = useState<Product[]>([]);
   const { disableScroll, enableScroll } = usePreventBodyScroll();
+
+  useEffect(() => {
+    if (data) {
+      setItems(data);
+    }
+  }, [data]);
 
   return (
     <>
@@ -48,7 +49,7 @@ function ItemScrollMenu({ header, contents }: ItemScrollMenuProps) {
           >
             {items.map((item) => (
               <div key={item.productId}>
-                <ItemCard productId={item.productId} />
+                <ItemCard isLoading={isLoading} error={error} product={item} />
               </div>
             ))}
           </ScrollMenu>
