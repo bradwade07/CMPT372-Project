@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/api/product.types";
@@ -9,7 +9,6 @@ type ItemCardProps = {
 	product: Product;
 };
 
-// TODO: conditionally render a loading card when isLoading is true
 function ItemCard({ isLoading, error, product }: ItemCardProps) {
 	const router = useRouter();
 
