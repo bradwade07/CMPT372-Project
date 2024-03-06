@@ -1,0 +1,8 @@
+products(productId SERIAL, name STRING, imgSrc?, description STRING, addedOn DATE)
+productPrice(productId INTEGER, basePrice FLOAT, currentPrice FLOAT)
+
+warehouses(warehouseId SERIAL, latitude FLOAT, longitude FLOAT)
+warehouseStock(warehouseId INTEGER, productId SERIAL, stock INTEGER)
+userInfo(userEmail STRING PRIMARY KEY, address?)
+userCart(userEmail STRING PRIMARY KEY, productId INTEGER, quantity INTEGER)
+userWishlist(userEmail STRING PRIMARY KEY, productId INTEGER)
