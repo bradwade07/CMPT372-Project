@@ -1,6 +1,6 @@
 "use client";
 
-import { getSessionEmail, login } from "@/app/auth";
+import { login } from "@/app/auth";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,11 +22,7 @@ function page() {
 				<div className="flex justify-center mb-8">
 					<GoogleLogin
 						onSuccess={(credentialResponse: CredentialResponse) =>
-							login(credentialResponse)
-								.then(async () => {
-									console.log(await getSessionEmail());
-								})
-								.then(() => router.push("/"))
+							login(credentialResponse).then(() => router.push("/"))
 						}
 						onError={() => {
 							console.log("Login Failed");

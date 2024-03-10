@@ -13,8 +13,7 @@ function page({ params }: { params: { categoryName: string } }) {
 					<div className="flex justify-center items-center text-center w-full h-60 border border-blue-500">
 						Representative image
 					</div>
-					<div className="flex justify-center items-center text-center my-4"></div>
-					<div className="flex flex-1 w-full mb-10">
+					<div className="flex flex-1 w-full mb-10 mt-8">
 						<div
 							className="flex justify-center items-center text-center border border-blue-500 w-80"
 							style={{ height: "800px" }}

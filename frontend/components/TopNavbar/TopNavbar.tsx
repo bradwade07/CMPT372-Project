@@ -5,13 +5,11 @@ import {
 	NavbarContent,
 	NavbarItem,
 	Link,
-	Button,
-	Input,
 } from "@nextui-org/react";
 import Image from "next/image";
 import { Categories } from "@/app/categories";
-import { getSession } from "@/app/auth";
 import SigninButton from "../SigninButton/SigninButton";
+import NavbarSearchbar from "../NavbarSearchbar/NavbarSearchbar";
 
 type TopNavbarProps = {
 	highlightLink?: Categories;
@@ -43,18 +41,7 @@ function TopNavbar({ highlightLink }: TopNavbarProps) {
 			</NavbarContent>
 			<NavbarContent justify="end">
 				<NavbarItem>
-					<Input
-						classNames={{
-							base: "max-w-full sm:max-w-[10rem] h-10",
-							mainWrapper: "h-full",
-							input: "text-small",
-							inputWrapper:
-								"h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-						}}
-						placeholder="Type to search..."
-						size="sm"
-						type="search"
-					/>
+					<NavbarSearchbar />
 				</NavbarItem>
 				<NavbarItem>
 					<SigninButton />
