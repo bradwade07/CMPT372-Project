@@ -1,5 +1,6 @@
 products(productId SERIAL, name STRING, imgSrc?, description STRING, addedOn DATE)
 productPrice(productId INTEGER, basePrice FLOAT, currentPrice FLOAT)
+userType(userEmail STRING PRIMARY KEY, type STRING)
 
 warehouses(warehouseId SERIAL, latitude FLOAT, longitude FLOAT)
 warehouseStock(warehouseId INTEGER, productId SERIAL, stock INTEGER)
