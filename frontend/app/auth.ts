@@ -5,6 +5,8 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { getUserType } from "@/api/user";
+import { UserTypes } from "@/api/user.type";
 
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
@@ -36,20 +38,35 @@ export async function getSessionUserData(): Promise<
 > {
 	const session = await getSession();
 	if (session) {
-		const data = <GoogleCredentials>jwt.decode(session.data);
-		return data;
+		const userData = <GoogleCredentials>jwt.decode(session.googleJWT);
+		return userData;
+	} else {
+		return undefined;
+	}
+}
+
+export async function getSessionUserType(): Promise<UserTypes | undefined> {
+	const session = await getSession();
+	if (session) {
+		return session.userType;
+	} else {
+		return undefined;
 	}
 }
 
 export async function login(credentialResponse: CredentialResponse) {
-	const data = credentialResponse.credential;
+	const googleJWT = credentialResponse.credential;
 
-	// Create the session
-	const expires = new Date(Date.now() + cookieLength);
-	const session = await encrypt({ data, expires });
+	if (googleJWT) {
+		const userType = await getUserType(googleJWT);
 
-	// Save the session in a cookie
-	cookies().set("session", session, { expires, httpOnly: true });
+		// Create the session
+		const expires = new Date(Date.now() + cookieLength);
+		const session = await encrypt({ googleJWT, userType, expires });
+
+		// Save the session in a cookie
+		cookies().set("session", session, { expires, httpOnly: true });
+	}
 }
 
 export async function logout() {

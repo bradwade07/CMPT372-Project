@@ -10,18 +10,70 @@ import {
 	DropdownTrigger,
 	Link,
 } from "@nextui-org/react";
-import { GoogleCredentials, getSessionUserData, logout } from "@/app/auth";
+import {
+	GoogleCredentials,
+	getSessionUserData,
+	getSessionUserType,
+	logout,
+} from "@/app/auth";
+import { useQuery } from "@tanstack/react-query";
+import { UserTypes } from "@/api/user.type";
 
 function UserControls() {
 	const [userInfo, setUserInfo] = useState<GoogleCredentials>();
+	const [userType, setUserType] = useState<UserTypes>(UserTypes.Customer);
 
 	useEffect(() => {
 		retrieveSessionData();
 	}, []);
 
 	async function retrieveSessionData() {
-		const info = await getSessionUserData();
-		setUserInfo(info);
+		const userInfo = await getSessionUserData();
+		const userType = await getSessionUserType();
+		if (userInfo && userType) {
+			setUserInfo(userInfo);
+			setUserType(userType);
+		}
+	}
+
+	function getUserSpecificOptions(): JSX.Element {
+		switch (userType) {
+			case UserTypes.Customer:
+				return (
+					<DropdownItem
+						key="become vendor"
+						as={Link}
+						href="become-vendor"
+						className="text-black"
+					>
+						Become a Vendor
+					</DropdownItem>
+				);
+			case UserTypes.Vendor:
+				return (
+					<DropdownItem
+						key="listings"
+						as={Link}
+						href="/product-listings"
+						className="text-black"
+					>
+						My Product Listings
+					</DropdownItem>
+				);
+			case UserTypes.Admin:
+				return (
+					<DropdownItem
+						key="admin dashboard"
+						as={Link}
+						href="/admin-dashboard"
+						className="text-black"
+					>
+						Admin Dashboard
+					</DropdownItem>
+				);
+			default:
+				return <></>;
+		}
 	}
 
 	return (
@@ -42,11 +94,12 @@ function UserControls() {
 						<p className="font-semibold">{userInfo?.email}</p>
 					</DropdownItem>
 					<DropdownItem key="wishlist">My Wishlist</DropdownItem>
+					{getUserSpecificOptions()}
 					<DropdownItem
-						as={Link}
 						key="logout"
-						color="danger"
+						as={Link}
 						href="/"
+						color="danger"
 						onClick={async () => {
 							await logout();
 						}}
