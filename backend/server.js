@@ -11,5 +11,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.get("/landingBackend", async (req, res) =>{
+    helpers.init(req, res);
     helpers.landingBackendFn(req, res);
+
 })
