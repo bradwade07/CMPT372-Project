@@ -15,3 +15,8 @@ app.get("/landingBackend", async (req, res) =>{
     helpers.landingBackendFn(req, res);
 
 })
+
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
+  
