@@ -33,6 +33,22 @@ const helpers = {
   },
   landingBackendFn: async function(req, res){
 
+  },
+  checkUserByEmail: async function(email){
+    try{
+      await pool.query("BEGIN")
+      const result = await pool.query(
+        `SELECT users.type_id, usertypes.type FROM users 
+        JOIN usertypes ON users.type_id = usertypes.type_id 
+        WHERE user_email = $1`, [email]
+        
+      );
+      await pool.query("COMMIT")
+      return result.rows;
+    }catch(error){
+      await pool.query("ROLLBACK");
+      
+    }
   }
 };
 module.exports = { helpers };
