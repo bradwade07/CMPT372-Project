@@ -70,6 +70,35 @@ app.get('/cartProducts', async (req,res) => {
         console.error('Error retrieving cart products:', error);
         res.status(500).send('Server error');
     }
+}),
+app.get('/wishListProducts', async (req,res) => {
+    const userEmail = req.query.email; //as written on discord Body: user email
+    if(!userEmail){
+        return res.status(400).send('Email is required');
+    }
+    try{
+        const prodInfo = await getWishListProductsByEmail(userEmail);
+        if(prodInfo.length > 0){
+            const responseObject = {
+             
+                    userEmail: userEmail,
+                    itemCount: wishlistProducts.length,
+                    items: wishlistProducts.map(product => ({
+                      productId: product.product_id,
+                      productName: product.product_name,
+                      productDescription: product.product_description,
+                      productImage: product.product_imgsrc,
+                      productDateAdded : product_date_added 
+                    }))
+            };
+            res.status(200).json(responseObject);
+        }else{
+            res.status(400).json('No products found in the user\'s shopping cart');
+        }
+    }catch(error){
+        console.error('Error retrieving cart products:', error);
+        res.status(500).send('Server error');
+    }
 })
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

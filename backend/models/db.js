@@ -77,7 +77,24 @@ const helpers = {
   }catch(error){
     await pool.query("ROLLBACK");
   }
-  }
+  },
+   getWishlistProductsByEmail: async(email)=> {
+    try {
+      await pool.query("BEGIN")
+      const query = `
+        SELECT product.* FROM product
+        JOIN userwishlist ON product.product_id = userwishlist.product_id
+        WHERE userwishlist.user_email = $1
+      `;
+      const values = [email];
+  
+      const result = await pool.query(query, values);
+      await pool.query("COMMIT")
+      return result.rows;
+    } catch (error) {
+      await pool.query("ROLLBACK");
+    }
+  } 
 };
 
 
