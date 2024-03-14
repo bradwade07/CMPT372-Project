@@ -9,7 +9,7 @@ type ItemCardProps = {
 	product: Product;
 };
 
-function ItemCard({ isLoading, error, product }: ItemCardProps) {
+export function ItemCard({ isLoading, error, product }: ItemCardProps) {
 	const router = useRouter();
 
 	return (
@@ -38,5 +38,3 @@ function ItemCard({ isLoading, error, product }: ItemCardProps) {
 		</Card>
 	);
 }
-
-export default ItemCard;

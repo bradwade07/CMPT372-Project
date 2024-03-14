@@ -3,8 +3,8 @@
 import { Product } from "@/api/product.types";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import ItemCard from "../ItemCard/ItemCard";
-import ItemCardSkeleton from "../ItemCardSkeleton/ItemCardSkeleton";
+import { ItemCard } from "./ItemCard";
+import { ItemCardSkeleton } from "./ItemCardSkeleton";
 import { getCategoryProducts } from "@/api/product";
 import { Pagination } from "@nextui-org/react";
 
@@ -21,7 +21,7 @@ const queryFunctions: {
 	// Add more functions as needed
 };
 
-function ItemGrid({ queryFunctionKey, filters }: ItemGridProps) {
+export function ItemGrid({ queryFunctionKey, filters }: ItemGridProps) {
 	const { isLoading, error, data } = useQuery({
 		queryKey: [filters, queryFunctionKey],
 		queryFn: () => queryFunctions[queryFunctionKey](filters),
@@ -61,5 +61,3 @@ function ItemGrid({ queryFunctionKey, filters }: ItemGridProps) {
 		</div>
 	);
 }
-
-export default ItemGrid;

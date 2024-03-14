@@ -9,10 +9,10 @@ import { LeftArrow, RightArrow } from "./arrows";
 import usePreventBodyScroll from "./usePreventBodyScroll";
 
 import "./hideScrollbar.css";
-import ItemCard from "@/components/ItemCard/ItemCard";
+import { ItemCard } from "../ItemCard";
+import { ItemCardSkeleton } from "../ItemCardSkeleton";
 import { Product } from "@/api/product.types";
 import { useQuery } from "@tanstack/react-query";
-import ItemCardSkeleton from "../ItemCardSkeleton/ItemCardSkeleton";
 import { getNewProducts, getSaleProducts } from "@/api/product";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
@@ -31,7 +31,10 @@ const queryFunctions: {
 	// Add more functions as needed
 };
 
-function ItemScrollMenu({ header, queryFunctionKey }: ItemScrollMenuProps) {
+export function ItemScrollMenu({
+	header,
+	queryFunctionKey,
+}: ItemScrollMenuProps) {
 	const { isLoading, error, data } = useQuery({
 		queryKey: [queryFunctionKey],
 		queryFn: queryFunctions[queryFunctionKey],
@@ -72,8 +75,6 @@ function ItemScrollMenu({ header, queryFunctionKey }: ItemScrollMenuProps) {
 		</>
 	);
 }
-
-export default ItemScrollMenu;
 
 function onWheel(apiObj: scrollVisibilityApiType, ev: React.WheelEvent): void {
 	const isThouchpad = Math.abs(ev.deltaX) !== 0 || Math.abs(ev.deltaY) < 15;

@@ -1,4 +1,3 @@
-import { CredentialResponse } from "@react-oauth/google";
 import { axios } from "./axios";
 import { UserTypes } from "./user.type";
 
