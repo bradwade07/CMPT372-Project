@@ -49,6 +49,36 @@ const helpers = {
       await pool.query("ROLLBACK");
       
     }
+  },
+  getCartProductsByEmail: async(email) => {
+  try{
+    await pool.query("BEGIN")
+    const query = `
+    SELECT 
+    product.product_id, 
+    product.product_name, 
+    product.product_description, 
+    product.product_imgsrc, 
+    productprice.base_price, 
+    productprice.current_price, 
+    usercart.quantity,
+    (productprice.current_price * usercart.quantity) AS total_price,
+    productstock.in_stock
+  FROM product
+  JOIN usercart ON product.product_id = usercart.product_id
+  JOIN productprice ON product.product_id = productprice.product_id
+  LEFT JOIN productstock ON product.product_id = productstock.product_id
+  WHERE usercart.user_email = $1;  
+    `;
+    const values = [email];
+    const result = await pool.query(query, values);
+    await pool.query("COMMIT")
+    return result.rows;
+  }catch(error){
+    await pool.query("ROLLBACK");
+  }
   }
 };
+
+
 module.exports = { helpers };
