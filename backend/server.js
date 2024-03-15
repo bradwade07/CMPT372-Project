@@ -5,6 +5,7 @@ const cors = require('cors');
 const { helpers } = require('./models/db');
 
 
+
 const port = 8080;
 
 app.use(cors())
@@ -17,7 +18,16 @@ app.get('/', (req, res) => {
   
 
 
-
+app.get('/landingBackend', async (req, res) =>{
+    try{
+    helpers.init(req, res);
+    helpers.landingBackendFn(req, res);
+    }catch(error){
+        console.error('Error in /landingBackend endpoint:', error)
+        res.status(500).send('Internal Server error')
+    }
+    
+})
 app.get('/landingBackend', async (req, res) =>{
     try{
     helpers.init(req, res);
@@ -108,10 +118,8 @@ app.get('/wishListProducts', async (req, res) => {
     try {
         const prodInfo = await helpers.getWishListProductsByEmail(userEmail);
         if (prodInfo.length > 0) {
-            // If products are found, send them back in the response
             res.json(prodInfo);
         } else {
-            // If no products are found, inform the client
             res.status(404).json('No products found in the user\'s wish list');
         }
     } catch (error) {
@@ -119,6 +127,27 @@ app.get('/wishListProducts', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+app.get('/productsOnSale', async (req, res) => {
+    console.log('Accessing /productsOnSale');
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    try {
+        
+        const products = await helpers.getProductsOnSale(limit);
+        if (products.length > 0) {
+            res.json(products);
+        } else {
+            res.status(404).json({ message: 'No products on sale found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error while getting products on sale');
+    }
+});
+
+// app.get('/productsOnSale', async (req, res) => {
+//     console.log('Accessing /productsOnSale');
+//     res.send('Route is accessible');
+// });
 
 
 

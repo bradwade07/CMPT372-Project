@@ -52,7 +52,8 @@ const helpers = {
       await pool.query("ROLLBACK");
       
     }
-  },getCartProductsByEmail: async(email) => {
+  },
+  getCartProductsByEmail: async(email) => {
     try {
       await pool.query("BEGIN");
       const query = `
@@ -116,7 +117,39 @@ const helpers = {
         console.error("Error retrieving wish list products:", error);
         throw error; 
     }
+},
+getProductsOnSale: async (limit) => {
+  
+  let query = `
+    SELECT p.product_id, p.product_name, p.product_description, pp.base_price, pp.current_price
+    FROM product p
+    JOIN productprice pp ON p.product_id = pp.product_id
+    WHERE pp.current_price < pp.base_price
+    ORDER BY pp.current_price DESC
+  `;
+
+
+  if (limit !== null) {
+    query += ` LIMIT $1`;
+    try {
+      const result = await pool.query(query, [limit]);
+      return result.rows;
+    } catch (error) {
+      console.error("Error retrieving products on sale:", error);
+      throw error;
+    }
+  } else {
+  
+    try {
+      const result = await pool.query(query); 
+      return result.rows;
+    } catch (error) {
+      console.error("Error retrieving products on sale:", error);
+      throw error;
+    }
+  }
 }
+
 
 };
 
