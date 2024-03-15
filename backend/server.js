@@ -144,6 +144,25 @@ app.get('/productsOnSale', async (req, res) => {
     }
 });
 
+
+
+app.get('/newestProducts', async (req, res) => {
+    console.log('Accessing /newestProducts');
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : null; 
+    try {
+        const products = await helpers.getNewestProducts(limit);
+        if (products.length > 0) {
+            res.json(products);
+        } else {
+            res.status(404).json({ message: 'No newest products found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error while getting newest products');
+    }
+});
+
+
 // app.get('/productsOnSale', async (req, res) => {
 //     console.log('Accessing /productsOnSale');
 //     res.send('Route is accessible');

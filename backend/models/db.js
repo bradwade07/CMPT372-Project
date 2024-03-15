@@ -148,6 +148,34 @@ getProductsOnSale: async (limit) => {
       throw error;
     }
   }
+},
+
+
+getNewestProducts: async (limit) => {
+  let query = `
+      SELECT product_id, product_name, product_description, product_imgsrc, product_date_added
+      FROM product
+      ORDER BY product_date_added DESC
+  `;
+
+  if (limit !== null && !isNaN(limit)) {
+      query += ` LIMIT $1`;
+      try {
+          const result = await pool.query(query, [limit]);
+          return result.rows;
+      } catch (error) {
+          console.error("Error retrieving newest products:", error);
+          throw error;
+      }
+  } else {
+      try {
+          const result = await pool.query(query);
+          return result.rows;
+      } catch (error) {
+          console.error("Error retrieving newest products:", error);
+          throw error;
+      }
+  }
 }
 
 
