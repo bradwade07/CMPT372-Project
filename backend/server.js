@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { helpers } = require('./models/db')
+const { helpers } = require('./models/db');
 
 
 const port = 8080;
@@ -10,6 +10,13 @@ const port = 8080;
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.send('Welcome to Our API!');
+  });
+  
+
+
 
 app.get('/landingBackend', async (req, res) =>{
     try{
@@ -27,17 +34,39 @@ app.get('/checkUser', async(req,res) => {
         return res.status(400).send('Email is required');
     }
     try{
-        const users = await checkUserByemail(userEmail);
-        if(users.length > 0){
+        const users = await helpers.checkUserByEmail(userEmail);
+        console.log(users);
+        if (users && users.length > 0){
             res.status(200).json({ userType: users[0].type });
         }else{
             res.status(400).json('User not found');
         }
     }catch(error){
-        console.error('Error user', user);
-        res.status(500).send('Server error')
+        console.error('Error retrieving user info:', error);
+        res.status(500).send('Server error');
     }
 });
+
+//hello everyone this is to test, nothing else
+app.get('/testCartProducts', async (req, res) => {
+    const userEmail = 'test@example.com'; // Change to a relevant email
+    try {
+        const products = await helpers.getCartProductsByEmail(userEmail);
+        console.log(products);
+        if (products && products.length > 0) {
+            res.json(products); 
+        } else {
+            res.status(404).json({ message: 'No products found in the user\'s cart' });
+        }
+    } catch(error) {
+        console.error('Error retrieving cart products:', error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+
+
 app.get('/cartProducts', async (req,res) => {
     const userEmail = req.query.email; //as written on discord Body: user email
     if(!userEmail){
@@ -71,35 +100,34 @@ app.get('/cartProducts', async (req,res) => {
         res.status(500).send('Server error');
     }
 }),
-app.get('/wishListProducts', async (req,res) => {
-    const userEmail = req.query.email; //as written on discord Body: user email
-    if(!userEmail){
+app.get('/wishListProducts', async (req, res) => {
+    const userEmail = req.query.email;
+    if (!userEmail) {
         return res.status(400).send('Email is required');
     }
-    try{
-        const prodInfo = await getWishListProductsByEmail(userEmail);
-        if(prodInfo.length > 0){
-            const responseObject = {
-             
-                    userEmail: userEmail,
-                    itemCount: wishlistProducts.length,
-                    items: wishlistProducts.map(product => ({
-                      productId: product.product_id,
-                      productName: product.product_name,
-                      productDescription: product.product_description,
-                      productImage: product.product_imgsrc,
-                      productDateAdded : product_date_added 
-                    }))
-            };
-            res.status(200).json(responseObject);
-        }else{
-            res.status(400).json('No products found in the user\'s shopping cart');
+    try {
+        const prodInfo = await helpers.getWishListProductsByEmail(userEmail);
+        if (prodInfo.length > 0) {
+            // If products are found, send them back in the response
+            res.json(prodInfo);
+        } else {
+            // If no products are found, inform the client
+            res.status(404).json('No products found in the user\'s wish list');
         }
-    }catch(error){
-        console.error('Error retrieving cart products:', error);
+    } catch (error) {
+        console.error('Error retrieving wish list products:', error);
         res.status(500).send('Server error');
     }
-})
+});
+
+
+
+
+app.get('/favicon.ico', (req, res) => res.status(204));
+
+app.all('*', (req, res) => {
+    res.status(404).send('Resource not found');
+  });
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 })

@@ -1,13 +1,14 @@
 const {Pool} = require("pg");
 
-var pool;
+//var pool;
 
-pool = new Pool({
-  //TODO: connection string
-  user: "postgres",
-  host: "db",
-  password: "root"
+const pool = new Pool({
+  user: 'ashrafulislam',
+  host: 'localhost',
+  database: 'project',
+  port: 5432,
 });
+
 
 const helpers = {
   init: async function (req, res) {
@@ -38,64 +39,87 @@ const helpers = {
     try{
       await pool.query("BEGIN")
       const result = await pool.query(
+        
         `SELECT users.type_id, usertypes.type FROM users 
         JOIN usertypes ON users.type_id = usertypes.type_id 
         WHERE user_email = $1`, [email]
         
       );
+    //  const result = await pool.query("SELECT * FROM userInfo WHERE user_email = $1", [email]);
       await pool.query("COMMIT")
       return result.rows;
     }catch(error){
       await pool.query("ROLLBACK");
       
     }
-  },
-  getCartProductsByEmail: async(email) => {
-  try{
-    await pool.query("BEGIN")
-    const query = `
-    SELECT 
-    product.product_id, 
-    product.product_name, 
-    product.product_description, 
-    product.product_imgsrc, 
-    productprice.base_price, 
-    productprice.current_price, 
-    usercart.quantity,
-    (productprice.current_price * usercart.quantity) AS total_price,
-    productstock.in_stock
-  FROM product
-  JOIN usercart ON product.product_id = usercart.product_id
-  JOIN productprice ON product.product_id = productprice.product_id
-  LEFT JOIN productstock ON product.product_id = productstock.product_id
-  WHERE usercart.user_email = $1;  
-    `;
-    const values = [email];
-    const result = await pool.query(query, values);
-    await pool.query("COMMIT")
-    return result.rows;
-  }catch(error){
-    await pool.query("ROLLBACK");
-  }
-  },
-   getWishlistProductsByEmail: async(email)=> {
+  },getCartProductsByEmail: async(email) => {
     try {
-      await pool.query("BEGIN")
+      await pool.query("BEGIN");
       const query = `
+    SELECT 
+        product.product_id, 
+        product.product_name, 
+        product.product_description, 
+        product.product_imgsrc, 
+        productprice.base_price, 
+        productprice.current_price, 
+        usercart.quantity,
+        (productprice.current_price * usercart.quantity) AS total_price,
+        warehousestock.stock AS in_stock -- Corrected column alias
+    FROM 
+        product
+    JOIN 
+        usercart ON product.product_id = usercart.product_id
+    JOIN 
+        productprice ON product.product_id = productprice.product_id
+    LEFT JOIN 
+        warehousestock ON product.product_id = warehousestock.product_id -- Join condition corrected
+    WHERE 
+        usercart.user_email = $1;  
+`;
+      const values = [email];
+      const result = await pool.query(query, values);
+      await pool.query("COMMIT");
+  
+      if (result.rows.length === 0) {
+        return [{ message: "No products found in the user's cart" }];
+      }
+  
+      console.log("Query result:", result.rows);
+      return result.rows;
+    } catch(error) {
+      await pool.query("ROLLBACK");
+      throw error;
+    }
+  },
+  getWishListProductsByEmail: async (email) => {
+    try {
+        await pool.query("BEGIN");
+        
+        const query = `
         SELECT product.* FROM product
         JOIN userwishlist ON product.product_id = userwishlist.product_id
         WHERE userwishlist.user_email = $1
-      `;
-      const values = [email];
-  
-      const result = await pool.query(query, values);
-      await pool.query("COMMIT")
-      return result.rows;
+
+        `;
+        
+       // const values = [email];
+       const values = [email.trim()]; // Trim the email before using it
+
+      
+        const result = await pool.query(query, values); 
+        await pool.query("COMMIT");
+        return result.rows;
+      
     } catch (error) {
-      await pool.query("ROLLBACK");
+        await pool.query("ROLLBACK");
+        console.error("Error retrieving wish list products:", error);
+        throw error; 
     }
-  } 
+}
+
 };
+
 
 
 module.exports = { helpers };
