@@ -6,18 +6,23 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { getUserType } from "@/api/user";
-import { UserTypes } from "@/api/user.type";
+import { UserTypes } from "@/api/user.types";
+
+if (!process.env.SECRET_KEY) {
+	throw Error("env variable not set: SECRET_KEY");
+}
 
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
-const cookieLength = 1000 * 60 * 60; // 1 hour
+const cookieLength = 1000 * 60 * 60 * 3; // 3 hours
 
 export type GoogleCredentials = {
 	email: string;
 	picture: string;
 };
 
+// encrypts the payload using the key
 export async function encrypt(payload: any) {
 	return await new SignJWT(payload)
 		.setProtectedHeader({ alg: "HS256" })
@@ -26,6 +31,7 @@ export async function encrypt(payload: any) {
 		.sign(key);
 }
 
+// decrypts the input using the key
 export async function decrypt(input: string): Promise<any> {
 	const { payload } = await jwtVerify(input, key, {
 		algorithms: ["HS256"],
@@ -33,6 +39,7 @@ export async function decrypt(input: string): Promise<any> {
 	return payload;
 }
 
+// Gets all of the user data of the logged in user
 export async function getSessionUserData(): Promise<
 	GoogleCredentials | undefined
 > {
@@ -41,45 +48,86 @@ export async function getSessionUserData(): Promise<
 		const userData = <GoogleCredentials>jwt.decode(session.googleJWT);
 		return userData;
 	} else {
+		console.error("Could not retrieve user session");
 		return undefined;
 	}
 }
 
+// Gets the user type of the logged in user
 export async function getSessionUserType(): Promise<UserTypes | undefined> {
 	const session = await getSession();
 	if (session) {
 		return session.userType;
 	} else {
+		console.error("Could not retrieve user type");
 		return undefined;
 	}
 }
 
-export async function login(credentialResponse: CredentialResponse) {
-	const googleJWT = credentialResponse.credential;
-
-	if (googleJWT) {
-		const userType = await getUserType(googleJWT);
-
-		// Create the session
-		const expires = new Date(Date.now() + cookieLength);
-		const session = await encrypt({ googleJWT, userType, expires });
-
-		// Save the session in a cookie
-		cookies().set("session", session, { expires, httpOnly: true });
+// Gets all of the user email of the logged in user
+export async function getSessionUserEmail(): Promise<string | undefined> {
+	const session = await getSession();
+	if (session) {
+		const user_email = (<GoogleCredentials>jwt.decode(session.googleJWT)).email;
+		return user_email;
+	} else {
+		console.error("Could not retrieve user email");
+		return undefined;
 	}
 }
 
+// Given the google response, creates a new session for the user if they exist in the database already
+// If they don't exist, creates a new account for them as a customer
+export async function login(
+	credentialResponse: CredentialResponse
+): Promise<void> {
+	const googleJWT = credentialResponse.credential;
+	if (googleJWT) {
+		let user_email = (<GoogleCredentials>jwt.decode(googleJWT)).email;
+
+		if (user_email) {
+			const userType = await getUserType(user_email);
+
+			if (userType) {
+				// Create the session
+				const expires = new Date(Date.now() + cookieLength);
+				const session = await encrypt({ googleJWT, userType, expires });
+
+				// Save the session in a cookie
+				cookies().set("session", session, { expires, httpOnly: true });
+
+				return;
+			} else {
+				// TODO: perform logic to redirect user to create new account, but create customer account initially
+
+				const expires = new Date(Date.now() + cookieLength);
+				const session = await encrypt({ googleJWT, userType, expires });
+				cookies().set("session", session, { expires, httpOnly: true });
+				return;
+			}
+		}
+	}
+	throw Error("Error occurred while logging in");
+}
+
+// Logs the current user out
 export async function logout() {
 	// Destroy the session
 	cookies().set("session", "", { expires: new Date(0) });
 }
 
+// Returns the session cookie of the current user if there is one
 export async function getSession(): Promise<any | null> {
-	const session = cookies().get("session")?.value;
-	if (!session) return null;
-	return await decrypt(session);
+	try {
+		const session = cookies().get("session")?.value;
+		if (!session) return null;
+		return await decrypt(session);
+	} catch (error) {
+		console.error("Error occurred when retrieving session: " + error);
+	}
 }
 
+// Refreshes the current session, effectively resetting the expiry time
 export async function updateSession(request: NextRequest) {
 	const session = request.cookies.get("session")?.value;
 	if (!session) return;

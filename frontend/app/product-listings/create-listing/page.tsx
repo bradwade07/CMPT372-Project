@@ -7,9 +7,9 @@ function page() {
 		<>
 			<TopNavbar />
 			<main className="flex flex-col items-center mb-16">
-				<h3 className="mt-8 mx-4 text-2xl">Become a Vendor</h3>
+				<h3 className="mt-8 mx-4 text-2xl">Create Listing</h3>
 				<div className="flex flex-1 justify-center w-full mb-10 mt-8">
-					<p>Become a vendor</p>
+					<p>Create Listing</p>
 				</div>
 			</main>
 		</>

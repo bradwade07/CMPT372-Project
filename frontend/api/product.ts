@@ -1,24 +1,40 @@
-import { Product, ShoppingCartEntry } from "./product.types";
+import { Product } from "./product.types";
 import { axios } from "./axios";
-import { GoogleCredentials } from "@/app/auth";
 
-export async function getProduct(productId: number) {
+// given a product's id, returns all that product's info
+export async function getProduct(
+	product_id: number
+): Promise<Product | undefined> {
 	const mock: Product = {
-		productId: productId,
-		name: "Wooden Stool",
-		imgSrc: "/images/wood-stool.jpg",
-		price: 15.2,
+		product_id: product_id,
+		product_name: "Wooden Stool",
+		img_src: "/images/wood-stool.jpg",
+		base_price: 15.2,
 		description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
 	};
 	return mock;
+
+	// backend call
+	try {
+		let response = await axios.get<Product>("/???", {
+			data: {
+				product_id: product_id,
+			},
+		});
+
+		return response.data;
+	} catch (error) {
+		console.error(error);
+	}
 }
 
-export async function getNewProducts(): Promise<Product[]> {
-	const generateProduct = (productId: number): Product => ({
-		productId: productId,
-		name: "Wooden Stool",
-		imgSrc: "/images/wood-stool.jpg",
-		price: 15.2,
+// returns a number of the newest products
+export async function getNewProducts(limit: number): Promise<Product[]> {
+	const generateProduct = (product_id: number): Product => ({
+		product_id: product_id,
+		product_name: "Wooden Stool",
+		img_src: "/images/wood-stool.jpg",
+		base_price: 15.2,
 		description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
 	});
 
@@ -30,14 +46,28 @@ export async function getNewProducts(): Promise<Product[]> {
 	}
 
 	return products;
+
+	// backend call
+	try {
+		let response = await axios.get<Product[]>("/newestProducts", {
+			data: {
+				limit: limit,
+			},
+		});
+
+		return response.data;
+	} catch (error) {
+		console.error(error);
+	}
 }
 
-export async function getSaleProducts(): Promise<Product[]> {
-	const generateProduct = (productId: number): Product => ({
-		productId: productId,
-		name: "Wooden Stool",
-		imgSrc: "/images/wood-stool.jpg",
-		price: 15.2,
+// returns a number of products that are on sale
+export async function getSaleProducts(limit?: number): Promise<Product[]> {
+	const generateProduct = (product_id: number): Product => ({
+		product_id: product_id,
+		product_name: "Wooden Stool",
+		img_src: "/images/wood-stool.jpg",
+		base_price: 15.2,
 		description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
 	});
 
@@ -49,16 +79,32 @@ export async function getSaleProducts(): Promise<Product[]> {
 	}
 
 	return products;
+
+	// backend call
+	try {
+		let requestData = {};
+
+		if (limit != undefined) {
+			requestData = { data: { limit: limit } };
+		}
+
+		let response = await axios.get<Product[]>("/productsOnSale", requestData);
+
+		return response.data;
+	} catch (error) {
+		console.error(error);
+	}
 }
 
-export async function getCategoryProducts(
+// returns basic info on all the products that fulfill a set of filters
+export async function getFilteredProducts(
 	filters: string[]
 ): Promise<Product[]> {
-	const generateProduct = (productId: number): Product => ({
-		productId: productId,
-		name: "Wooden Stool",
-		imgSrc: "/images/wood-stool.jpg",
-		price: 15.2,
+	const generateProduct = (product_id: number): Product => ({
+		product_id: product_id,
+		product_name: "Wooden Stool",
+		img_src: "/images/wood-stool.jpg",
+		base_price: 15.2,
 		description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
 	});
 
@@ -70,27 +116,17 @@ export async function getCategoryProducts(
 	}
 
 	return products;
-}
 
-// note: backend for this function needs to access the session cookie to get shopping cart for this user
-export async function getShoppingCartProducts(): Promise<ShoppingCartEntry[]> {
-	const generateProduct = (productId: number): Product => ({
-		productId: productId,
-		name: "Wooden Stool",
-		imgSrc: "/images/wood-stool.jpg",
-		price: 15.2,
-		description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-	});
+	// backend call
+	try {
+		let response = await axios.get<Product[]>("/???", {
+			data: {
+				filters: filters,
+			},
+		});
 
-	const numberOfProducts = 8;
-	const shoppingCartEntries: ShoppingCartEntry[] = [];
-
-	for (let i = 1; i <= numberOfProducts; i++) {
-		shoppingCartEntries.push({
-			product: generateProduct(i),
-			quantity: i,
-		} as ShoppingCartEntry);
+		return response.data;
+	} catch (error) {
+		console.error(error);
 	}
-
-	return shoppingCartEntries;
 }

@@ -1,5 +1,5 @@
-import ItemScrollMenu from "@/components/ItemScrollMenu/ItemScrollMenu";
-import TopNavbar from "@/components/TopNavbar/TopNavbar";
+import { TopNavbar } from "@/components/navbar";
+import { ItemScrollMenu } from "@/components/products";
 
 function Home() {
 	return (

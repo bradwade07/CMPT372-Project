@@ -1,5 +1,5 @@
-import ItemGrid from "@/components/ItemGrid/ItemGrid";
-import TopNavbar from "@/components/TopNavbar/TopNavbar";
+import { TopNavbar } from "@/components/navbar";
+import { ItemGrid } from "@/components/products";
 
 function page({ params }: { params: { query: string } }) {
 	const queryString = decodeURI(params.query);
