@@ -1,1 +1,4 @@
 node_modules/
+/backend/dockerfile
+/backend/dockerignore/
+/backend/docker-compose.yml/
