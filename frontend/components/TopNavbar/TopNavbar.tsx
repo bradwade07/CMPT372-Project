@@ -8,14 +8,14 @@ import {
 } from "@nextui-org/react";
 import Image from "next/image";
 import { Categories } from "@/app/categories";
-import { SigninButton } from "./SigninButton";
-import { NavbarSearchbar } from "./NavbarSearchbar";
+import SigninButton from "../SigninButton/SigninButton";
+import NavbarSearchbar from "../NavbarSearchbar/NavbarSearchbar";
 
 type TopNavbarProps = {
 	highlightLink?: Categories;
 };
 
-export function TopNavbar({ highlightLink }: TopNavbarProps) {
+function TopNavbar({ highlightLink }: TopNavbarProps) {
 	return (
 		<Navbar isBordered shouldHideOnScroll>
 			<NavbarContent justify="start">
@@ -50,3 +50,5 @@ export function TopNavbar({ highlightLink }: TopNavbarProps) {
 		</Navbar>
 	);
 }
+
+export default TopNavbar;

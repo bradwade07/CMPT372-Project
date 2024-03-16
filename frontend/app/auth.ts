@@ -8,10 +8,6 @@ import jwt from "jsonwebtoken";
 import { getUserType } from "@/api/user";
 import { UserTypes } from "@/api/user.type";
 
-if (!process.env.SECRET_KEY) {
-	throw Error("env variable not set: SECRET_KEY");
-}
-
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 

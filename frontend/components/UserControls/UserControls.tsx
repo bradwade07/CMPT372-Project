@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ShoppingCartModal } from "./shoppingCart";
+import ShoppingCartModal from "../ShoppingCartModal/ShoppingCartModal";
 import {
 	Avatar,
 	Dropdown,
@@ -16,9 +16,10 @@ import {
 	getSessionUserType,
 	logout,
 } from "@/app/auth";
+import { useQuery } from "@tanstack/react-query";
 import { UserTypes } from "@/api/user.type";
 
-export function UserControls() {
+function UserControls() {
 	const [userInfo, setUserInfo] = useState<GoogleCredentials>();
 	const [userType, setUserType] = useState<UserTypes>(UserTypes.Customer);
 
@@ -90,10 +91,7 @@ export function UserControls() {
 				<DropdownMenu aria-label="Profile Actions" variant="flat">
 					<DropdownItem key="profile" className="h-14 gap-2">
 						<p className="font-semibold">Signed in as</p>
-						<p className="font-semibold">
-							{userInfo?.email}
-							<br />({userType})
-						</p>
+						<p className="font-semibold">{userInfo?.email}</p>
 					</DropdownItem>
 					<DropdownItem key="wishlist">My Wishlist</DropdownItem>
 					{getUserSpecificOptions()}
@@ -113,3 +111,5 @@ export function UserControls() {
 		</div>
 	);
 }
+
+export default UserControls;

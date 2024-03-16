@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 
-export function NavbarSearchbar() {
+function NavbarSearchbar() {
 	const router = useRouter();
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -40,3 +40,5 @@ export function NavbarSearchbar() {
 		/>
 	);
 }
+
+export default NavbarSearchbar;

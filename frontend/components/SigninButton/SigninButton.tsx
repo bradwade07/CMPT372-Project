@@ -3,10 +3,10 @@
 import { getSession } from "@/app/auth";
 import { Button, Link } from "@nextui-org/react";
 import React from "react";
-import { UserControls } from "./UserControls";
+import UserControls from "../UserControls/UserControls";
 import { useQuery } from "@tanstack/react-query";
 
-export function SigninButton() {
+const SigninButton = () => {
 	const { isLoading, data: session } = useQuery({
 		queryKey: ["session"],
 		queryFn: checkForSession,
@@ -29,4 +29,6 @@ export function SigninButton() {
 				))}
 		</>
 	);
-}
+};
+
+export default SigninButton;

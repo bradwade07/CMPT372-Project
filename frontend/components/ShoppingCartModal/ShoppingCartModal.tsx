@@ -12,26 +12,17 @@ import {
 	Badge,
 } from "@nextui-org/react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getShoppingCartProducts } from "@/api/shoppingCart";
-import { ShoppingCartItem } from "./ShoppingCartItem";
-import { useRouter } from "next/navigation";
-import { removeFromShoppingCart } from "@/api/shoppingCart";
+import { useQuery } from "@tanstack/react-query";
+import { getShoppingCartProducts } from "@/api/product";
+import ShoppingCartItem from "../ShoppingCartItem/ShoppingCartItem";
 
-export function ShoppingCartModal() {
-	const router = useRouter();
-
-	const { isLoading, error, data, refetch } = useQuery({
+function ShoppingCartModal() {
+	const { isLoading, error, data } = useQuery({
 		queryKey: ["Shopping Cart"],
 		queryFn: getShoppingCartProducts,
 	});
 
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-	const removeItemMutation = useMutation({
-		mutationFn: removeFromShoppingCart,
-		onSuccess: () => refetch(),
-	});
 
 	return (
 		<>
@@ -47,24 +38,14 @@ export function ShoppingCartModal() {
 							<ModalHeader className="flex flex-col gap-1">
 								Shopping Cart
 							</ModalHeader>
-							<ModalBody className="overflow-y-auto max-h-[80vh] min-h-[80vh]">
-								{data?.map((item) => (
-									<div key={item.product.productId}>
-										<ShoppingCartItem
-											item={item}
-											onItemRemove={removeItemMutation.mutate}
-										/>
-									</div>
-								))}
+							<ModalBody className="overflow-y-auto max-h-[80vh]">
+								{data?.map((item) => <ShoppingCartItem item={item} />)}
 							</ModalBody>
 							<ModalFooter>
 								<Button color="default" variant="light" onPress={onClose}>
 									Close
 								</Button>
-								<Button
-									color="primary"
-									onPress={() => router.push("/checkout")}
-								>
+								<Button color="primary" onPress={onClose}>
 									Check Out
 								</Button>
 							</ModalFooter>
@@ -75,3 +56,5 @@ export function ShoppingCartModal() {
 		</>
 	);
 }
+
+export default ShoppingCartModal;

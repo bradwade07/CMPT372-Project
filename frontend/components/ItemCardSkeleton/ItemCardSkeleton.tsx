@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 
-export function ItemCardSkeleton() {
+function ItemCardSkeleton() {
 	return (
 		<Card className="py-2 w-60">
 			<CardHeader className="py-2 px-4 flex-col items-start">
@@ -26,3 +26,5 @@ export function ItemCardSkeleton() {
 		</Card>
 	);
 }
+
+export default ItemCardSkeleton;

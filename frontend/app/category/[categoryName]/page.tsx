@@ -1,6 +1,6 @@
 import { getPageEnumVal } from "@/app/categories";
-import { TopNavbar } from "@/components/navbar";
-import { ItemGrid } from "@/components/products";
+import ItemGrid from "@/components/ItemGrid/ItemGrid";
+import TopNavbar from "@/components/TopNavbar/TopNavbar";
 
 function page({ params }: { params: { categoryName: string } }) {
 	const categoryNameEnumVal = getPageEnumVal(params.categoryName);
