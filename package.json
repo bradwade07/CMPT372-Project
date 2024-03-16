@@ -1,16 +1,14 @@
 {
   "scripts": {
+    "format": "prettier . --write",
     "prepare": "husky install"
   },
-  "lint-staged":{
-    "**/*.{js,jsx,ts,tsx}":[
-      "npx prettier --write"
-    ]
-  },
   "devDependencies": {
-    "eslint-config-prettier": "9.1.0",
-    "husky": "^8.0.0",
+    "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "3.2.5"
+  },
+  "lint-staged": {
+    "*.--write": "prettier --write"
   }
 }
