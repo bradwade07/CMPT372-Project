@@ -7,31 +7,31 @@ import assert from "assert";
 import { useState } from "react";
 
 assert(
-	process.env.GOOGLE_CLIENT_ID,
-	"env variable not set or made publically available: GOOGLE_CLIENT_ID"
+  process.env.GOOGLE_CLIENT_ID,
+  "env variable not set or made publically available: GOOGLE_CLIENT_ID",
 );
 
 export function Providers({ children }: { children: React.ReactNode }) {
-	const [queryClient] = useState(
-		() =>
-			new QueryClient({
-				defaultOptions: {
-					queries: {
-						// With SSR, we usually want to set some default staleTime
-						// above 0 to avoid refetching immediately on the client
-						staleTime: 60 * 1000,
-					},
-				},
-			})
-	);
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // With SSR, we usually want to set some default staleTime
+            // above 0 to avoid refetching immediately on the client
+            staleTime: 60 * 1000,
+          },
+        },
+      }),
+  );
 
-	return (
-		<GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID || ""}>
-			<NextUIProvider>
-				<QueryClientProvider client={queryClient}>
-					{children}
-				</QueryClientProvider>
-			</NextUIProvider>
-		</GoogleOAuthProvider>
-	);
+  return (
+    <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID || ""}>
+      <NextUIProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </NextUIProvider>
+    </GoogleOAuthProvider>
+  );
 }

@@ -7,26 +7,26 @@ import { UserControls } from "./UserControls";
 import { useQuery } from "@tanstack/react-query";
 
 export function SigninButton() {
-	const { isLoading, data: session } = useQuery({
-		queryKey: ["session"],
-		queryFn: checkForSession,
-	});
+  const { isLoading, data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: checkForSession,
+  });
 
-	async function checkForSession() {
-		const session = await getSession();
-		return session;
-	}
+  async function checkForSession() {
+    const session = await getSession();
+    return session;
+  }
 
-	return (
-		<>
-			{!isLoading &&
-				(session ? (
-					<UserControls />
-				) : (
-					<Button as={Link} color="primary" href="/signin" variant="flat">
-						Sign In
-					</Button>
-				))}
-		</>
-	);
+  return (
+    <>
+      {!isLoading &&
+        (session ? (
+          <UserControls />
+        ) : (
+          <Button as={Link} color="primary" href="/signin" variant="flat">
+            Sign In
+          </Button>
+        ))}
+    </>
+  );
 }

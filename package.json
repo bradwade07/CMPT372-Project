@@ -1,14 +1,21 @@
 {
-  "scripts": {
-    "format": "prettier . --write",
-    "prepare": "husky install"
-  },
   "devDependencies": {
-    "husky": "^9.0.11",
+    "husky": "^8.0.0",
     "lint-staged": "^15.2.2",
-    "prettier": "3.2.5"
+    "prettier": "^3.2.5"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "format": "prettier --write ."
   },
   "lint-staged": {
-    "*.--write": "prettier --write"
+    "**/*.{js,jsx,ts,tsx}": [
+      "prettier --write ."
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
