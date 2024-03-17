@@ -1,18 +1,37 @@
 const {Pool} = require("pg");
+require('dotenv').config(); // Load environment variables from .env file
 
-const pool = new Pool({
+
+async function connect(){
+  console.log("entering connect");
+  
+  const pool = new Pool({
   user: process.env.POOL_USER,
-  host: process.env.POOL_HOST,
+  host: process.env.POOL_CONNECTION,
   database: process.env.POOL_DATABASE,
   password: process.env.POOL_PASSWORD,
-  port: 5432,
+  port: '5432',
 });
+
+  console.log("after pool");
+  try {
+    console.log("in try connect");
+      await pool.connect();
+      console.log('Connected to database');
+    
+  } catch (e) {
+    console.error('Error in connection to database', e.message);
+  }
+}
+
+module.exports = connect;
+
 
 const helpers = {
   init: async function () {
     await pool.query("BEGIN");
     await pool.query("CREATE TABLE IF NOT EXISTS userinfo (user_email VARCHAR(255) PRIMARY KEY, user_address TEXT);");
-    await pool.query("CREATE TABLE IF NOT EXISTS product (product_id SERIAL PRIMARY KEY, product_name VARCHAR(255), product_imgsrc VARCHAR(255), product_description VARCHAR(255), product_date_added bigINT, user_email VARCHAR(255), product_rating FLOAT, FOREIGN KEY (user_email) REFERENCES userInfo(user_email));");
+    await pool.query("CREATE TABLE IF NOT EXISTS product (product_id SERIAL PRIMARY KEY, product_name VARCHAR(255), product_imgsrc VARCHAR(255), product_description VARCHAR(255), product_date_added bigINT, user_email VARCHAR(255), product_avg_rating FLOAT, FOREIGN KEY (user_email) REFERENCES userInfo(user_email));");
     await pool.query("CREATE TABLE IF NOT EXISTS productprice (product_id INTEGER PRIMARY KEY, base_price FLOAT, current_price FLOAT, FOREIGN KEY (product_id) REFERENCES product(product_id));");
     await pool.query("CREATE TABLE IF NOT EXISTS tag (tag_id SERIAL PRIMARY KEY, tag_name VARCHAR(255));");
     await pool.query("CREATE TABLE IF NOT EXISTS producttags (product_id INTEGER, tag_id INTEGER, PRIMARY KEY (product_id, tag_id), FOREIGN KEY (product_id) REFERENCES product(product_id), FOREIGN KEY (tag_id) REFERENCES tag(tag_id));");
@@ -28,11 +47,11 @@ const helpers = {
       await pool.query("BEGIN");
       await pool.query("INSERT INTO userinfo (user_email, user_address) VALUES ('user1@example.com', '123 Example Street, City, Country');");
       await pool.query("INSERT INTO userinfo (user_email, user_address) VALUES ('user2@example.com', '456 Another Road, City, Country');");
-      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_rating) VALUES ('Product A', 'imgsrcA.jpg', 'Description of product A.', 1617181920, 'user1@example.com', 1.0);");
-      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_rating VALUES ('Product B', 'imgsrcB.jpg', 'Description of product B.', 1617181930, 'user1@example.com', 3.2);");
-      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_rating) VALUES ('Product C', 'imgsrcC.jpg', 'Description of product C.', 1617181940, 'user2@example.com', 1.1);");
-      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_rating) VALUES ('Product D', 'imgsrcD.jpg', 'Description of product D.', 1617181950, 'user2@example.com', 3.2);");
-      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_rating) VALUES ('Product E', 'imgsrcE.jpg', 'Description of product E.', 1617181960, 'user2@example.com', 4);");
+      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product A', 'imgsrcA.jpg', 'Description of product A.', 1617181920, 'user1@example.com', 1.0);");
+      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product B', 'imgsrcB.jpg', 'Description of product B.', 1617181930, 'user1@example.com', 3.2);");
+      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product C', 'imgsrcC.jpg', 'Description of product C.', 1617181940, 'user2@example.com', 1.1);");
+      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product D', 'imgsrcD.jpg', 'Description of product D.', 1617181950, 'user2@example.com', 3.2);");
+      await pool.query("INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product E', 'imgsrcE.jpg', 'Description of product E.', 1617181960, 'user2@example.com', 4);");
       await pool.query("INSERT INTO productprice (product_id, base_price, current_price) VALUES (1, 100.00, 90.00);");
       await pool.query("INSERT INTO productprice (product_id, base_price, current_price) VALUES (2, 200.00, 180.00);");
       await pool.query("INSERT INTO productprice (product_id, base_price, current_price) VALUES (3, 150.00, 145.00);");

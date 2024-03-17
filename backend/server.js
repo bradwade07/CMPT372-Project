@@ -2,7 +2,8 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { helpers } = require('./models/db')
+const { helpers, createTcpPool } = require('./models/db')
+const { connect } = require('http2')
 
 const port = 8080;
 
@@ -10,8 +11,10 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+
 app.post("/backend", async (req, res) => {
     try {
+      await connect();
       var response = helpers.init();
       console.log("Success: Tables created succesfully!");
       res.status(200).send("Success: Tables created succesfully!");
@@ -23,6 +26,7 @@ app.post("/backend", async (req, res) => {
   });
 
 app.get("/landingBackend", async (req, res) =>{
+
     helpers.init(req, res);
     helpers.landingBackendFn(req, res);
 
@@ -30,6 +34,7 @@ app.get("/landingBackend", async (req, res) =>{
 
 // Route for adding a new user
 app.post('/addUser', async (req, res) => {
+
   const { userEmail, userType } = req.body;
   try {
     await helpers.addUser(userEmail, userType);
@@ -42,6 +47,7 @@ app.post('/addUser', async (req, res) => {
 
 // Route for updating user type
 app.patch('/updateUserType', async (req, res) => {
+
   const { userEmail, userType } = req.body;
   try {
     await helpers.updateUserType(userEmail, userType);
@@ -54,6 +60,7 @@ app.patch('/updateUserType', async (req, res) => {
 
 // Route for updating user address
 app.patch('/updateUserAddress', async (req, res) => {
+
   const { userEmail, streetAddress, postalCode, city, province } = req.body;
   try {
     await helpers.updateUserAddress(userEmail, streetAddress, postalCode, city, province);
@@ -65,10 +72,12 @@ app.patch('/updateUserAddress', async (req, res) => {
 });
 //test function
 app.get('/test', async (req, res) => {
+  await connect();
   res.send('succ');
 })
 
 app.delete('/cart', async (req, res) => {
+
   const { userEmail, pid } = req.body;
   try {
     await helpers.removeFromCart(userEmail, pid);
@@ -80,6 +89,7 @@ app.delete('/cart', async (req, res) => {
 });
 
 app.delete('/wishlist', async (req, res) => {
+
   const { userEmail, pid } = req.body;
   try {
     await helpers.removeFromWishList(userEmail, pid);
