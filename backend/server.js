@@ -13,7 +13,6 @@ app.use(express.urlencoded({ extended: false }))
 
 app.post("/backend", async (req, res) => {
     try {
-      const pool = await connectWithConnector();
       var response = helpers.init();
       console.log("Success: Tables created succesfully!");
       res.status(200).send("Success: Tables created succesfully!");
@@ -74,7 +73,7 @@ app.get('/test', async (req, res) => {
   try {
     const pool = await connectWithConnector();
     res.send('success');
-  } catch (error) {
+  } catch (error) { 
     console.error('Error connecting to the database:', error);
     res.status(500).send('Internal Server Error');
   }

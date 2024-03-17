@@ -19,7 +19,7 @@ const connectWithConnector = async config => {
   // keep secrets safe.
   const connector = new Connector();
   const clientOpts = await connector.getTediousOptions({
-    instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
+    instanceConnectionName: process.env.DB_CONNECTION,
     ipType: getIpType(),
   });
   const dbConfig = {
@@ -33,14 +33,14 @@ const connectWithConnector = async config => {
     authentication: {
       type: 'default',
       options: {
-        userName: process.env.POOL_USER, // e.g. 'my-db-user'
-        password: process.env.POOL_PASSWORD, // e.g. 'my-db-password'
+        userName: process.env.DB_USER, // e.g. 'my-db-user'
+        password: process.env.DB_PASS, // e.g. 'my-db-password'
       },
     },
     options: {
       ...clientOpts,
       port: 9999,
-      database: process.env.POOL_DATABASE, // e.g. 'my-database'
+      database: process.env.DB_DATABASE, // e.g. 'my-database'
       useColumnNames: true,
     },
     // ... Specify additional properties here.
