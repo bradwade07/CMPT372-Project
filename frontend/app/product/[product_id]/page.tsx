@@ -1,4 +1,4 @@
-"use client";
+"use client"; // FIXME: shouldn't really be making a "page" component a client component, somehow refactor things later into client components so that this page doesn't have to have "use client"
 
 import { getProduct } from "@/api/product";
 import { addToShoppingCart } from "@/api/shoppingCart";
