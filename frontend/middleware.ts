@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSessionUserType } from "./app/auth";
+import { getSession, getSessionUserType } from "./app/auth";
 import { UserTypes } from "./api/user.types";
 
-// TODO: create middleware for checkout
 export async function middleware(request: NextRequest) {
+  const session = await getSession();
   const userType = await getSessionUserType();
+
+  // checking the user type on user specific URLs
   if (request.nextUrl.pathname.startsWith("/become-vendor")) {
     if (!(userType == UserTypes.Customer)) {
       console.log("Cannot become vendor if not a customer");
@@ -22,9 +24,23 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
+
+  // user must be logged in to checkout and pay
+  if (request.nextUrl.pathname.startsWith("/checkout")) {
+    if (!session) {
+      console.log("Cannot go to checkout without being logged in");
+      return NextResponse.redirect(new URL("/signin", request.url));
+    }
+  }
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/become-vendor", "/product-listings", "/admin-dashboard"],
+  matcher: [
+    "/become-vendor",
+    "/product-listings",
+    "/admin-dashboard",
+    "/checkout",
+    "/checkout/:path*",
+  ],
 };

@@ -27,7 +27,7 @@ export async function createNewUser(
 export async function getUserType(
   user_email: string,
 ): Promise<UserTypes | undefined> {
-  return UserTypes.Vendor;
+  return UserTypes.Customer;
 
   // try {
   //   let response = await axios.get(`/getUserTypeByUserEmail/${user_email}`);
