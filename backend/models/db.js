@@ -128,7 +128,7 @@ getProductsOnSale: async (limit) => {
     ORDER BY pp.current_price DESC
   `;
 
-
+//collected from gpt  below codes
   if (limit !== null) {
     query += ` LIMIT $1`;
     try {
@@ -157,7 +157,7 @@ getNewestProducts: async (limit) => {
       FROM product
       ORDER BY product_date_added DESC
   `;
-
+//collected from gpt below codes
   if (limit !== null && !isNaN(limit)) {
       query += ` LIMIT $1`;
       try {
