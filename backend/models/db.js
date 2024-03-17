@@ -1,30 +1,57 @@
-const {Pool} = require("pg");
-require('dotenv').config(); // Load environment variables from .env file
 
+const {Connection} = require('tedious');
+const {Connector} = require('@google-cloud/cloud-sql-connector');
 
-async function connect(){
-  console.log("entering connect");
-  
-  const pool = new Pool({
-  user: process.env.POOL_USER,
-  host: process.env.POOL_CONNECTION,
-  database: process.env.POOL_DATABASE,
-  password: process.env.POOL_PASSWORD,
-  port: '5432',
-});
+// In case the PRIVATE_IP environment variable is defined then we set
+// the ipType=PRIVATE for the new connector instance, otherwise defaults
+// to public ip type.
+const getIpType = () =>
+  process.env.PRIVATE_IP === '1' || process.env.PRIVATE_IP === 'true'
+    ? 'PRIVATE'
+    : 'PUBLIC';
 
-  console.log("after pool");
-  try {
-    console.log("in try connect");
-      await pool.connect();
-      console.log('Connected to database');
-    
-  } catch (e) {
-    console.error('Error in connection to database', e.message);
-  }
-}
+// connectWithConnector initializes a TCP connection
+// to a Cloud SQL instance of SQL Server.
+const connectWithConnector = async config => {
+  // Note: Saving credentials in environment variables is convenient, but not
+  // secure - consider a more secure solution such as
+  // Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
+  // keep secrets safe.
+  const connector = new Connector();
+  const clientOpts = await connector.getTediousOptions({
+    instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
+    ipType: getIpType(),
+  });
+  const dbConfig = {
+    // Please note that the `server` property here is not used and is only
+    // defined due to a bug in the tedious driver
+    // (ref: https://github.com/tediousjs/tedious/issues/1541)
+    // With that in mind, do not try to change this value since it will have no
+    // impact in how the connector works, this sample will be updated to remove
+    // this property declaration as soon as the tedious driver bug is fixed
+    server: '0.0.0.0', // e.g. '127.0.0.1'
+    authentication: {
+      type: 'default',
+      options: {
+        userName: process.env.POOL_USER, // e.g. 'my-db-user'
+        password: process.env.POOL_PASSWORD, // e.g. 'my-db-password'
+      },
+    },
+    options: {
+      ...clientOpts,
+      port: 9999,
+      database: process.env.POOL_DATABASE, // e.g. 'my-database'
+      useColumnNames: true,
+    },
+    // ... Specify additional properties here.
+    ...config,
+  };
 
-module.exports = connect;
+  // Establish a connection to the database.
+  return new Connection(dbConfig);
+};
+
+module.exports = connectWithConnector;
 
 
 const helpers = {

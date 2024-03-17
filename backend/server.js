@@ -2,8 +2,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { helpers, createTcpPool } = require('./models/db')
-const { connect } = require('http2')
+const { helpers, connectWithConnector } = require('./models/db')
 
 const port = 8080;
 
@@ -14,7 +13,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.post("/backend", async (req, res) => {
     try {
-      await connect();
+      const pool = await connectWithConnector();
       var response = helpers.init();
       console.log("Success: Tables created succesfully!");
       res.status(200).send("Success: Tables created succesfully!");
@@ -72,9 +71,15 @@ app.patch('/updateUserAddress', async (req, res) => {
 });
 //test function
 app.get('/test', async (req, res) => {
-  await connect();
-  res.send('succ');
-})
+  try {
+    const pool = await connectWithConnector();
+    res.send('success');
+  } catch (error) {
+    console.error('Error connecting to the database:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 app.delete('/cart', async (req, res) => {
 
