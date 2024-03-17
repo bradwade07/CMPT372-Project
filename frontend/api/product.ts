@@ -1,98 +1,64 @@
 import { Product } from "./product.types";
 import { axios } from "./axios";
+import { isAxiosError } from "axios";
 
 // given a product's id, returns all that product's info
-export async function getProduct(
-  product_id: number,
-): Promise<Product | undefined> {
-  const mock: Product = {
-    product_id: product_id,
-    product_name: "Wooden Stool",
-    img_src: "/images/wood-stool.jpg",
-    base_price: 15.2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-  };
-  return mock;
-
-  // backend call
+export async function getProduct(product_id: number): Promise<Product | null> {
   try {
-    let response = await axios.get<Product>("/???", {
-      data: {
-        product_id: product_id,
-      },
-    });
+    let response = await axios.get<Product[]>(`/getProduct/${product_id}`, {});
 
-    return response.data;
+    return response.data[0];
   } catch (error) {
-    console.error(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data);
+    } else {
+      console.error(error);
+    }
+
+    return null;
   }
 }
 
 // returns a number of the newest products
 export async function getNewProducts(limit: number): Promise<Product[]> {
-  const generateProduct = (product_id: number): Product => ({
-    product_id: product_id,
-    product_name: "Wooden Stool",
-    img_src: "/images/wood-stool.jpg",
-    base_price: 15.2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-  });
-
-  const numberOfProducts = 20; // Define the number of products needed
-  const products: Product[] = [];
-
-  for (let i = 1; i <= numberOfProducts; i++) {
-    products.push(generateProduct(i));
-  }
-
-  return products;
-
-  // backend call
   try {
-    let response = await axios.get<Product[]>("/newestProducts", {
-      data: {
-        limit: limit,
-      },
-    });
+    let response = await axios.get<Product[]>(
+      `/getNewestProductsByLimit/${limit}`,
+    );
 
     return response.data;
   } catch (error) {
-    console.error(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data);
+    } else {
+      console.error(error);
+    }
+
+    return [];
   }
 }
 
 // returns a number of products that are on sale
 export async function getSaleProducts(limit?: number): Promise<Product[]> {
-  const generateProduct = (product_id: number): Product => ({
-    product_id: product_id,
-    product_name: "Wooden Stool",
-    img_src: "/images/wood-stool.jpg",
-    base_price: 15.2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-  });
-
-  const numberOfProducts = 20; // Define the number of products needed
-  const products: Product[] = [];
-
-  for (let i = 1; i <= numberOfProducts; i++) {
-    products.push(generateProduct(i));
-  }
-
-  return products;
-
-  // backend call
   try {
-    let requestData = {};
-
-    if (limit != undefined) {
-      requestData = { data: { limit: limit } };
+    let limitNum = limit;
+    if (!limitNum) {
+      limitNum = -1;
     }
 
-    let response = await axios.get<Product[]>("/productsOnSale", requestData);
+    let response = await axios.get<Product[]>(
+      `/getProductsOnSaleByLimit/${limitNum}`,
+    );
 
     return response.data;
   } catch (error) {
-    console.error(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data);
+    } else {
+      console.error(error);
+    }
+
+    return [];
   }
 }
 
@@ -100,30 +66,20 @@ export async function getSaleProducts(limit?: number): Promise<Product[]> {
 export async function getFilteredProducts(
   filters: string[],
 ): Promise<Product[]> {
-  const generateProduct = (product_id: number): Product => ({
-    product_id: product_id,
-    product_name: "Wooden Stool",
-    img_src: "/images/wood-stool.jpg",
-    base_price: 15.2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-  });
-
-  const numberOfProducts = 23; // Define the number of products needed
-  const products: Product[] = [];
-
-  for (let i = 1; i <= numberOfProducts; i++) {
-    products.push(generateProduct(i));
-  }
-
-  return products;
-
-  // backend call
   // TODO: turn array of filters into a query string
+  // TODO: integrate when backend is fixed
   try {
-    let response = await axios.get<Product[]>("/???", {});
+    let response = await axios.get<Product[]>("/getProductsByFilters");
 
+    console.log(response.data);
     return response.data;
   } catch (error) {
-    console.error(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data);
+    } else {
+      console.error(error);
+    }
+
+    return [];
   }
 }

@@ -6,9 +6,12 @@ import { Product, WishlistEntry } from "./product.types";
 const generateProduct = (product_id: number): Product => ({
   product_id: product_id,
   product_name: "Wooden Stool",
-  img_src: "/images/wood-stool.jpg",
+  product_imgsrc: "/images/wood-stool.jpg",
   base_price: 15.2,
-  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+  current_price: 15.2,
+  product_description:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+  product_date_added: 1000,
 });
 
 const numberOfProducts = 8;
@@ -21,28 +24,32 @@ for (let i = 1; i <= numberOfProducts; i++) {
   } as WishlistEntry);
 }
 
+// TODO: integrate when backend is working
+
 // gets the current user's wishlist
 export async function getWishlistProducts(): Promise<WishlistEntry[]> {
   return wishlistEntries;
 
   // backend call
-  const user_email = await getSessionUserEmail();
-  if (user_email) {
-    try {
-      let response = await axios.get<WishlistEntry[]>("/???", {
-        data: {
-          user_email: user_email,
-        },
-      });
+  // const user_email = await getSessionUserEmail();
+  // if (user_email) {
+  //   try {
+  //     let response = await axios.get<WishlistEntry[]>(`/getUserWishlistByUserEmail/${user_email}`);
 
-      return response.data;
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    console.error("Could not retrieve user's wishlist");
-    return [];
-  }
+  //     return response.data;
+  //   } catch (error) {
+  //     if (isAxiosError(error)) {
+  //       console.error(error.response?.data);
+  //     }
+  //     else {
+  //       console.error(error)
+  //     }
+  //     return [];
+  //   }
+  // } else {
+  //   console.error("Could not retrieve user's wishlist");
+  //   return [];
+  // }
 }
 
 // adds a product to the current user's wishlist
@@ -61,21 +68,27 @@ export async function addToWishlist(
   return;
 
   // backend call
-  const user_email = await getSessionUserEmail();
-  if (user_email) {
-    try {
-      await axios.post("/???", {
-        data: {
-          product_id: product_id,
-          quantity: quantity,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    console.error("Could not add to user's wishlist");
-  }
+  // const user_email = await getSessionUserEmail();
+  // if (user_email) {
+  //   try {
+  //     await axios.post("/postProductToUserWishlist", {
+  //       data: {
+  //         product_id: product_id,
+  //         quantity: quantity,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     if (isAxiosError(error)) {
+  //       console.error(error.response?.data);
+  //     }
+  //     else {
+  //       console.error(error)
+  //     }
+  //   }
+  // }
+  // else {
+  //   console.error("Could not add to user's wishlist");
+  // }
 }
 
 // removes a products from the current user's wishlist
@@ -86,18 +99,24 @@ export async function removeFromWishlist(product_id: number): Promise<void> {
   return;
 
   // backend call
-  const user_email = await getSessionUserEmail();
-  if (user_email) {
-    try {
-      await axios.post("/???", {
-        data: {
-          product_id: product_id,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    console.error("Could not remove from user's wishlist");
-  }
+  // const user_email = await getSessionUserEmail();
+  // if (user_email) {
+  //   try {
+  //     await axios.post("/deleteUserWishlistByPidUserEmail", {
+  //       data: {
+  //         user_email: user_email,
+  //         product_id: product_id,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     if (isAxiosError(error)) {
+  //       console.error(error.response?.data);
+  //     }
+  //     else {
+  //       console.error(error)
+  //     }
+  //   }
+  // } else {
+  //   console.error("Could not remove from user's wishlist");
+  // }
 }

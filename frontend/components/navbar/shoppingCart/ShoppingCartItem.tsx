@@ -18,7 +18,7 @@ export function ShoppingCartItem({
         <CardBody className="flex flex-row justify-between items-end">
           <div className="flex items-center">
             <Image
-              src={item.product.img_src}
+              src={item.product.product_imgsrc}
               alt={`${item.product.product_name} image`}
               width={50}
               height={50}
