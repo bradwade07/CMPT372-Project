@@ -23,11 +23,11 @@ const connectWithConnector = async config => {
     ipType: getIpType(),
   });
   const dbConfig = {
-    // Please note that the `server` property here is not used and is only
-    // defined due to a bug in the tedious driver
-    // (ref: https://github.com/tediousjs/tedious/issues/1541)
-    // With that in mind, do not try to change this value since it will have no
-    // impact in how the connector works, this sample will be updated to remove
+    // Please note thatcthe `server` property here is not used and is only
+    // defined due to acbug in the tedious driver
+    // (ref: https://gichub.com/tediousjs/tedious/issues/1541)
+    // With that in minc, do not try to change this value since it will have no
+    // impact in how thc connector works, this sample will be updated to remove
     // this property declaration as soon as the tedious driver bug is fixed
     server: '0.0.0.0', // e.g. '127.0.0.1'
     authentication: {
@@ -53,8 +53,59 @@ const connectWithConnector = async config => {
 
 module.exports = connectWithConnector;
 
-
 const helpers = {
+
+  addUser: async function(userEmail, userType) {
+    try {
+      await pool.query('INSERT INTO users (user_email, type_id) VALUES ($1, $2)', [userEmail, userType]);
+      return null;
+    } catch (error) {
+      console.error('Error adding user:', error);
+      throw error;
+    }
+  },
+
+  updateUserType: async function(userEmail, userType) {
+    try {
+      await pool.query('UPDATE users SET type_id = $1 WHERE user_email = $2', [userType, userEmail]);
+      return null;
+    } catch (error) {
+      console.error('Error updating user type:', error);
+      throw error;
+    }
+  },
+
+  updateUserAddress: async function(userEmail, streetAddress, postalCode, city, province) {
+    try {
+      await pool.query('UPDATE userInfo SET user_address = $1 WHERE user_email = $2', [`${streetAddress}, ${city}, ${province}, ${postalCode}`, userEmail]);
+      return null;
+    } catch (error) {
+      console.error('Error updating user address:', error);
+      throw error;
+    }
+  },
+
+  removeFromCart: async function(userEmail, pid) {
+    try {
+      await pool.query('DELETE FROM usercart WHERE user_email = $1 AND product_id = $2', [userEmail, pid]);
+      return null;
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+      throw error;
+    }
+  },
+
+  removeFromWishList: async function(userEmail, pid) {
+    try {
+      await pool.query('DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2', [userEmail, pid]);
+
+      return null;
+    } catch (error) {
+      console.error('Error removing item from wish list:', error);
+      throw error;
+    }
+  },
+
   init: async function () {
     await pool.query("BEGIN");
     await pool.query("CREATE TABLE IF NOT EXISTS userinfo (user_email VARCHAR(255) PRIMARY KEY, user_address TEXT);");
