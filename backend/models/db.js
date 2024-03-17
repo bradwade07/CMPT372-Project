@@ -198,9 +198,9 @@ const helpers = {
     try {
       const response = await pool.query(
         `SELECT * 
-                                         FROM product 
-                                         JOIN productprice ON product.product_id = productprice.product_id 
-                                         WHERE product.product_id = $1;`,
+        FROM product 
+        JOIN productprice ON product.product_id = productprice.product_id 
+        WHERE product.product_id = $1;`,
         [id],
       );
       return response.rows;
@@ -402,7 +402,7 @@ const helpers = {
   getProductsOnSaleByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_imgsrc, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_imgsrc, p.product_date_added, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE pp.current_price < pp.base_price
@@ -425,9 +425,10 @@ const helpers = {
   getNewestProductsByLimit: async function (limit) {
     try {
       let query = `
-        SELECT product_id, product_name, product_description, product_imgsrc, product_date_added
-        FROM product
-        ORDER BY product_date_added DESC
+        SELECT p.product_id, p.product_name, p.product_description, p.product_imgsrc, p.product_date_added, pp.base_price, pp.current_price
+        FROM product p
+        JOIN productprice pp ON p.product_id = pp.product_id
+        ORDER BY p.product_date_added DESC
       `;
       if (limit >= 0) {
         query += ` LIMIT $1;`;

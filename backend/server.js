@@ -10,16 +10,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.post("/backend", async (req, res) => {
-  try {
-    await helpers.init();
-    console.log("Success: Tables created succesfully!");
-    res.status(201).send("Success: Tables created succesfully!");
-  } catch (error) {
-    console.error("Error: Failed to create tables.", error);
-    res.status(500).send("Error: Failed to create tables.");
-  }
-});
 app.post("/insertTestData", async (req, res) => {
   try {
     helpers.insertTestData();
@@ -220,7 +210,7 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
     if (products.length > 0) {
       res.json(products);
     } else {
-      res.status(404).json({ error: "Products found!" });
+      res.status(404).json({ error: "Products not found!" });
     }
   } catch (error) {
     console.error(error);
@@ -432,5 +422,12 @@ app.patch("/patchWarehouseStock", async (req, res) => {
   }
 });
 
-app.listen(port, "0.0.0.0");
-console.log(`Running on http://0.0.0.0:${port}`);
+try {
+  helpers.init().then(() => {
+    console.log("Success: Tables created succesfully!");
+    app.listen(port, "0.0.0.0");
+    console.log(`Running on http://0.0.0.0:${port}`);
+  });
+} catch (error) {
+  console.error("Error: Failed to create tables.", error);
+}
