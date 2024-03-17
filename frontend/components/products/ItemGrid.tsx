@@ -1,31 +1,21 @@
 "use client";
 
-import { Product } from "@/api/product.types";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { ItemCard } from "./ItemCard";
 import { ItemCardSkeleton } from "./ItemCardSkeleton";
 import { getFilteredProducts } from "@/api/product";
 import { Pagination } from "@nextui-org/react";
+import { FiltersType } from "@/api/filters.types";
 
 type ItemGridProps = {
-  queryFunctionKey: QueryFunctionKeys;
-  filters: string[];
+  filters: FiltersType;
 };
 
-// using string queryfunctionkeys instead of passing the actual function to this component to keep the possibility of the parent
-// component being a server component, cannot pass functions from server component to client component
-type QueryFunctionKeys = "getFilteredProducts";
-const queryFunctions: {
-  [key: string]: (filters: string[]) => Promise<Product[]>;
-} = {
-  getFilteredProducts: getFilteredProducts,
-};
-
-export function ItemGrid({ queryFunctionKey, filters }: ItemGridProps) {
+export function ItemGrid({ filters }: ItemGridProps) {
   const { isLoading, error, data } = useQuery({
-    queryKey: [filters, queryFunctionKey],
-    queryFn: () => queryFunctions[queryFunctionKey](filters),
+    queryKey: [filters],
+    queryFn: () => getFilteredProducts(filters),
   });
 
   const totalPaginationPages = 10;

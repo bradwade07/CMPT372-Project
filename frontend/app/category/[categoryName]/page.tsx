@@ -1,9 +1,9 @@
-import { getPageEnumVal } from "@/api/categories.types";
+import { getCategoryEnumVal } from "@/api/filters.types";
 import { TopNavbar } from "@/components/navbar";
 import { ItemsAndFilters } from "@/components/products";
 
 function page({ params }: { params: { categoryName: string } }) {
-  const categoryNameEnumVal = getPageEnumVal(params.categoryName);
+  const categoryNameEnumVal = getCategoryEnumVal(params.categoryName);
 
   if (categoryNameEnumVal) {
     return (

@@ -1,6 +1,7 @@
 import { Product } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
+import { FiltersType } from "./filters.types";
 
 // given a product's id, returns all that product's info
 export async function getProduct(product_id: number): Promise<Product | null> {
@@ -64,12 +65,15 @@ export async function getSaleProducts(limit?: number): Promise<Product[]> {
 
 // returns basic info on all the products that fulfill a set of filters
 export async function getFilteredProducts(
-  filters: string[],
+  filters: FiltersType,
 ): Promise<Product[]> {
-  // TODO: turn array of filters into a query string
   // TODO: integrate when backend is fixed
   try {
-    let response = await axios.get<Product[]>("/getProductsByFilters");
+    let response = await axios.get<Product[]>("/getProductsByFilters", {
+      data: {
+        filters: filters,
+      },
+    });
 
     console.log(response.data);
     return response.data;

@@ -7,7 +7,7 @@ import {
   Link,
 } from "@nextui-org/react";
 import Image from "next/image";
-import { Categories } from "@/api/categories.types";
+import { Categories } from "@/api/filters.types";
 import { SigninButton } from "./SigninButton";
 import { NavbarSearchbar } from "./NavbarSearchbar";
 
