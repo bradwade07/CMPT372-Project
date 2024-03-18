@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.post("/insertTestData", async (req, res) => {
+  //testing
   try {
     helpers.insertTestData();
     console.log("Success: Data inserted succesfully!");
@@ -20,9 +21,31 @@ app.post("/insertTestData", async (req, res) => {
     res.status(500).send("Error: Data Not Inserted.");
   }
 });
-app.get("/getProduct/:product_id", async (req, res) => {
-  let product_id = req.params.product_id
-    ? parseInt(req.params.product_id)
+app.post("/deleteTestData", async (req, res) => {
+  //testing
+  try {
+    helpers.deleteTestData();
+    console.log("Success: Data deleted succesfully!");
+    res.status(201).send("Success: Data deleted succesfully!");
+  } catch (error) {
+    console.error("Error: Data Not deleted.", error);
+    res.status(500).send("Error: Data Not deleted.");
+  }
+});
+app.post("/deleteAllTables", async (req, res) => {
+  //testing
+  try {
+    helpers.deleteAllTables();
+    console.log("Success: Tables deleted succesfully!");
+    res.status(201).send("Success: Tables deleted succesfully!");
+  } catch (error) {
+    console.error("Error: Tables Not deleted.", error);
+    res.status(500).send("Error: Tables Not deleted.");
+  }
+});
+app.get("/getProduct", async (req, res) => {
+  let product_id = req.body.product_id
+    ? parseInt(req.body.product_id)
     : res.status(400).send({ error: "Invalid product id!" });
   let reply = [];
   try {
@@ -41,7 +64,6 @@ app.get("/getProduct/:product_id", async (req, res) => {
   }
 });
 app.get("/getProductsByFilters", async (req, res) => {
-  //TODO: error handling
   const product_name = req.query.product_name
     ? req.query.product_name.trim()
     : "";
@@ -76,7 +98,7 @@ app.get("/getProductsByFilters", async (req, res) => {
       ? parseInt(req.query.product_date_added_after)
       : 0;
   const tags = req.query.tags
-    ? req.query.tags.toLowerCase().split(",").trim()
+    ? req.query.tags.trim().toLowerCase().split(",")
     : [];
   const user_email = req.query.user_email ? req.query.user_email.trim() : "";
 
@@ -118,7 +140,7 @@ app.get("/getProductsByFilters", async (req, res) => {
       responseIds = responseIds.filter((id) => tempRows.includes(id));
     }
 
-    const reply = [];
+    let reply = [];
     for (id of responseIds) {
       response = await helpers.getProductInfoByPid(id);
       response.forEach((row) => {
@@ -136,13 +158,13 @@ app.get("/getProductsByFilters", async (req, res) => {
       });
     }
 
-    res.status(200).json(response);
+    res.status(200).send(reply);
   } catch (error) {
     res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
+app.get("/getUserTypeByUserEmail", async (req, res) => {
+  let user_email = req.body.user_email;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -157,13 +179,13 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user!" });
   }
 });
-app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
-  user_email
+app.get("/getUserCartByUserEmail", async (req, res) => {
+  let user_email = req.body.user_email;
+  user_email = user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
   try {
-    const products = await helpers.getUserCartByUserEmail(userEmail);
+    const products = await helpers.getUserCartByUserEmail(user_email);
     if (products.length > 0) {
       res.json(products);
     } else {
@@ -173,13 +195,13 @@ app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user cart!" });
   }
 });
-app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
+app.get("/getUserWishlistByUserEmail", async (req, res) => {
+  let user_email = req.body.user_email;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
   try {
-    const products = await helpers.getUserWishlistByUserEmail(userEmail);
+    const products = await helpers.getUserWishlistByUserEmail(user_email);
     if (products.length > 0) {
       res.json(products);
     } else {
@@ -189,8 +211,8 @@ app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user wishlist!" });
   }
 });
-app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
+app.get("/getProductsOnSaleByLimit", async (req, res) => {
+  const limit = req.body.limit ? parseInt(req.body.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getProductsOnSaleByLimit(limit);
     if (products.length > 0) {
@@ -203,8 +225,8 @@ app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
     res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
+app.get("/getNewestProductsByLimit", async (req, res) => {
+  const limit = req.body.limit ? parseInt(req.body.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getNewestProductsByLimit(limit);
     if (products.length > 0) {
@@ -218,32 +240,29 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
   }
 });
 app.post("/postUser", async (req, res) => {
-  //TODO: fix
   let { street_name, city, province, post_code, country, user_email, type } =
     req.body;
-  street_name
+  street_name = street_name
+    ? street_name.trim()
+    : res.status(400).send({ error: "Street name required!" });
+  city = city ? city.trim() : res.status(400).send({ error: "City required!" });
+  province = province
+    ? province.trim()
+    : res.status(400).send({ error: "Province required!" });
+  post_code = post_code
+    ? post_code.trim()
+    : res.status(400).send({ error: "Post code required!" });
+  country = country
+    ? country.trim()
+    : res.status(400).send({ error: "Country required!" });
+  user_email = user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
-  city
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  province
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  post_code
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  country
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  type
+  type = type
     ? type.toLowerCase().trim()
-    : res.status(400).send({ error: "Invalid type!" });
-  if (type !== "customer" || type !== "vendor") {
-    res.status(400).send({ error: "Invalid type!" });
+    : res.status(400).send({ error: "Invalid type1!" });
+  if (type !== "customer" && type !== "vendor") {
+    res.status(400).send({ error: "Invalid type2!" });
   }
   let type_id = type === "vendor" ? 1 : 2;
   try {
@@ -263,14 +282,17 @@ app.post("/postUser", async (req, res) => {
   }
 });
 app.patch("/patchUserType", async (req, res) => {
-  //TODO: test
   let { user_email, type } = req.body;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
   type ? type.trim() : res.status(400).send({ error: "Invalid type!" });
+  if (type !== "customer" && type !== "vendor") {
+    res.status(400).send({ error: "Invalid type2!" });
+  }
+  let type_id = type === "vendor" ? 1 : 2;
   try {
-    await helpers.patchUserType(user_email, type);
+    await helpers.patchUserType(user_email, type_id);
     res.status(200).json({ success: "User type modified successfully!" });
   } catch (error) {
     console.error("Error:", error);
@@ -278,7 +300,6 @@ app.patch("/patchUserType", async (req, res) => {
   }
 });
 app.patch("/patchUserAddress", async (req, res) => {
-  //TODO: test
   let { user_email, street_name, city, province, post_code, country } =
     req.body;
   user_email
@@ -313,7 +334,6 @@ app.patch("/patchUserAddress", async (req, res) => {
   }
 });
 app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
-  //TODO: test
   let { user_email, product_id } = req.body;
   user_email
     ? user_email.trim()
@@ -332,8 +352,7 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
   }
 });
 app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
-  //TODO: test
-  const { user_email, product_id } = req.body;
+  let { user_email, product_id } = req.body;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -351,8 +370,8 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
   }
 });
 app.post("/postProductToUserCart", async (req, res) => {
-  //TODO: test
-  const { user_email, product_id, quantity } = req.body;
+  //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
+  let { user_email, product_id, quantity } = req.body;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -369,8 +388,8 @@ app.post("/postProductToUserCart", async (req, res) => {
   }
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
-  //TODO: test
-  const { user_email, product_id, quantity } = req.body;
+  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
+  let { user_email, product_id, quantity } = req.body;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -389,7 +408,7 @@ app.post("/postProductToUserWishlist", async (req, res) => {
   }
 });
 app.patch("/patchWarehouseStock", async (req, res) => {
-  //TODO: test
+  //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
   warehouse_id = warehouse_id
     ? parseInt(warehouse_id)
