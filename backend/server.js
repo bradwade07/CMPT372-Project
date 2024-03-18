@@ -355,7 +355,7 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
   }
 });
 app.post("/postProductToUserCart", async (req, res) => {
-    //TODO: test
+    //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
   user_email
     ? user_email.trim()
@@ -373,7 +373,7 @@ app.post("/postProductToUserCart", async (req, res) => {
   }
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
-  //TODO: test
+  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
   user_email
     ? user_email.trim()
@@ -393,7 +393,7 @@ app.post("/postProductToUserWishlist", async (req, res) => {
   }
 });
 app.patch("/patchWarehouseStock", async (req, res) => {
-  //TODO: test
+  //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
   warehouse_id = warehouse_id
     ? parseInt(warehouse_id)
