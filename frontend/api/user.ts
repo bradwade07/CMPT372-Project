@@ -1,12 +1,15 @@
+import { isAxiosError } from "axios";
 import { axios } from "./axios";
-import { UserAddress, UserTypes, isUserType } from "./user.types";
+import { UserAddress, UserTypes, getUserTypeFromString } from "./user.types";
 
-// TODO: integrate when backend is working
+// TODO: figure out how to make calls to the backend from server actions
 
 export async function createNewUser(
   user_email: string,
   user_type: UserTypes,
 ): Promise<void> {
+  return;
+
   // try {
   //   await axios.post("/postUser", {
   //     data: {
@@ -16,7 +19,7 @@ export async function createNewUser(
   //   });
   // } catch (error) {
   //   if (isAxiosError(error)) {
-  //     console.error(error.response?.data);
+  //     console.error(error.response?.data || error.response || error);
   //   }
   //   else {
   //     console.error(error)
@@ -26,24 +29,28 @@ export async function createNewUser(
 
 export async function getUserType(
   user_email: string,
-): Promise<UserTypes | undefined> {
-  return UserTypes.Customer;
+): Promise<UserTypes | null> {
+  return UserTypes.Vendor;
 
   // try {
   //   let response = await axios.get(`/getUserTypeByUserEmail/${user_email}`);
 
-  //   if (isUserType(response.data)) {
-  //     return response.data;
+  //   const user_type = getUserTypeFromString(response.data.type)
+
+  //   if (user_type) {
+  //     return user_type;
   //   } else {
-  //     return undefined;
+  //     return null;
   //   }
   // } catch (error) {
+  //   console.log(error)
   //   if (isAxiosError(error)) {
-  //     console.error(error.response?.data);
+  //     console.error(error.response?.data || error.response || error);
   //   }
   //   else {
   //     console.error(error)
   //   }
+  //   return null;
   // }
 }
 
@@ -60,7 +67,7 @@ export async function updateUserType(
   //   });
   // } catch (error) {
   //   if (isAxiosError(error)) {
-  //     console.error(error.response?.data);
+  //     console.error(error.response?.data || error.response || error);
   //   }
   //   else {
   //     console.error(error)
@@ -81,7 +88,7 @@ export async function updateUserAddress(
   //   });
   // } catch (error) {
   //   if (isAxiosError(error)) {
-  //     console.error(error.response?.data);
+  //     console.error(error.response?.data || error.response || error);
   //   }
   //   else {
   //     console.error(error)

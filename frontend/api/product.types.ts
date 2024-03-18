@@ -9,11 +9,9 @@ export type Product = {
 };
 
 export type ShoppingCartEntry = {
-  product: Product;
   quantity: number;
-};
+} & Product;
 
 export type WishlistEntry = {
-  product: Product;
   quantity: number;
-};
+} & Product;

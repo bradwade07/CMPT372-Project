@@ -17,22 +17,22 @@ export function ShoppingCartItem({
       <Card className="h-auto">
         <CardBody className="flex flex-row justify-between items-end">
           <div className="flex items-center">
-            <Image
-              src={item.product.product_imgsrc}
-              alt={`${item.product.product_name} image`}
+            <img
+              src={(item && item.product_imgsrc) || "/images/grey.jpg"}
+              alt={`${item.product_name} image`}
               width={50}
               height={50}
             />
             <div>
-              <p>{item.product.product_name}</p>
-              <p>Price: ${item.product.base_price.toFixed(2)}</p>
+              <p>{item.product_name}</p>
+              <p>Price: ${item.base_price.toFixed(2)}</p>
               <p>Quantity: {item.quantity}</p>
             </div>
           </div>
           <div>
             <p
               className="text-blue-600 text-sm cursor-pointer"
-              onClick={() => onItemRemove(item.product.product_id)}
+              onClick={() => onItemRemove(item.product_id)}
             >
               Remove
             </p>

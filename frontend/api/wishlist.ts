@@ -1,55 +1,31 @@
 import { getSessionUserEmail } from "@/app/auth";
 import { axios } from "./axios";
-import { Product, WishlistEntry } from "./product.types";
-
-// mock entries
-const generateProduct = (product_id: number): Product => ({
-  product_id: product_id,
-  product_name: "Wooden Stool",
-  product_imgsrc: "/images/wood-stool.jpg",
-  base_price: 15.2,
-  current_price: 15.2,
-  product_description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-  product_date_added: 1000,
-});
-
-const numberOfProducts = 8;
-var wishlistEntries: WishlistEntry[] = [];
-
-for (let i = 1; i <= numberOfProducts; i++) {
-  wishlistEntries.push({
-    product: generateProduct(i),
-    quantity: i,
-  } as WishlistEntry);
-}
-
-// TODO: integrate when backend is working
+import { WishlistEntry } from "./product.types";
+import { isAxiosError } from "axios";
 
 // gets the current user's wishlist
 export async function getWishlistProducts(): Promise<WishlistEntry[]> {
-  return wishlistEntries;
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    try {
+      let response = await axios.get<WishlistEntry[]>(
+        `/getUserWishlistByUserEmail/${user_email}`,
+      );
 
-  // backend call
-  // const user_email = await getSessionUserEmail();
-  // if (user_email) {
-  //   try {
-  //     let response = await axios.get<WishlistEntry[]>(`/getUserWishlistByUserEmail/${user_email}`);
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
 
-  //     return response.data;
-  //   } catch (error) {
-  //     if (isAxiosError(error)) {
-  //       console.error(error.response?.data);
-  //     }
-  //     else {
-  //       console.error(error)
-  //     }
-  //     return [];
-  //   }
-  // } else {
-  //   console.error("Could not retrieve user's wishlist");
-  //   return [];
-  // }
+      return [];
+    }
+  } else {
+    console.error("Could not retrieve user's wishlist");
+    return [];
+  }
 }
 
 // adds a product to the current user's wishlist
@@ -57,16 +33,7 @@ export async function addToWishlist(
   product_id: number,
   quantity: number,
 ): Promise<void> {
-  let newProduct = generateProduct(product_id);
-  if (
-    !wishlistEntries.find((item) => {
-      return item.product.product_id == newProduct.product_id;
-    })
-  ) {
-    wishlistEntries.push({ product: newProduct, quantity: quantity });
-  }
-  return;
-
+  // TODO: integrate when backend is working
   // backend call
   // const user_email = await getSessionUserEmail();
   // if (user_email) {
@@ -79,7 +46,7 @@ export async function addToWishlist(
   //     });
   //   } catch (error) {
   //     if (isAxiosError(error)) {
-  //       console.error(error.response?.data);
+  //       console.error(error.response?.data || error.response || error);
   //     }
   //     else {
   //       console.error(error)
@@ -93,30 +60,23 @@ export async function addToWishlist(
 
 // removes a products from the current user's wishlist
 export async function removeFromWishlist(product_id: number): Promise<void> {
-  wishlistEntries = wishlistEntries.filter((item) => {
-    return item.product.product_id != product_id;
-  });
-  return;
-
-  // backend call
-  // const user_email = await getSessionUserEmail();
-  // if (user_email) {
-  //   try {
-  //     await axios.post("/deleteUserWishlistByPidUserEmail", {
-  //       data: {
-  //         user_email: user_email,
-  //         product_id: product_id,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     if (isAxiosError(error)) {
-  //       console.error(error.response?.data);
-  //     }
-  //     else {
-  //       console.error(error)
-  //     }
-  //   }
-  // } else {
-  //   console.error("Could not remove from user's wishlist");
-  // }
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    try {
+      await axios.delete("/deleteUserWishlistByPidUserEmail", {
+        data: {
+          user_email: user_email,
+          product_id: product_id,
+        },
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.error("Could not remove item from user's wishlist");
+  }
 }

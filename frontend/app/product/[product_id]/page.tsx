@@ -56,11 +56,10 @@ function page({ params }: { params: { product_id: number } }) {
               className="relative flex justify-center items-center border border-blue-500 w-full object-contain"
               style={{ flexGrow: 0.85 }}
             >
-              <Image
+              <img
                 src={"/images/grey.jpg"} // TODO: properly display image
                 alt="Product Image"
-                fill={true}
-              ></Image>
+              />
             </div>
             <div
               className="flex justify-center items-center border border-blue-500 w-full"

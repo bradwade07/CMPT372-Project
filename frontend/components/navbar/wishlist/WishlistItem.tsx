@@ -28,8 +28,8 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
       <Card className="h-auto w-full" isPressable onClick={handleItemClick}>
         <CardBody className="flex flex-row justify-between items-end">
           <div className="flex items-center">
-            <Image
-              src={item.product_imgsrc}
+            <img
+              src={(item && item.product_imgsrc) || "/images/grey.jpg"}
               alt={`${item.product_name} image`}
               width={50}
               height={50}

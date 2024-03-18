@@ -25,3 +25,19 @@ export type FiltersType = {
   tags?: string[];
   user_email?: string;
 };
+
+export function filtersToQueryString(filters: FiltersType): string {
+  const queryStringParams: string[] = [];
+
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        queryStringParams.push(`${key}=${value.join(",")}`);
+      } else {
+        queryStringParams.push(`${key}=${value}`);
+      }
+    }
+  }
+
+  return queryStringParams.join("&");
+}

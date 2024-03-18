@@ -432,8 +432,17 @@ const helpers = {
   getUserWishlistByUserEmail: async function (email) {
     try {
       const query = `
-        SELECT product.* FROM product
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_imgsrc,
+            productprice.base_price, 
+            productprice.current_price, 
+            userwishlist.quantity
+        FROM product
         JOIN userwishlist ON product.product_id = userwishlist.product_id
+        JOIN productprice ON product.product_id = productprice.product_id
         WHERE userwishlist.user_email = $1;
         `;
       const values = [email];

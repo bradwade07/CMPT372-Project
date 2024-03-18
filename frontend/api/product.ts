@@ -1,7 +1,7 @@
 import { Product } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
-import { FiltersType } from "./filters.types";
+import { FiltersType, filtersToQueryString } from "./filters.types";
 
 // given a product's id, returns all that product's info
 export async function getProduct(product_id: number): Promise<Product | null> {
@@ -11,7 +11,7 @@ export async function getProduct(product_id: number): Promise<Product | null> {
     return response.data[0];
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error(error.response?.data);
+      console.error(error.response?.data || error.response || error);
     } else {
       console.error(error);
     }
@@ -30,7 +30,7 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
     return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error(error.response?.data);
+      console.error(error.response?.data || error.response || error);
     } else {
       console.error(error);
     }
@@ -54,7 +54,7 @@ export async function getSaleProducts(limit?: number): Promise<Product[]> {
     return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error(error.response?.data);
+      console.error(error.response?.data || error.response || error);
     } else {
       console.error(error);
     }
@@ -67,19 +67,17 @@ export async function getSaleProducts(limit?: number): Promise<Product[]> {
 export async function getFilteredProducts(
   filters: FiltersType,
 ): Promise<Product[]> {
-  // TODO: integrate when backend is fixed
-  try {
-    let response = await axios.get<Product[]>("/getProductsByFilters", {
-      data: {
-        filters: filters,
-      },
-    });
+  const queryString = filtersToQueryString(filters);
 
-    console.log(response.data);
+  try {
+    let response = await axios.get<Product[]>(
+      `/getProductsByFilters?${queryString}`,
+    );
+
     return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error(error.response?.data);
+      console.error(error.response?.data || error.response || error);
     } else {
       console.error(error);
     }

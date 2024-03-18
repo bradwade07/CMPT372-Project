@@ -26,7 +26,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         <h4 className="font-bold text-xl">{product && product.product_name}</h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2">
-        <Image
+        <img
           alt="Card background"
           className="object-cover rounded-xl pb-2"
           src={(product && product.product_imgsrc) || "/images/grey.jpg"}
