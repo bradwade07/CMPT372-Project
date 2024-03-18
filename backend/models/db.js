@@ -96,6 +96,32 @@ const helpers = {
     await pool.query("COMMIT");
     //////////////////////////
   },
+  deleteAllTables: async function () {
+    try {
+      await pool.query("BEGIN");
+  
+      // Drop tables in reverse order of dependency
+      await pool.query("DROP TABLE IF EXISTS warehousestock CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS warehouse CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS userwishlist CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS users CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS usertypes CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS usercart CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS producttags CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS tag CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS productprice CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS product CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS userinfo CASCADE;");
+      await pool.query("DROP TABLE IF EXISTS address CASCADE;");
+      
+      await pool.query("COMMIT");
+      console.log("All tables deleted successfully.");
+    } catch (error) {
+      await pool.query("ROLLBACK");
+      console.error("Error deleting tables:", error);
+      throw error;
+    }
+  },
   getProductInfoByPid: async function (id) {
     try {
       const response = await pool.query(`SELECT * 
