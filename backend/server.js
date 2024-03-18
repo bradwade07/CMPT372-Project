@@ -43,9 +43,9 @@ app.post("/deleteAllTables", async (req, res) => {
     res.status(500).send("Error: Tables Not deleted.");
   }
 });
-app.get("/getProduct", async (req, res) => {
-  let product_id = req.body.product_id
-    ? parseInt(req.body.product_id)
+app.get("/getProduct/:product_id", async (req, res) => {
+  let product_id = req.params.product_id
+    ? parseInt(req.params.product_id)
     : res.status(400).send({ error: "Invalid product id!" });
   let reply = [];
   try {
@@ -163,8 +163,8 @@ app.get("/getProductsByFilters", async (req, res) => {
     res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-app.get("/getUserTypeByUserEmail", async (req, res) => {
-  let user_email = req.body.user_email;
+app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
+  let user_email = req.params.user_email;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -179,8 +179,8 @@ app.get("/getUserTypeByUserEmail", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user!" });
   }
 });
-app.get("/getUserCartByUserEmail", async (req, res) => {
-  let user_email = req.body.user_email;
+app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
+  let user_email = req.params.user_email;
   user_email = user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -195,8 +195,8 @@ app.get("/getUserCartByUserEmail", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user cart!" });
   }
 });
-app.get("/getUserWishlistByUserEmail", async (req, res) => {
-  let user_email = req.body.user_email;
+app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
+  let user_email = req.params.user_email;
   user_email
     ? user_email.trim()
     : res.status(400).send({ error: "Invalid user email!" });
@@ -211,8 +211,8 @@ app.get("/getUserWishlistByUserEmail", async (req, res) => {
     res.status(500).send({ error: "Server failed to get user wishlist!" });
   }
 });
-app.get("/getProductsOnSaleByLimit", async (req, res) => {
-  const limit = req.body.limit ? parseInt(req.body.limit) : -1; //-1 is unlimited
+app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getProductsOnSaleByLimit(limit);
     if (products.length > 0) {
@@ -225,8 +225,8 @@ app.get("/getProductsOnSaleByLimit", async (req, res) => {
     res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-app.get("/getNewestProductsByLimit", async (req, res) => {
-  const limit = req.body.limit ? parseInt(req.body.limit) : -1; //-1 is unlimited
+app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getNewestProductsByLimit(limit);
     if (products.length > 0) {
