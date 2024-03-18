@@ -18,7 +18,7 @@ pool = new Pool({
 
 const helpers = {
   init: async function () {
-    await pool.query("BEGIN");
+    await pool.query(`BEGIN`);
     await pool.query(
       "CREATE TABLE IF NOT EXISTS address (address_id SERIAL PRIMARY KEY, street_name VARCHAR(255), city VARCHAR(255), province VARCHAR(255), post_code VARCHAR(255), country VARCHAR(255));",
     );
@@ -55,11 +55,11 @@ const helpers = {
     await pool.query(
       "CREATE TABLE IF NOT EXISTS warehousestock (warehouse_id INTEGER, product_id INTEGER, PRIMARY KEY (warehouse_id, product_id), quantity INTEGER, FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
     );
-    await pool.query("COMMIT");
+    await pool.query(`COMMIT`);
   },
   insertTestData: async function () {
     //TODO: remove testing
-    await pool.query("BEGIN");
+    await pool.query(`BEGIN`);
     await pool.query(
       "INSERT INTO address (street_name, city, province, post_code, country) VALUES ('123 Example Street', 'City', 'Province', 'PostalCode', 'Country');",
     );
@@ -72,8 +72,8 @@ const helpers = {
     await pool.query(
       "INSERT INTO userinfo (user_email, address_id) VALUES ('user2@example.com', 2);",
     );
-    await pool.query("INSERT INTO usertypes (type) VALUES ('vendor');");
-    await pool.query("INSERT INTO usertypes (type) VALUES ('customer');");
+    await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
+    await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
     await pool.query(
       "INSERT INTO users (user_email, type_id) VALUES ('user1@example.com', 1);",
     );
@@ -110,11 +110,11 @@ const helpers = {
     await pool.query(
       "INSERT INTO productprice (product_id, base_price, current_price) VALUES (5, 300.00, 280.00);",
     );
-    await pool.query("INSERT INTO tag (tag_name) VALUES ('electronics');");
-    await pool.query("INSERT INTO tag (tag_name) VALUES ('home');");
-    await pool.query("INSERT INTO tag (tag_name) VALUES ('garden');");
-    await pool.query("INSERT INTO tag (tag_name) VALUES ('fashion');");
-    await pool.query("INSERT INTO tag (tag_name) VALUES ('toys');");
+    await pool.query(`INSERT INTO tag (tag_name) VALUES ('electronics');`);
+    await pool.query(`INSERT INTO tag (tag_name) VALUES ('home');`);
+    await pool.query(`INSERT INTO tag (tag_name) VALUES ('garden');`);
+    await pool.query(`INSERT INTO tag (tag_name) VALUES ('fashion');`);
+    await pool.query(`INSERT INTO tag (tag_name) VALUES ('toys');`);
 
     // Associating products with tags
     // Assuming product IDs 1 to 5 have been inserted as before
@@ -191,31 +191,57 @@ const helpers = {
     await pool.query(
       "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (2, 5, 30);",
     ); // 30 of Product E in Warehouse 2
-    await pool.query("COMMIT");
+    await pool.query(`COMMIT`);
     //////////////////////////
+  },
+  deleteTestData: async function() {
+    try {
+      await pool.query(`BEGIN`);
+  
+      // Delete data from tables with foreign key constraints first
+      await pool.query(`DELETE FROM usercart;`);
+      await pool.query(`DELETE FROM userwishlist;`);
+      await pool.query(`DELETE FROM warehousestock;`);
+      await pool.query(`DELETE FROM producttags;`);
+      await pool.query(`DELETE FROM productprice;`);
+      await pool.query(`DELETE FROM product;`);
+      await pool.query(`DELETE FROM users;`);
+      await pool.query(`DELETE FROM usertypes;`);
+      await pool.query(`DELETE FROM userinfo;`);
+      await pool.query(`DELETE FROM address;`);
+      await pool.query(`DELETE FROM tag;`);
+      await pool.query(`DELETE FROM warehouse;`);
+  
+      await pool.query(`COMMIT`);
+      console.log("Test data and tables deleted successfully.");
+    } catch (error) {
+      await pool.query(`ROLLBACK`);
+      console.error("Error deleting test data:", error);
+      throw error;
+    }
   },
   deleteAllTables: async function () {
     try {
-      await pool.query("BEGIN");
+      await pool.query(`BEGIN`);
   
       // Drop tables in reverse order of dependency
-      await pool.query("DROP TABLE IF EXISTS warehousestock CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS warehouse CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS userwishlist CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS users CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS usertypes CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS usercart CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS producttags CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS tag CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS productprice CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS product CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS userinfo CASCADE;");
-      await pool.query("DROP TABLE IF EXISTS address CASCADE;");
+      await pool.query(`DROP TABLE IF EXISTS warehousestock CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS warehouse CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS userwishlist CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS users CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS usertypes CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS usercart CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS producttags CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS tag CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS productprice CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS product CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
       
-      await pool.query("COMMIT");
+      await pool.query(`COMMIT`);
       console.log("All tables deleted successfully.");
     } catch (error) {
-      await pool.query("ROLLBACK");
+      await pool.query(`ROLLBACK`);
       console.error("Error deleting tables:", error);
       throw error;
     }
@@ -324,7 +350,6 @@ const helpers = {
     }
   },
   getProductIdByTags: async function (tags) {
-    //TODO: fix
     try {
       const tagResponse = await pool.query(
         "SELECT tag_id FROM tag WHERE tag_name = ANY($1);",
@@ -359,25 +384,25 @@ const helpers = {
   },
   getUserTypeByUserEmail: async function (email) {
     try {
-      await pool.query("BEGIN");
+      await pool.query(`BEGIN`);
       const result = await pool.query(
         `SELECT users.type_id, usertypes.type FROM users 
         JOIN usertypes ON users.type_id = usertypes.type_id 
         WHERE user_email = $1;`,
         [email],
       );
-      await pool.query("COMMIT");
+      await pool.query(`COMMIT`);
       return result.rows;
     } catch (error) {
-      await pool.query("ROLLBACK");
+      await pool.query(`ROLLBACK`);
       console.error("Error retrieving user by email:", error);
       throw error;
     }
   },
 
   getUserCartByUserEmail: async function (email) {
-    //TODO: fix
     try {
+        
       const query = `
         SELECT 
             product.product_id, 
@@ -394,7 +419,7 @@ const helpers = {
         `;
       const values = [email];
       const result = await pool.query(query, values);
-      return result.rows.length
+      return (result.rows.length > 0)
         ? result.rows
         : {
             message: "No products found in the user's cart",
@@ -470,29 +495,21 @@ const helpers = {
     }
   },
 
-  postUser: async function (
-    street_name,
-    city,
-    province,
-    post_code,
-    country,
-    user_email,
-    type_id,
-  ) {
+  postUser: async function (street_name, city, province, post_code, country, user_email, type_id) {
     try {
-      const address_id = await postAddress(
+      const address_id = await helpers.postAddress(
         street_name,
         city,
         province,
         post_code,
-        country,
+        country
       );
       await pool.query(
         `INSERT INTO userinfo (user_email, address_id) VALUES ($1, $2);`,
         [user_email, address_id],
       );
       await pool.query(
-        `INSERT INTO user (user_email, type_id) VALUES ($1, $2);`,
+        `INSERT INTO users (user_email, type_id) VALUES ($1, $2);`,
         [user_email, type_id],
       );
     } catch (error) {
@@ -500,13 +517,7 @@ const helpers = {
       throw error;
     }
   },
-  postAddress: async function (
-    street_name,
-    city,
-    province,
-    post_code,
-    country,
-  ) {
+  postAddress: async function (street_name, city, province, post_code, country) {
     try {
       const response = await pool.query(
         `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
@@ -521,7 +532,7 @@ const helpers = {
 
   patchUserType: async function (user_email, type) {
     try {
-      await pool.query("UPDATE users SET type_id = $1 WHERE user_email = $2", [
+      await pool.query((`UPDATE users SET type_id = $1 WHERE user_email = $2`), [
         type,
         user_email,
       ]);
@@ -531,39 +542,25 @@ const helpers = {
     }
   },
 
-  patchUserAddress: async function (
-    user_email,
-    street_name,
-    city,
-    province,
-    post_code,
-    country,
-  ) {
+  patchUserAddress: async function (user_email, street_name, city, province, post_code, country) {
     try {
-      const response = await pool.query(
-        "INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;",
-        [street_name, city, province, post_code, country],
-      );
-      await pool.query(
-        "UPDATE userInfo SET address_id = $1 WHERE user_email = $2",
-        [response.rows[0].address_id, user_email],
-      );
+      const response = await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`, [street_name, city, province, post_code, country]);
+      await pool.query(`UPDATE userInfo SET address_id = $1 WHERE user_email = $2;`, [response.rows[0].address_id, user_email]);
     } catch (error) {
       console.error("Error updating user address:", error);
       throw error;
     }
   },
+  
   deleteUserCartByPidUserEmail: async function (user_email, product_id) {
     try {
-      await pool.query(
-        "DELETE FROM usercart WHERE user_email = $1 AND product_id = $2",
-        [user_email, product_id],
-      );
+      await pool.query( `DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `, [user_email, product_id]);
     } catch (error) {
       console.error("Error removing item from cart:", error);
       throw error;
     }
-  },
+  }
+  ,
   deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
