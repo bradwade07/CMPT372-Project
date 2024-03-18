@@ -24,7 +24,7 @@ export function ItemGrid({ filters }: ItemGridProps) {
   };
 
   return (
-    <div className="flex flex-col w-fit">
+    <div className="flex flex-col w-full">
       <div className="flex flex-wrap gap-y-8 flex-1 justify-items-center items-center">
         {!(isLoading || error) && data
           ? data.map((item) => (

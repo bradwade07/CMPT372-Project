@@ -89,40 +89,25 @@ export async function getSessionUserEmail(): Promise<string | null> {
 // If they don't exist, creates a new account for them as a customer
 export async function login(
   credentialResponse: CredentialResponse,
+  user_type: UserTypes,
 ): Promise<void> {
   const googleJWT = credentialResponse.credential;
   if (googleJWT) {
     const user_email = (<GoogleCredentials>jwt.decode(googleJWT)).email;
 
     if (user_email) {
-      const user_type = await getUserType(user_email);
+      // Create the session
+      const expires = new Date(Date.now() + cookieLength);
+      const session = await encrypt({
+        googleJWT,
+        userType: user_type,
+        expires,
+      });
 
-      if (user_type) {
-        // Create the session
-        const expires = new Date(Date.now() + cookieLength);
-        const session = await encrypt({
-          googleJWT,
-          userType: user_type,
-          expires,
-        });
+      // Save the session in a cookie
+      cookies().set("session", session, { expires, httpOnly: true });
 
-        // Save the session in a cookie
-        cookies().set("session", session, { expires, httpOnly: true });
-
-        return;
-      } else {
-        // Creates a new user in the database as a Customer using this email
-        await createNewUser(user_email, UserTypes.Customer);
-
-        const expires = new Date(Date.now() + cookieLength);
-        const session = await encrypt({
-          googleJWT,
-          userType: UserTypes.Customer,
-          expires,
-        });
-        cookies().set("session", session, { expires, httpOnly: true });
-        return;
-      }
+      return;
     }
   }
   throw Error("Error occurred while logging in");
