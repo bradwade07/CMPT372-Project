@@ -4,13 +4,18 @@ import { Button, Card, CardBody } from "@nextui-org/react";
 import React, { useState } from "react";
 import { PriceFilter } from "./PriceFilter";
 import { RatingFilter } from "./RatingFilter";
+import { FiltersType } from "@/api/filters.types";
 
-export function Filters() {
-  const priceFilterRange = { min: 0, max: 100 };
+type FiltersProps = {
+  onFiltersSave: (values: FiltersType) => void;
+};
+
+export function Filters({ onFiltersSave }: FiltersProps) {
+  const priceFilterRange = { min: 0, max: 300 };
   const ratingFilterRange = { min: 0, max: 5 };
 
   const [priceRange, setPriceRange] = useState(priceFilterRange);
-  const [reviewRange, setReviewRange] = useState(ratingFilterRange);
+  const [ratingRange, setRatingRange] = useState(ratingFilterRange);
 
   return (
     <Card className="w-80 h-fit">
@@ -24,9 +29,33 @@ export function Filters() {
         <RatingFilter
           min={ratingFilterRange.min}
           max={ratingFilterRange.max}
-          onChange={setReviewRange}
+          onChange={setRatingRange}
         />
-        <Button>Save Filters</Button>
+        <Button
+          onPress={() => {
+            const filterVals: FiltersType = {
+              current_price_min:
+                priceRange.min != priceFilterRange.min
+                  ? priceRange.min
+                  : undefined,
+              current_price_max:
+                priceRange.max != priceFilterRange.max
+                  ? priceRange.max
+                  : undefined,
+              product_avg_rating_min:
+                ratingRange.min != ratingFilterRange.min
+                  ? ratingRange.min
+                  : undefined,
+              product_avg_rating_max:
+                ratingRange.max != ratingFilterRange.max
+                  ? ratingRange.max
+                  : undefined,
+            };
+            onFiltersSave(filterVals);
+          }}
+        >
+          Save Filters
+        </Button>
       </CardBody>
     </Card>
   );

@@ -47,6 +47,7 @@ export async function getSession(): Promise<any | null> {
     return await decrypt(session);
   } catch (error) {
     console.error("Error occurred when retrieving session: " + error);
+    return null;
   }
 }
 

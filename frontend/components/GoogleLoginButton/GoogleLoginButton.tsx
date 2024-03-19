@@ -13,9 +13,8 @@ export function GoogleLoginButton() {
   return (
     <GoogleLogin
       onSuccess={async (credentialResponse: CredentialResponse) => {
-        // TODO: make this prettier later
         const user_email = (
-          jwt.decode(credentialResponse.credential as any) as GoogleCredentials
+          jwt.decode(credentialResponse.credential!) as GoogleCredentials
         ).email;
         const user_type = await getUserType(user_email);
 
@@ -29,7 +28,7 @@ export function GoogleLoginButton() {
         router.push("/");
       }}
       onError={() => {
-        console.log("Login Failed");
+        console.error("Login Failed");
       }}
     />
   );
