@@ -1,12 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import { ItemCard } from "./ItemCard";
 import { ItemCardSkeleton } from "./ItemCardSkeleton";
 import { getFilteredProducts } from "@/api/product";
 import { Pagination } from "@nextui-org/react";
 import { FiltersType } from "@/api/filters.types";
+
+const itemsPerPage = 20;
 
 type ItemGridProps = {
   filters: FiltersType;
@@ -18,21 +20,28 @@ export function ItemGrid({ filters }: ItemGridProps) {
     queryFn: () => getFilteredProducts(filters),
   });
 
-  const totalPaginationPages = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPaginationPages = data ? Math.ceil(data.length / itemsPerPage) : 1;
+
   const onPaginationChange = (page: number) => {
-    console.log(`pagination change to ${page}`);
+    setCurrentPage(page);
   };
+
+  // Calculate start and end index based on current page and items per page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
 
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-wrap gap-y-8 flex-1 justify-items-center items-center">
         {!(isLoading || error) && data
-          ? data.map((item) => (
+          ? data.slice(startIndex, endIndex).map((item) => (
               <div key={item.product_id} className="mx-auto">
                 <ItemCard isLoading={isLoading} error={error} product={item} />
               </div>
             ))
-          : Array.from({ length: 10 }, (_, index) => (
+          : Array.from({ length: itemsPerPage }, (_, index) => (
               <div key={index} className="mx-auto">
                 <ItemCardSkeleton />
               </div>
