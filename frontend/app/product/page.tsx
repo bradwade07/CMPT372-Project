@@ -6,18 +6,21 @@ import { addToWishlist } from "@/api/wishlist";
 import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-function page({ params }: { params: { product_id: number } }) {
+type SearchParams = {
+  product_id: number;
+};
+
+function page({ searchParams }: { searchParams: SearchParams }) {
   const router = useRouter();
 
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ["Product", params.product_id],
-    queryFn: () => getProduct(params.product_id),
+    queryKey: ["Product", searchParams.product_id],
+    queryFn: () => getProduct(searchParams.product_id),
   });
 
   // queryClient and query invalidation used to force shopping cart and wishlist to refetch the updated contents
@@ -25,7 +28,7 @@ function page({ params }: { params: { product_id: number } }) {
 
   async function addItemToShoppingCart() {
     try {
-      await addToShoppingCart(params.product_id, selectedQuantity);
+      await addToShoppingCart(searchParams.product_id, selectedQuantity);
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
     } catch (error) {
       router.push("/signin");
@@ -35,7 +38,7 @@ function page({ params }: { params: { product_id: number } }) {
 
   async function addItemToWishlist() {
     try {
-      await addToWishlist(params.product_id, selectedQuantity);
+      await addToWishlist(searchParams.product_id, selectedQuantity);
       queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
     } catch (error) {
       router.push("/signin");

@@ -1,6 +1,5 @@
 import { ShoppingCartEntry } from "@/api/product.types";
 import { Card, CardBody } from "@nextui-org/react";
-import Image from "next/image";
 import React from "react";
 
 type ShoppingCartItemProps = {

@@ -12,7 +12,7 @@ export function NavbarSearchbar() {
   const handleKeyPress = (event: { key: string }) => {
     if (event.key === "Enter") {
       if (searchQuery != "") {
-        router.push(`/search/${searchQuery}`);
+        router.push(`/search?query=${searchQuery}`);
       }
     }
   };
