@@ -7,6 +7,11 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node": "^21.7.1",
+    "pg": "^8.11.3",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0"
   }
 }

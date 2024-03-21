@@ -6,8 +6,7 @@ import {
   NavbarItem,
   Link,
 } from "@nextui-org/react";
-import Image from "next/image";
-import { Categories } from "@/api/categories.types";
+import { Categories } from "@/api/filters.types";
 import { SigninButton } from "./SigninButton";
 import { NavbarSearchbar } from "./NavbarSearchbar";
 
@@ -21,7 +20,7 @@ export function TopNavbar({ highlightLink }: TopNavbarProps) {
       <NavbarContent justify="start">
         <NavbarBrand>
           <Link href="/" className="font-bold text-inherit">
-            <Image src={"/logo.jpg"} alt={"Logo Icon"} width={50} height={50} />
+            <img src={"/logo.jpg"} alt={"Logo Icon"} width={50} height={50} />
             <h3 className="ml-2 text-large">NAME</h3>
           </Link>
         </NavbarBrand>
@@ -31,7 +30,7 @@ export function TopNavbar({ highlightLink }: TopNavbarProps) {
           <NavbarItem key={item}>
             <Link
               color={highlightLink == item ? "primary" : "foreground"}
-              href={`/category/${item}`}
+              href={`/category?categoryName=${item}`}
               aria-current={highlightLink == item}
             >
               {item}

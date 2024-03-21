@@ -4,13 +4,23 @@ export enum UserTypes {
   Admin = "Admin",
 }
 
-export function isUserType(value: string): boolean {
-  return Object.values(UserTypes).includes(value as UserTypes);
+export function getUserTypeFromString(
+  typeString: string,
+): UserTypes | undefined {
+  const typeKeys = Object.keys(UserTypes) as (keyof typeof UserTypes)[];
+
+  for (const key of typeKeys) {
+    if (UserTypes[key].toLowerCase() === typeString.toLowerCase()) {
+      return UserTypes[key];
+    }
+  }
+
+  return undefined;
 }
 
 export type UserAddress = {
   street_address: string;
-  postal_code: string;
+  post_code: string;
   city: string;
   province: string;
 };

@@ -53,7 +53,7 @@ export function ShoppingCartModal() {
               </ModalHeader>
               <ModalBody className="overflow-y-auto">
                 {data?.map((item) => (
-                  <div key={item.product.product_id}>
+                  <div key={item.product_id}>
                     <ShoppingCartItem
                       item={item}
                       onItemRemove={removeItemMutation.mutate}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/api/product.types";
 
@@ -18,7 +18,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
       isPressable
       onClick={() => {
         if (!error && !isLoading) {
-          router.push(`/product/${product.product_id}`);
+          router.push(`/product?product_id=${product.product_id}`);
         }
       }}
     >
@@ -26,14 +26,16 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         <h4 className="font-bold text-xl">{product && product.product_name}</h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2">
-        <Image
+        <img
           alt="Card background"
           className="object-cover rounded-xl pb-2"
-          src={product && product.img_src}
+          src={(product && product.product_imgsrc) || "/images/grey.jpg"}
           width={270}
         />
-        <p>${product && product.base_price.toFixed(2)}</p>
-        <p>{product && product.description}</p>
+        <p>
+          ${product && product.base_price} ${product && product.current_price}
+        </p>
+        <p>{product && product.product_description}</p>
       </CardBody>
     </Card>
   );

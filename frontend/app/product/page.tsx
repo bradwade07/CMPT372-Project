@@ -1,23 +1,26 @@
 "use client"; // FIXME: shouldn't really be making a "page" component a client component, somehow refactor things later into client components so that this page doesn't have to have "use client"
 
 import { getProduct } from "@/api/product";
-import { addToShoppingCart } from "@/api/shoppingCart";
+import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
 import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-function page({ params }: { params: { product_id: number } }) {
+type SearchParams = {
+  product_id: number;
+};
+
+function page({ searchParams }: { searchParams: SearchParams }) {
   const router = useRouter();
 
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ["Product", params.product_id],
-    queryFn: () => getProduct(params.product_id),
+    queryKey: ["Product", searchParams.product_id],
+    queryFn: () => getProduct(searchParams.product_id),
   });
 
   // queryClient and query invalidation used to force shopping cart and wishlist to refetch the updated contents
@@ -25,7 +28,7 @@ function page({ params }: { params: { product_id: number } }) {
 
   async function addItemToShoppingCart() {
     try {
-      await addToShoppingCart(params.product_id, selectedQuantity);
+      await addToShoppingCart(searchParams.product_id, selectedQuantity);
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
     } catch (error) {
       router.push("/signin");
@@ -35,7 +38,7 @@ function page({ params }: { params: { product_id: number } }) {
 
   async function addItemToWishlist() {
     try {
-      await addToWishlist(params.product_id, selectedQuantity);
+      await addToWishlist(searchParams.product_id, selectedQuantity);
       queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
     } catch (error) {
       router.push("/signin");
@@ -56,11 +59,10 @@ function page({ params }: { params: { product_id: number } }) {
               className="relative flex justify-center items-center border border-blue-500 w-full object-contain"
               style={{ flexGrow: 0.85 }}
             >
-              <Image
-                src={data?.img_src || "/images/grey.jpg"}
+              <img
+                src={"/images/grey.jpg"} // TODO: properly display image
                 alt="Product Image"
-                fill={true}
-              ></Image>
+              />
             </div>
             <div
               className="flex justify-center items-center border border-blue-500 w-full"
@@ -75,7 +77,7 @@ function page({ params }: { params: { product_id: number } }) {
           >
             <p className="font-bold text-xl">{data?.product_name}</p>
             <p className="text-large">${data?.base_price}</p>
-            <p className="mb-32">{data?.description}</p>
+            <p className="mb-32">{data?.product_description}</p>
             <div className="flex flex-col mb-32 gap-4">
               <Button color="primary" onClick={addItemToShoppingCart}>
                 ADD TO CART

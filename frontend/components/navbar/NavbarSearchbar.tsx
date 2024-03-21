@@ -11,7 +11,9 @@ export function NavbarSearchbar() {
 
   const handleKeyPress = (event: { key: string }) => {
     if (event.key === "Enter") {
-      router.push(`/search/${searchQuery}`);
+      if (searchQuery != "") {
+        router.push(`/search?query=${searchQuery}`);
+      }
     }
   };
 

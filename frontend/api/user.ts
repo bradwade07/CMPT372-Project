@@ -1,67 +1,88 @@
+import { isAxiosError } from "axios";
 import { axios } from "./axios";
-import { UserAddress, UserTypes, isUserType } from "./user.types";
+import { UserAddress, UserTypes, getUserTypeFromString } from "./user.types";
 
-export async function createNewUser(user_email: string, user_type: UserTypes) {
+export async function createNewUser(
+  user_email: string,
+  user_type: UserTypes,
+): Promise<void> {
   try {
-    await axios.post("/???", {
-      data: {
-        user_email: user_email,
-        user_type: user_type,
-      },
+    await axios.post("/postUser", {
+      user_email: user_email,
+      user_type: user_type,
+      street_name: "1234 Smith Street",
+      city: "Burnaby",
+      province: "BC",
+      post_code: "1A2 B3C",
+      country: "Canada",
     });
   } catch (error) {
-    console.error(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
   }
 }
 
 export async function getUserType(
   user_email: string,
-): Promise<UserTypes | undefined> {
-  return UserTypes.Vendor;
-
-  // backend call
+): Promise<UserTypes | null> {
   try {
-    let response = await axios.get("/getUser", {
-      data: {
-        user_email: user_email,
-      },
-    });
+    let response = await axios.get(`/getUserTypeByUserEmail/${user_email}`);
 
-    if (isUserType(response.data)) {
-      return response.data;
+    const user_type = getUserTypeFromString(response.data.type);
+
+    if (user_type) {
+      return user_type;
     } else {
-      return undefined;
+      return null;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+    return null;
   }
 }
 
-export async function updateUserType(user_email: string, user_type: UserTypes) {
-  try {
-    await axios.patch("/???", {
-      data: {
-        user_email: user_email,
-        user_type: user_type,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+export async function updateUserType(
+  user_email: string,
+  user_type: UserTypes,
+): Promise<void> {
+  // try {
+  //   await axios.patch("/patchUserType", {
+  //     user_email: user_email,
+  //     user_type: user_type,
+  //   });
+  // } catch (error) {
+  //   if (isAxiosError(error)) {
+  //     console.error(error.response?.data || error.response || error);
+  //   }
+  //   else {
+  //     console.error(error)
+  //   }
+  // }
 }
 
 export async function updateUserAddress(
   user_email: string,
   address: UserAddress,
-) {
-  try {
-    await axios.patch("/???", {
-      data: {
-        user_email: user_email,
-        address: address,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+): Promise<void> {
+  // try {
+  //   await axios.patch("/patchUserAddress", {
+  //     user_email: user_email,
+  //     address: address,
+  //   });
+  // } catch (error) {
+  //   if (isAxiosError(error)) {
+  //     console.error(error.response?.data || error.response || error);
+  //   }
+  //   else {
+  //     console.error(error)
+  //   }
+  // }
 }

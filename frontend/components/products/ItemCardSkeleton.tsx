@@ -11,7 +11,7 @@ export function ItemCardSkeleton() {
       </CardHeader>
       <CardBody className="overflow-visible py-2">
         <Skeleton className="rounded-lg">
-          <Image alt="" className="" src="" width={270} height={250} />
+          <img alt="" className="" src="" width={270} height={250} />
         </Skeleton>
         <Skeleton className="w-3/5 rounded-lg mt-2">
           <p>price</p>
