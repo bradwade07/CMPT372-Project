@@ -19,54 +19,58 @@ app.post("/insertTestData", async (req, res) => {
   try {
     helpers.insertTestData();
     console.log("Success: Data inserted succesfully!");
-    res.status(201).send("Success: Data inserted succesfully!");
+    return res.status(201).send("Success: Data inserted succesfully!");
   } catch (error) {
     console.error("Error: Data Not Inserted.", error);
-    res.status(500).send("Error: Data Not Inserted.");
+    return res.status(500).send("Error: Data Not Inserted.");
   }
 });
+
 app.post("/deleteTestData", async (req, res) => {
   //testing
   try {
     helpers.deleteTestData();
     console.log("Success: Data deleted succesfully!");
-    res.status(201).send("Success: Data deleted succesfully!");
+    return res.status(201).send("Success: Data deleted succesfully!");
   } catch (error) {
     console.error("Error: Data Not deleted.", error);
-    res.status(500).send("Error: Data Not deleted.");
+    return res.status(500).send("Error: Data Not deleted.");
   }
 });
+
 app.post("/deleteAllTables", async (req, res) => {
   //testing
   try {
     helpers.deleteAllTables();
     console.log("Success: Tables deleted succesfully!");
-    res.status(201).send("Success: Tables deleted succesfully!");
+    return res.status(201).send("Success: Tables deleted succesfully!");
   } catch (error) {
     console.error("Error: Tables Not deleted.", error);
-    res.status(500).send("Error: Tables Not deleted.");
+    return res.status(500).send("Error: Tables Not deleted.");
   }
 });
+
 app.get("/getProduct/:product_id", async (req, res) => {
-  let product_id = req.params.product_id
-    ? parseInt(req.params.product_id)
-    : res.status(400).send({ error: "Invalid product id!" });
-  let reply = [];
+  if (!req.params.product_id)
+    return res.status(400).send({ error: "Invalid product id!" });
+  let product_id = parseInt(req.params.product_id);
+
   try {
     // Check for non-positive product_id
     if (product_id <= 0) {
-      res.status(400).send({ error: "Invalid Product ID!" });
+      return res.status(400).send({ error: "Invalid Product ID!" });
     }
     const response = await helpers.getProductInfoByPid(product_id);
     if (response.length === 0) {
-      res.status(404).send({ error: "Product not found!" });
+      return res.status(404).send({ error: "Product not found!" });
     } else {
-      res.status(200).json(response);
+      return res.status(200).json(response);
     }
   } catch (error) {
-    res.status(500).send({ error: "Server failed to get product!" });
+    return res.status(500).send({ error: "Server failed to get product!" });
   }
 });
+
 app.get("/getProductsByFilters", async (req, res) => {
   const product_name = req.query.product_name
     ? req.query.product_name.trim()
@@ -162,59 +166,65 @@ app.get("/getProductsByFilters", async (req, res) => {
       });
     }
 
-    res.status(200).send(reply);
+    return res.status(200).send(reply);
   } catch (error) {
-    res.status(500).send({ error: "Server failed to get products!" });
+    return res.status(500).send({ error: "Server failed to get products!" });
   }
 });
+
 app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
   try {
     const users = await helpers.getUserTypeByUserEmail(user_email);
     if (users.length > 0) {
-      res.status(200).json({ type: users[0].type });
+      return res.status(200).json({ type: users[0].type });
     } else {
-      res.status(404).send({ error: "User not found!" });
+      return res.status(404).send({ error: "User not found!" });
     }
   } catch (error) {
-    res.status(500).send({ error: "Server failed to get user!" });
+    return res.status(500).send({ error: "Server failed to get user!" });
   }
 });
+
 app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
-  user_email = user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
   try {
     const products = await helpers.getUserCartByUserEmail(user_email);
     if (products.length > 0) {
       res.json(products);
     } else {
-      res.status(404).json({ error: "User cart not found!" });
+      return res.status(404).json({ error: "User cart not found!" });
     }
   } catch (error) {
-    res.status(500).send({ error: "Server failed to get user cart!" });
+    return res.status(500).send({ error: "Server failed to get user cart!" });
   }
 });
+
 app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
-  let user_email = req.params.user_email;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
   try {
     const products = await helpers.getUserWishlistByUserEmail(user_email);
     if (products.length > 0) {
       res.json(products);
     } else {
-      res.status(404).send({ error: "User wishlist not found!" });
+      return res.status(404).send({ error: "User wishlist not found!" });
     }
   } catch (error) {
-    res.status(500).send({ error: "Server failed to get user wishlist!" });
+    return res
+      .status(500)
+      .send({ error: "Server failed to get user wishlist!" });
   }
 });
+
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
   const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
@@ -222,13 +232,14 @@ app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
     if (products.length > 0) {
       res.json(products);
     } else {
-      res.status(404).json({ error: "Products not found!" });
+      return res.status(404).json({ error: "Products not found!" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send({ error: "Server failed to get products!" });
+    return res.status(500).send({ error: "Server failed to get products!" });
   }
 });
+
 app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
   const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
@@ -236,13 +247,14 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
     if (products.length > 0) {
       res.json(products);
     } else {
-      res.status(404).json({ error: "Products not found!" });
+      return res.status(404).json({ error: "Products not found!" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send({ error: "Server failed to get products!" });
+    return res.status(500).send({ error: "Server failed to get products!" });
   }
 });
+
 app.post("/postUser", async (req, res) => {
   let { street_name, city, province, post_code, country, user_email, type } =
     req.body;
@@ -279,49 +291,65 @@ app.post("/postUser", async (req, res) => {
       user_email,
       type_id,
     );
-    res.status(201).json({ success: "Product added successfully!" });
+    return res.status(201).json({ success: "Product added successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Server failed to add user!" });
+    return res.status(500).json({ error: "Server failed to add user!" });
   }
 });
+
+// FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
+// also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let { user_email, type } = req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  type ? type.trim() : res.status(400).send({ error: "Invalid type!" });
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  if (!type) return res.status(400).send({ error: "Invalid type!" });
+  type = type.trim().toLowerCase();
   if (type !== "customer" && type !== "vendor") {
-    res.status(400).send({ error: "Invalid type2!" });
+    return res.status(400).send({ error: "Invalid type2!" });
   }
-  let type_id = type === "vendor" ? 1 : 2;
+
+  let type_id = type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+
   try {
     await helpers.patchUserType(user_email, type_id);
-    res.status(200).json({ success: "User type modified successfully!" });
+    return res
+      .status(200)
+      .json({ success: "User type modified successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Server failed to modify user type!" });
+    return res
+      .status(500)
+      .json({ error: "Server failed to modify user type!" });
   }
 });
 app.patch("/patchUserAddress", async (req, res) => {
   let { user_email, street_name, city, province, post_code, country } =
     req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  street_name
-    ? street_name.trim()
-    : res.status(400).send({ error: "Invalid street name!" });
-  city ? city.trim() : res.status(400).send({ error: "Invalid city!" });
-  province
-    ? province.trim()
-    : res.status(400).send({ error: "Invalid province!" });
-  post_code
-    ? post_code.trim()
-    : res.status(400).send({ error: "Invalid post code!" });
-  country
-    ? country.trim()
-    : res.status(400).send({ error: "Invalid country!" });
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  if (!street_name)
+    return res.status(400).send({ error: "Invalid street name!" });
+  street_name = street_name.trim();
+
+  if (!city) return res.status(400).send({ error: "Invalid city!" });
+  city = city.trim();
+
+  if (!province) return res.status(400).send({ error: "Invalid province!" });
+  province = province.trim();
+
+  if (!post_code) return res.status(400).send({ error: "Invalid post code!" });
+  post_code = post_code.trim();
+
+  if (!country) return res.status(400).send({ error: "Invalid country!" });
+  country = country.trim();
+
   try {
     await helpers.patchUserAddress(
       user_email,
@@ -331,44 +359,54 @@ app.patch("/patchUserAddress", async (req, res) => {
       post_code,
       country,
     );
-    res.status(200).send({ success: "User address modified successfully!" });
+    return res
+      .status(200)
+      .send({ success: "User address modified successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send({ error: "Server failed to modify user address!" });
+    return res
+      .status(500)
+      .send({ error: "Server failed to modify user address!" });
   }
 });
 app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
   let { user_email, product_id } = req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
   product_id = parseInt(product_id);
+
   try {
     await helpers.deleteUserCartByPidUserEmail(user_email, product_id);
-    res
+    return res
       .status(200)
       .send({ success: "Item removed from user cart successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res
+    return res
       .status(500)
       .send({ error: "Server failed to delete prodcut from user cart!" });
   }
 });
 app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
   let { user_email, product_id } = req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
   product_id = parseInt(product_id);
+
   try {
     await helpers.deleteUserWishlistByPidUserEmail(user_email, product_id);
-    res
+    return res
       .status(200)
       .send({ success: "Item removed from user wishlist successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res
+    return res
       .status(500)
       .send({ error: "Server failed to delete product from user wishlist!" });
   }
@@ -376,17 +414,22 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
 app.post("/postProductToUserCart", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
   product_id = parseInt(product_id);
   quantity = parseInt(quantity);
+
   try {
     await helpers.postProductToUserCart(user_email, product_id, quantity);
-    res.status(200).send({ success: "Item added to user cart successfully!" });
+    return res
+      .status(200)
+      .send({ success: "Item added to user cart successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res
+    return res
       .status(500)
       .send({ error: "Server failed to add product to the user cart!" });
   }
@@ -394,19 +437,22 @@ app.post("/postProductToUserCart", async (req, res) => {
 app.post("/postProductToUserWishlist", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
-  user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
   product_id = parseInt(product_id);
   quantity = parseInt(quantity);
+
   try {
     await helpers.postProductToUserWishlist(user_email, product_id, quantity);
-    res
+    return res
       .status(200)
       .send({ success: "Item added to user wishlist successfully!" });
   } catch (error) {
     console.error("Error:", error);
-    res
+    return res
       .status(500)
       .send({ error: "Server failed to add product to the user wishlist!" });
   }
@@ -414,15 +460,18 @@ app.post("/postProductToUserWishlist", async (req, res) => {
 app.patch("/patchWarehouseStock", async (req, res) => {
   //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
-  warehouse_id = warehouse_id
-    ? parseInt(warehouse_id)
-    : res.status(400).send({ error: "Invalid warehouse id!" });
-  product_id = product_id
-    ? parseInt(product_id)
-    : res.status(400).send({ error: "Invalid warehouse id!" });
-  quantity = quantity
-    ? parseInt(quantity)
-    : res.status(400).send({ error: "Invalid warehouse id!" });
+
+  if (!warehouse_id)
+    return res.status(400).send({ error: "Invalid warehouse id!" });
+  warehouse_id = parseInt(warehouse_id);
+
+  if (!product_id)
+    return res.status(400).send({ error: "Invalid product id!" });
+  product_id = parseInt(product_id);
+
+  if (!quantity) return res.status(400).send({ error: "Invalid quantity!" });
+  quantity = parseInt(quantity);
+
   try {
     const response = await helpers.patchWarehouseStock(
       warehouse_id,
@@ -430,16 +479,16 @@ app.patch("/patchWarehouseStock", async (req, res) => {
       quantity,
     );
     if (response === 1) {
-      res
+      return res
         .status(200)
         .send({ success: "Warehouse quantity modified successfully!" });
     }
-    res
+    return res
       .status(400)
       .json({ error: "Warehouse quantity is less than desired quantity!" });
   } catch (error) {
     console.error("Error:", error);
-    res
+    return res
       .status(500)
       .json({ error: "Server failed to modify warehouse quantity!" });
   }
