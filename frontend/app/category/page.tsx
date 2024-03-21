@@ -2,8 +2,12 @@ import { getCategoryEnumVal } from "@/api/filters.types";
 import { TopNavbar } from "@/components/navbar";
 import { ItemsAndFilters } from "@/components/products";
 
-function page({ params }: { params: { categoryName: string } }) {
-  const categoryNameEnumVal = getCategoryEnumVal(params.categoryName);
+type SearchParams = {
+  categoryName: string;
+};
+
+function page({ searchParams }: { searchParams: SearchParams }) {
+  const categoryNameEnumVal = getCategoryEnumVal(searchParams.categoryName);
 
   if (categoryNameEnumVal) {
     return (

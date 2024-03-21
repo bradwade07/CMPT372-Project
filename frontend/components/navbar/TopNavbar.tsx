@@ -6,7 +6,6 @@ import {
   NavbarItem,
   Link,
 } from "@nextui-org/react";
-import Image from "next/image";
 import { Categories } from "@/api/filters.types";
 import { SigninButton } from "./SigninButton";
 import { NavbarSearchbar } from "./NavbarSearchbar";
@@ -31,7 +30,7 @@ export function TopNavbar({ highlightLink }: TopNavbarProps) {
           <NavbarItem key={item}>
             <Link
               color={highlightLink == item ? "primary" : "foreground"}
-              href={`/category/${item}`}
+              href={`/category?categoryName=${item}`}
               aria-current={highlightLink == item}
             >
               {item}

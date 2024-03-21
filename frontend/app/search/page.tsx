@@ -1,8 +1,12 @@
 import { TopNavbar } from "@/components/navbar";
 import { ItemsAndFilters } from "@/components/products";
 
-function page({ params }: { params: { query: string } }) {
-  const productQueryString = decodeURI(params.query);
+type SearchParams = {
+  query: string;
+};
+
+function page({ searchParams }: { searchParams: SearchParams }) {
+  const productQueryString = decodeURI(searchParams.query);
 
   return (
     <>

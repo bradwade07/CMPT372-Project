@@ -2,7 +2,6 @@
 
 import { Product } from "@/api/product.types";
 import { Card, CardBody } from "@nextui-org/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 

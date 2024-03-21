@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/api/product.types";
 
@@ -18,7 +18,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
       isPressable
       onClick={() => {
         if (!error && !isLoading) {
-          router.push(`/product/${product.product_id}`);
+          router.push(`/product?product_id=${product.product_id}`);
         }
       }}
     >

@@ -49,7 +49,7 @@ export function DeliveryDetails({
     street_address: "",
     postal_code: "",
     city: "",
-    province: "",
+    province: "BC",
   });
 
   // updates a specific attribute in the user's address whenever they type something
