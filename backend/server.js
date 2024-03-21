@@ -14,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Testing related endpoints
 app.post("/insertTestData", async (req, res) => {
   //testing
   try {
@@ -50,6 +51,7 @@ app.post("/deleteAllTables", async (req, res) => {
   }
 });
 
+// Products related endpoints
 app.get("/getProduct/:product_id", async (req, res) => {
   if (!req.params.product_id)
     return res.status(400).send({ error: "Invalid product id!" });
@@ -172,59 +174,6 @@ app.get("/getProductsByFilters", async (req, res) => {
   }
 });
 
-app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
-  if (!req.params.user_email.trim())
-    return res.status(400).send({ error: "Invalid user email!" });
-  let user_email = req.params.user_email.trim();
-
-  try {
-    const users = await helpers.getUserTypeByUserEmail(user_email);
-    if (users.length > 0) {
-      return res.status(200).json({ type: users[0].type });
-    } else {
-      return res.status(404).send({ error: "User not found!" });
-    }
-  } catch (error) {
-    return res.status(500).send({ error: "Server failed to get user!" });
-  }
-});
-
-app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
-  if (!req.params.user_email.trim())
-    return res.status(400).send({ error: "Invalid user email!" });
-  let user_email = req.params.user_email.trim();
-
-  try {
-    const products = await helpers.getUserCartByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).json({ error: "User cart not found!" });
-    }
-  } catch (error) {
-    return res.status(500).send({ error: "Server failed to get user cart!" });
-  }
-});
-
-app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
-  if (!req.params.user_email.trim())
-    return res.status(400).send({ error: "Invalid user email!" });
-  let user_email = req.params.user_email.trim();
-
-  try {
-    const products = await helpers.getUserWishlistByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).send({ error: "User wishlist not found!" });
-    }
-  } catch (error) {
-    return res
-      .status(500)
-      .send({ error: "Server failed to get user wishlist!" });
-  }
-});
-
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
   const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
@@ -255,6 +204,7 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
   }
 });
 
+// User info related endpoints
 app.post("/postUser", async (req, res) => {
   let {
     street_name,
@@ -311,6 +261,23 @@ app.post("/postUser", async (req, res) => {
   }
 });
 
+app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
+  try {
+    const users = await helpers.getUserTypeByUserEmail(user_email);
+    if (users.length > 0) {
+      return res.status(200).json({ type: users[0].type });
+    } else {
+      return res.status(404).send({ error: "User not found!" });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: "Server failed to get user!" });
+  }
+});
+
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
@@ -340,6 +307,7 @@ app.patch("/patchUserType", async (req, res) => {
       .json({ error: "Server failed to modify user type!" });
   }
 });
+
 app.patch("/patchUserAddress", async (req, res) => {
   let { user_email, street_name, city, province, post_code, country } =
     req.body;
@@ -383,71 +351,8 @@ app.patch("/patchUserAddress", async (req, res) => {
       .send({ error: "Server failed to modify user address!" });
   }
 });
-app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body;
 
-  if (!user_email)
-    return res.status(400).send({ error: "Invalid user email!" });
-  user_email = user_email.trim();
-
-  product_id = parseInt(product_id);
-
-  try {
-    await helpers.deleteUserCartByPidUserEmail(user_email, product_id);
-    return res
-      .status(200)
-      .send({ success: "Item removed from user cart successfully!" });
-  } catch (error) {
-    console.error("Error:", error);
-    return res
-      .status(500)
-      .send({ error: "Server failed to delete prodcut from user cart!" });
-  }
-});
-app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body;
-
-  if (!user_email)
-    return res.status(400).send({ error: "Invalid user email!" });
-  user_email = user_email.trim();
-
-  product_id = parseInt(product_id);
-
-  try {
-    await helpers.deleteUserWishlistByPidUserEmail(user_email, product_id);
-    return res
-      .status(200)
-      .send({ success: "Item removed from user wishlist successfully!" });
-  } catch (error) {
-    console.error("Error:", error);
-    return res
-      .status(500)
-      .send({ error: "Server failed to delete product from user wishlist!" });
-  }
-});
-app.post("/postProductToUserCart", async (req, res) => {
-  //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
-  let { user_email, product_id, quantity } = req.body;
-
-  if (!user_email)
-    return res.status(400).send({ error: "Invalid user email!" });
-  user_email = user_email.trim();
-
-  product_id = parseInt(product_id);
-  quantity = parseInt(quantity);
-
-  try {
-    await helpers.postProductToUserCart(user_email, product_id, quantity);
-    return res
-      .status(200)
-      .send({ success: "Item added to user cart successfully!" });
-  } catch (error) {
-    console.error("Error:", error);
-    return res
-      .status(500)
-      .send({ error: "Server failed to add product to the user cart!" });
-  }
-});
+// User wishlist related endpoints
 app.post("/postProductToUserWishlist", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
@@ -471,6 +376,113 @@ app.post("/postProductToUserWishlist", async (req, res) => {
       .send({ error: "Server failed to add product to the user wishlist!" });
   }
 });
+
+app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
+  try {
+    const products = await helpers.getUserWishlistByUserEmail(user_email);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).send({ error: "User wishlist not found!" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ error: "Server failed to get user wishlist!" });
+  }
+});
+
+app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
+  let { user_email, product_id } = req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  product_id = parseInt(product_id);
+
+  try {
+    await helpers.deleteUserWishlistByPidUserEmail(user_email, product_id);
+    return res
+      .status(200)
+      .send({ success: "Item removed from user wishlist successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to delete product from user wishlist!" });
+  }
+});
+
+// User shopping cart related endpoints
+app.post("/postProductToUserCart", async (req, res) => {
+  //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
+  let { user_email, product_id, quantity } = req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  product_id = parseInt(product_id);
+  quantity = parseInt(quantity);
+
+  try {
+    await helpers.postProductToUserCart(user_email, product_id, quantity);
+    return res
+      .status(200)
+      .send({ success: "Item added to user cart successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to add product to the user cart!" });
+  }
+});
+
+app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
+  try {
+    const products = await helpers.getUserCartByUserEmail(user_email);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).json({ error: "User cart not found!" });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: "Server failed to get user cart!" });
+  }
+});
+
+app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
+  let { user_email, product_id } = req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  product_id = parseInt(product_id);
+
+  try {
+    await helpers.deleteUserCartByPidUserEmail(user_email, product_id);
+    return res
+      .status(200)
+      .send({ success: "Item removed from user cart successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to delete prodcut from user cart!" });
+  }
+});
+
+// Warehouse related endpoints
 app.patch("/patchWarehouseStock", async (req, res) => {
   //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
@@ -508,7 +520,7 @@ app.patch("/patchWarehouseStock", async (req, res) => {
   }
 });
 
-// paypal stuff
+// Paypal functions and endpoints
 /**
  * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
  * @see https://developer.paypal.com/api/rest/authentication/
@@ -542,6 +554,8 @@ const generateAccessToken = async () => {
  */
 const createOrder = async (user_email, acquisitionMethod) => {
   // TODO: using user_email, get the user's shopping cart, total it up, add fees (depending on delivery or pickup, and address of delivery), and pass the total to the paypal API
+  // user_email: user's email
+  // acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
 
   const accessToken = await generateAccessToken();
   const url = `${paypal_base}/v2/checkout/orders`;
@@ -611,9 +625,6 @@ async function handleResponse(response) {
   }
 }
 
-// body params:
-// user_email: user's email
-// acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
 app.post("/api/orders", async (req, res) => {
   try {
     const { user_email, acquisitionMethod } = req.body;
@@ -628,8 +639,6 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// body params:
-// orderID: an ID that is created from PayPal, don't worry about this one
 app.post("/api/orders/:orderID/capture", async (req, res) => {
   try {
     const { orderID } = req.params;
