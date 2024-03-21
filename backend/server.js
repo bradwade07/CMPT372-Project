@@ -256,31 +256,44 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
 });
 
 app.post("/postUser", async (req, res) => {
-  let { street_name, city, province, post_code, country, user_email, type } =
-    req.body;
-  street_name = street_name
-    ? street_name.trim()
-    : res.status(400).send({ error: "Street name required!" });
-  city = city ? city.trim() : res.status(400).send({ error: "City required!" });
-  province = province
-    ? province.trim()
-    : res.status(400).send({ error: "Province required!" });
-  post_code = post_code
-    ? post_code.trim()
-    : res.status(400).send({ error: "Post code required!" });
-  country = country
-    ? country.trim()
-    : res.status(400).send({ error: "Country required!" });
-  user_email = user_email
-    ? user_email.trim()
-    : res.status(400).send({ error: "Invalid user email!" });
-  type = type
-    ? type.toLowerCase().trim()
-    : res.status(400).send({ error: "Invalid type1!" });
+  let {
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+    user_email,
+    user_type,
+  } = req.body.data;
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  if (!street_name)
+    return res.status(400).send({ error: "Invalid street name!" });
+  street_name = street_name.trim();
+
+  if (!city) return res.status(400).send({ error: "Invalid city!" });
+  city = city.trim();
+
+  if (!province) return res.status(400).send({ error: "Invalid province!" });
+  province = province.trim();
+
+  if (!post_code) return res.status(400).send({ error: "Invalid post code!" });
+  post_code = post_code.trim();
+
+  if (!country) return res.status(400).send({ error: "Invalid country!" });
+  country = country.trim();
+
+  if (!type) return res.status(400).send({ error: "Invalid type!" });
+  type = type.trim().toLowerCase();
+
   if (type !== "customer" && type !== "vendor") {
-    res.status(400).send({ error: "Invalid type2!" });
+    return res.status(400).send({ error: "Invalid type2!" });
   }
-  let type_id = type === "vendor" ? 1 : 2;
+
+  let type_id = type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+
   try {
     await helpers.postUser(
       street_name,
@@ -301,13 +314,14 @@ app.post("/postUser", async (req, res) => {
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-  let { user_email, type } = req.body;
+  let { user_email, type } = req.body.data;
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
   user_email = user_email.trim();
 
   if (!type) return res.status(400).send({ error: "Invalid type!" });
   type = type.trim().toLowerCase();
+
   if (type !== "customer" && type !== "vendor") {
     return res.status(400).send({ error: "Invalid type2!" });
   }
@@ -328,7 +342,7 @@ app.patch("/patchUserType", async (req, res) => {
 });
 app.patch("/patchUserAddress", async (req, res) => {
   let { user_email, street_name, city, province, post_code, country } =
-    req.body;
+    req.body.data;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -370,7 +384,7 @@ app.patch("/patchUserAddress", async (req, res) => {
   }
 });
 app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body;
+  let { user_email, product_id } = req.body.data;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -391,7 +405,7 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
   }
 });
 app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body;
+  let { user_email, product_id } = req.body.data;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -413,7 +427,7 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
 });
 app.post("/postProductToUserCart", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
-  let { user_email, product_id, quantity } = req.body;
+  let { user_email, product_id, quantity } = req.body.data;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -436,7 +450,7 @@ app.post("/postProductToUserCart", async (req, res) => {
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
-  let { user_email, product_id, quantity } = req.body;
+  let { user_email, product_id, quantity } = req.body.data;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -459,7 +473,7 @@ app.post("/postProductToUserWishlist", async (req, res) => {
 });
 app.patch("/patchWarehouseStock", async (req, res) => {
   //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
-  let { warehouse_id, product_id, quantity } = req.body;
+  let { warehouse_id, product_id, quantity } = req.body.data;
 
   if (!warehouse_id)
     return res.status(400).send({ error: "Invalid warehouse id!" });
@@ -602,7 +616,7 @@ async function handleResponse(response) {
 // acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
 app.post("/api/orders", async (req, res) => {
   try {
-    const { user_email, acquisitionMethod } = req.body;
+    const { user_email, acquisitionMethod } = req.body.data;
     const { jsonResponse, httpStatusCode } = await createOrder(
       user_email,
       acquisitionMethod,

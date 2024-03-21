@@ -47,7 +47,7 @@ export function DeliveryDetails({
 
   const [deliveryFormData, setDeliveryFormData] = useState<UserAddress>({
     street_address: "",
-    postal_code: "",
+    post_code: "",
     city: "",
     province: "BC",
   });
@@ -107,11 +107,11 @@ export function DeliveryDetails({
           <Input
             className="mb-1"
             label="Postal Code"
-            name="postal_code"
+            name="post_code"
             placeholder="Enter your postal code"
             isRequired
             onChange={handleInputChange}
-            defaultValue={deliveryFormData.postal_code}
+            defaultValue={deliveryFormData.post_code}
           />
           <Input
             className="mb-1"
@@ -175,7 +175,7 @@ export function DeliveryDetails({
       <div>
         <p className="mb-1">Shipping Details:</p>
         <p>Address: {deliveryFormData.street_address}</p>
-        <p>Postal Code: {deliveryFormData.postal_code}</p>
+        <p>Postal Code: {deliveryFormData.post_code}</p>
         <p>City: {deliveryFormData.city}</p>
         <p>Province: {deliveryFormData.province}</p>
         <Button
