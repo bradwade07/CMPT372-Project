@@ -264,7 +264,7 @@ app.post("/postUser", async (req, res) => {
     country,
     user_email,
     user_type,
-  } = req.body.data;
+  } = req.body;
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
   user_email = user_email.trim();
@@ -314,7 +314,7 @@ app.post("/postUser", async (req, res) => {
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-  let { user_email, type: user_type } = req.body.data;
+  let { user_email, type: user_type } = req.body;
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
   user_email = user_email.trim();
@@ -342,7 +342,7 @@ app.patch("/patchUserType", async (req, res) => {
 });
 app.patch("/patchUserAddress", async (req, res) => {
   let { user_email, street_name, city, province, post_code, country } =
-    req.body.data;
+    req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -427,7 +427,7 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
 });
 app.post("/postProductToUserCart", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
-  let { user_email, product_id, quantity } = req.body.data;
+  let { user_email, product_id, quantity } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -450,7 +450,7 @@ app.post("/postProductToUserCart", async (req, res) => {
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
   //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
-  let { user_email, product_id, quantity } = req.body.data;
+  let { user_email, product_id, quantity } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -473,7 +473,7 @@ app.post("/postProductToUserWishlist", async (req, res) => {
 });
 app.patch("/patchWarehouseStock", async (req, res) => {
   //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
-  let { warehouse_id, product_id, quantity } = req.body.data;
+  let { warehouse_id, product_id, quantity } = req.body;
 
   if (!warehouse_id)
     return res.status(400).send({ error: "Invalid warehouse id!" });
@@ -616,7 +616,7 @@ async function handleResponse(response) {
 // acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
 app.post("/api/orders", async (req, res) => {
   try {
-    const { user_email, acquisitionMethod } = req.body.data;
+    const { user_email, acquisitionMethod } = req.body;
     const { jsonResponse, httpStatusCode } = await createOrder(
       user_email,
       acquisitionMethod,

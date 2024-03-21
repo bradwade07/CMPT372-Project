@@ -37,11 +37,9 @@ export async function addToWishlist(
   if (user_email) {
     try {
       await axios.post("/postProductToUserWishlist", {
-        data: {
-          user_email: user_email,
-          product_id: product_id,
-          quantity: quantity,
-        },
+        user_email: user_email,
+        product_id: product_id,
+        quantity: quantity,
       });
     } catch (error) {
       if (isAxiosError(error)) {

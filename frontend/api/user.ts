@@ -8,15 +8,13 @@ export async function createNewUser(
 ): Promise<void> {
   try {
     await axios.post("/postUser", {
-      data: {
-        user_email: user_email,
-        user_type: user_type,
-        street_name: "1234 Smith Street",
-        city: "Burnaby",
-        province: "BC",
-        post_code: "1A2 B3C",
-        country: "Canada",
-      },
+      user_email: user_email,
+      user_type: user_type,
+      street_name: "1234 Smith Street",
+      city: "Burnaby",
+      province: "BC",
+      post_code: "1A2 B3C",
+      country: "Canada",
     });
   } catch (error) {
     if (isAxiosError(error)) {
@@ -57,10 +55,8 @@ export async function updateUserType(
 ): Promise<void> {
   // try {
   //   await axios.patch("/patchUserType", {
-  //     data: {
-  //       user_email: user_email,
-  //       user_type: user_type,
-  //     },
+  //     user_email: user_email,
+  //     user_type: user_type,
   //   });
   // } catch (error) {
   //   if (isAxiosError(error)) {
@@ -78,10 +74,8 @@ export async function updateUserAddress(
 ): Promise<void> {
   // try {
   //   await axios.patch("/patchUserAddress", {
-  //     data: {
-  //       user_email: user_email,
-  //       address: address,
-  //     },
+  //     user_email: user_email,
+  //     address: address,
   //   });
   // } catch (error) {
   //   if (isAxiosError(error)) {
