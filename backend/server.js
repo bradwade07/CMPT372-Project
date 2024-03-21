@@ -384,7 +384,7 @@ app.patch("/patchUserAddress", async (req, res) => {
   }
 });
 app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body.data;
+  let { user_email, product_id } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -405,7 +405,7 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
   }
 });
 app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
-  let { user_email, product_id } = req.body.data;
+  let { user_email, product_id } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });

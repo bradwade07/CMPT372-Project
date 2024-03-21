@@ -14,7 +14,7 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
   const router = useRouter();
 
   function handleItemClick(event: React.MouseEvent) {
-    router.push(`/product/${item.product_id}`);
+    router.push(`/product?product_id=${item.product_id}`);
   }
 
   function handleItemRemove(event: React.MouseEvent) {

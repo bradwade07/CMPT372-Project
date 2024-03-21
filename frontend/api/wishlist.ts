@@ -33,29 +33,26 @@ export async function addToWishlist(
   product_id: number,
   quantity: number,
 ): Promise<void> {
-  // TODO: integrate when backend is working
-  // backend call
-  // const user_email = await getSessionUserEmail();
-  // if (user_email) {
-  //   try {
-  //     await axios.post("/postProductToUserWishlist", {
-  //       data: {
-  //         product_id: product_id,
-  //         quantity: quantity,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     if (isAxiosError(error)) {
-  //       console.error(error.response?.data || error.response || error);
-  //     }
-  //     else {
-  //       console.error(error)
-  //     }
-  //   }
-  // }
-  // else {
-  //   console.error("Could not add to user's wishlist");
-  // }
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    try {
+      await axios.post("/postProductToUserWishlist", {
+        data: {
+          user_email: user_email,
+          product_id: product_id,
+          quantity: quantity,
+        },
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.error("Could not add to user's wishlist");
+  }
 }
 
 // removes a products from the current user's wishlist

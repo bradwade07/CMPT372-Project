@@ -33,28 +33,26 @@ export default async function addToShoppingCart(
   product_id: number,
   quantity: number,
 ): Promise<void> {
-  // TODO: integrate when backend is working
-  // backend call
-  // const user_email = await getSessionUserEmail();
-  // if (user_email) {
-  //   try {
-  //     await axios.post("/postProductToUserCart", {
-  //       data: {
-  //         product_id: product_id,
-  //         quantity: quantity,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // } catch (error) {
-  //   if (isAxiosError(error)) {
-  //     console.error(error.response?.data || error.response || error);
-  //   }
-  //   else {
-  //     console.error(error)
-  //   }
-  // }
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    try {
+      await axios.post("/postProductToUserCart", {
+        data: {
+          user_email: user_email,
+          product_id: product_id,
+          quantity: quantity,
+        },
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.error("Could not add item to user's cart");
+  }
 }
 
 // removes a products from the current user's shopping cart
