@@ -8,13 +8,23 @@ var pool;
 //   host: "db",
 //   password: "root"
 // });
-pool = new Pool({
-  //TODO: connection string
-  user: "postgres",
-  host: "localhost",
-  password: "root",
-  port: "5432",
+// pool = new Pool({
+//   //TODO: connection string
+//   user: "ashrafulislam",
+//   host: "ashrafulislam",
+//   // password: "root",
+//   port: "5432",
+// });
+//const { Pool } = require("pg");
+
+ pool = new Pool({
+  user: 'ashrafulislam', // Your PostgreSQL user
+  host: 'localhost', // Typically localhost for a local database
+  database: 'ashrafulislam', // Your database name
+  //password: 'yourDatabasePassword', // Uncomment and provide your password if needed
+  port: 5432, // Default PostgreSQL port
 });
+
 
 const helpers = {
   init: async function () {
@@ -572,30 +582,123 @@ const helpers = {
       throw error;
     }
   },
-
-  postProductToUserCart: async function (user_email, product_id, quantity) {
+  getUserCartItem: async function(user_email, product_id) {
     try {
-      await pool.query(
-        `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
-      );
+      const query = `
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_imgsrc,
+            productprice.base_price, 
+            productprice.current_price, 
+            usercart.quantity
+        FROM 
+            product
+            JOIN usercart ON product.product_id = usercart.product_id
+            JOIN productprice ON product.product_id = productprice.product_id
+        WHERE 
+            usercart.user_email = $1
+            AND usercart.product_id = $2;
+      `;
+      const values = [user_email, product_id];
+      const result = await pool.query(query, values);
+      
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return {
+          message: "Item not found in the user's cart",
+        };
+      }
     } catch (error) {
-      console.error("Error adding item to cart:", error);
+      console.error("Error retrieving user cart item:", error);
       throw error;
     }
   },
+
+
+  // postProductToUserCart: async function (user_email, product_id, quantity) {
+  //   try {
+  //     await pool.query(
+  //       `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+  //       [user_email, product_id, quantity],
+  //     );
+  //   } catch (error) {
+  //     console.error("Error adding item to cart:", error);
+  //     throw error;
+  //   }
+  // },
+  postProductToUserCart: async function (user_email, product_id, quantity) {
+    try {
+        // Check if the product already exists in the user's cart
+        const existingCartItem = await pool.query(
+            `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
+            [user_email, product_id]
+        );
+
+        if (existingCartItem.rows.length > 0) {
+            // If the product already exists, update the quantity
+            const newQuantity = existingCartItem.rows[0].quantity + quantity;
+            await pool.query(
+                `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
+                [newQuantity, user_email, product_id]
+            );
+        } else {
+            // If the product does not exist, insert a new record
+            await pool.query(
+                `INSERT INTO usercart (user_email, product_id, quantity) VALUES ($1, $2, $3);`,
+                [user_email, product_id, quantity]
+            );
+        }
+    } catch (error) {
+        console.error("Error adding item to cart:", error);
+        throw error;
+    }
+},
+
+  // postProductToUserWishlist: async function (user_email, product_id, quantity) {
+  //   try {
+  //     await pool.query(
+  //       `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+  //       [user_email, product_id, quantity],
+  //     );
+  //   } catch (error) {
+  //     console.error("Error adding item to wish list:", error);
+  //     throw error;
+  //   }
+  // },
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
-      );
+       
+        if (isNaN(product_id) || isNaN(quantity)) {
+            throw new Error("Invalid product_id or quantity");
+        }
+
+      
+        const existingProduct = await pool.query(
+            `SELECT * FROM userwishlist WHERE user_email = $1 AND product_id = $2;`,
+            [user_email, product_id]
+        );
+
+        if (existingProduct.rows.length > 0) {
+            await pool.query(
+                `UPDATE userwishlist SET quantity = quantity + $1 WHERE user_email = $2 AND product_id = $3;`,
+                [quantity, user_email, product_id]
+            );
+        } else {
+            await pool.query(
+                `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+                [user_email, product_id, quantity]
+            );
+        }
     } catch (error) {
-      console.error("Error adding item to wish list:", error);
-      throw error;
+        console.error("Error adding item to wish list:", error);
+        throw error;
     }
-  },
+},
+
 
   patchWarehouseStock: async function (warehouse_id, product_id, quantity) {
     try {

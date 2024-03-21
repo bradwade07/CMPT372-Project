@@ -387,26 +387,46 @@ app.post("/postProductToUserCart", async (req, res) => {
 			.send({ error: "Server failed to add product to the user cart!" });
 	}
 });
+// app.post("/postProductToUserCart", async (req, res) => {
+//     let { user_email, product_id, quantity } = req.body;
+//     user_email = user_email.trim();
+//     product_id = parseInt(product_id);
+//     quantity = parseInt(quantity);
+    
+//     if (!user_email || isNaN(product_id) || isNaN(quantity)) {
+//         return res.status(400).send({ error: "Invalid input data!" });
+//     }
+
+//     try {
+//         const existingCartItem = await helpers.getUserCartItem(user_email, product_id);
+
+//         if (existingCartItem) {
+//             await helpers.updateCartItemQuantity(user_email, product_id, quantity + existingCartItem.quantity);
+//         } else {
+//             await helpers.postProductToUserCart(user_email, product_id, quantity);
+//         }
+
+//         res.status(200).send({ success: "Item added to user cart successfully!" });
+//     } catch (error) {
+//         console.error("Error:", error);
+//         res.status(500).send({ error: "Server failed to add product to the user cart!" });
+//     }
+// });
 app.post("/postProductToUserWishlist", async (req, res) => {
-	//TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
-	let { user_email, product_id, quantity } = req.body;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	product_id = parseInt(product_id);
-	quantity = parseInt(quantity);
-	try {
-		await helpers.postProductToUserWishlist(user_email, product_id, quantity);
-		res
-			.status(200)
-			.send({ success: "Item added to user wishlist successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res
-			.status(500)
-			.send({ error: "Server failed to add product to the user wishlist!" });
-	}
+    let { user_email, product_id, quantity } = req.body;
+    user_email = user_email.trim();
+
+    quantity = quantity ? parseInt(quantity) : 1;
+
+    try {
+        await helpers.postProductToUserWishlist(user_email, product_id, quantity);
+        res.status(200).send({ success: "Item added to user wishlist successfully!" });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Server failed to add product to the user wishlist!" });
+    }
 });
+
 app.patch("/patchWarehouseStock", async (req, res) => {
 	//TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
 	let { warehouse_id, product_id, quantity } = req.body;
