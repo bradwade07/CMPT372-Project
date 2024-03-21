@@ -631,21 +631,21 @@ const helpers = {
   // },
   postProductToUserCart: async function (user_email, product_id, quantity) {
     try {
-        // Check if the product already exists in the user's cart
+     
         const existingCartItem = await pool.query(
             `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
             [user_email, product_id]
         );
 
         if (existingCartItem.rows.length > 0) {
-            // If the product already exists, update the quantity
+          
             const newQuantity = existingCartItem.rows[0].quantity + quantity;
             await pool.query(
                 `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
                 [newQuantity, user_email, product_id]
             );
         } else {
-            // If the product does not exist, insert a new record
+          
             await pool.query(
                 `INSERT INTO usercart (user_email, product_id, quantity) VALUES ($1, $2, $3);`,
                 [user_email, product_id, quantity]
