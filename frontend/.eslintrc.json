@@ -1,7 +1,0 @@
-{
-  "extends": ["next/core-web-vitals", "prettier"],
-  // TODO: remove this rule later and fix any broken hook rules
-  "rules": {
-    "react-hooks/rules-of-hooks": "off"
-  }
-}
