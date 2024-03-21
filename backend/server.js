@@ -10,6 +10,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.get("/tester", async (req, res) => {//testing
+    res.send("Success in testing");
+  });
 app.post("/insertTestData", async (req, res) => {//testing
   try {
     helpers.insertTestData();
