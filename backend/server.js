@@ -285,14 +285,14 @@ app.post("/postUser", async (req, res) => {
   if (!country) return res.status(400).send({ error: "Invalid country!" });
   country = country.trim();
 
-  if (!type) return res.status(400).send({ error: "Invalid type!" });
-  type = type.trim().toLowerCase();
+  if (!user_type) return res.status(400).send({ error: "Invalid type!" });
+  user_type = user_type.trim().toLowerCase();
 
-  if (type !== "customer" && type !== "vendor") {
+  if (user_type !== "customer" && user_type !== "vendor") {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
 
   try {
     await helpers.postUser(
@@ -314,19 +314,19 @@ app.post("/postUser", async (req, res) => {
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-  let { user_email, type } = req.body.data;
+  let { user_email, type: user_type } = req.body.data;
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
   user_email = user_email.trim();
 
-  if (!type) return res.status(400).send({ error: "Invalid type!" });
-  type = type.trim().toLowerCase();
+  if (!user_type) return res.status(400).send({ error: "Invalid type!" });
+  user_type = user_type.trim().toLowerCase();
 
-  if (type !== "customer" && type !== "vendor") {
+  if (user_type !== "customer" && user_type !== "vendor") {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
 
   try {
     await helpers.patchUserType(user_email, type_id);
