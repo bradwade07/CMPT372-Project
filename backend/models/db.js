@@ -57,6 +57,7 @@ const helpers = {
     );
     await pool.query(`COMMIT`);
   },
+
   insertTestData: async function () {
     //TODO: remove testing
     await pool.query(`BEGIN`);
@@ -194,10 +195,11 @@ const helpers = {
     await pool.query(`COMMIT`);
     //////////////////////////
   },
-  deleteTestData: async function() {
+
+  deleteTestData: async function () {
     try {
       await pool.query(`BEGIN`);
-  
+
       // Delete data from tables with foreign key constraints first
       await pool.query(`DELETE FROM usercart;`);
       await pool.query(`DELETE FROM userwishlist;`);
@@ -211,7 +213,7 @@ const helpers = {
       await pool.query(`DELETE FROM address;`);
       await pool.query(`DELETE FROM tag;`);
       await pool.query(`DELETE FROM warehouse;`);
-  
+
       await pool.query(`COMMIT`);
       console.log("Test data and tables deleted successfully.");
     } catch (error) {
@@ -220,10 +222,11 @@ const helpers = {
       throw error;
     }
   },
+
   deleteAllTables: async function () {
     try {
       await pool.query(`BEGIN`);
-  
+
       // Drop tables in reverse order of dependency
       await pool.query(`DROP TABLE IF EXISTS warehousestock CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS warehouse CASCADE;`);
@@ -237,7 +240,7 @@ const helpers = {
       await pool.query(`DROP TABLE IF EXISTS product CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
-      
+
       await pool.query(`COMMIT`);
       console.log("All tables deleted successfully.");
     } catch (error) {
@@ -246,6 +249,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductInfoByPid: async function (id) {
     try {
       const response = await pool.query(
@@ -261,6 +265,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByName: async function (product_name) {
     try {
       let response;
@@ -278,6 +283,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByRating: async function (
     product_rating_min,
     product_rating_max,
@@ -297,6 +303,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByPrice: async function (product_price_min, product_price_max) {
     try {
       const response = await pool.query(
@@ -313,6 +320,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByDateAdded: async function (
     product_date_added_after,
     product_date_added_before,
@@ -332,6 +340,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByUserEmail: async function (user_email) {
     try {
       let response;
@@ -349,6 +358,7 @@ const helpers = {
       throw error;
     }
   },
+
   getProductIdByTags: async function (tags) {
     try {
       const tagResponse = await pool.query(
@@ -379,73 +389,6 @@ const helpers = {
       }
     } catch (error) {
       console.error("Error in getProductIdByTags:", error);
-      throw error;
-    }
-  },
-  getUserTypeByUserEmail: async function (email) {
-    try {
-      await pool.query(`BEGIN`);
-      const result = await pool.query(
-        `SELECT users.type_id, usertypes.type FROM users 
-        JOIN usertypes ON users.type_id = usertypes.type_id 
-        WHERE user_email = $1;`,
-        [email],
-      );
-      await pool.query(`COMMIT`);
-      return result.rows;
-    } catch (error) {
-      await pool.query(`ROLLBACK`);
-      console.error("Error retrieving user by email:", error);
-      throw error;
-    }
-  },
-
-  getUserCartByUserEmail: async function (email) {
-    try {
-        
-      const query = `
-        SELECT 
-            product.product_id, 
-            product.product_name, 
-            product.product_description, 
-            product.product_imgsrc,
-            productprice.base_price, 
-            productprice.current_price, 
-            usercart.quantity
-        FROM product
-        JOIN usercart ON product.product_id = usercart.product_id
-        JOIN productprice ON product.product_id = productprice.product_id
-        WHERE usercart.user_email = $1;
-        `;
-      const values = [email];
-      const result = await pool.query(query, values);
-      return (result.rows.length > 0)
-        ? result.rows
-        : {
-            message: "No products found in the user's cart",
-          };
-    } catch (error) {
-      console.error("Error retrieving user cart by email:", error);
-      throw error;
-    }
-  },
-
-  getUserWishlistByUserEmail: async function (email) {
-    try {
-      const query = `
-        SELECT product.* FROM product
-        JOIN userwishlist ON product.product_id = userwishlist.product_id
-        WHERE userwishlist.user_email = $1;
-        `;
-      const values = [email];
-      const result = await pool.query(query, values);
-      return result.rows.length
-        ? result.rows
-        : {
-            message: "No products found in the user's wishlist",
-          };
-    } catch (error) {
-      console.error("Error retrieving wish list products by email:", error);
       throw error;
     }
   },
@@ -495,14 +438,22 @@ const helpers = {
     }
   },
 
-  postUser: async function (street_name, city, province, post_code, country, user_email, type_id) {
+  postUser: async function (
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+    user_email,
+    type_id,
+  ) {
     try {
       const address_id = await helpers.postAddress(
         street_name,
         city,
         province,
         post_code,
-        country
+        country,
       );
       await pool.query(
         `INSERT INTO userinfo (user_email, address_id) VALUES ($1, $2);`,
@@ -517,7 +468,14 @@ const helpers = {
       throw error;
     }
   },
-  postAddress: async function (street_name, city, province, post_code, country) {
+
+  postAddress: async function (
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+  ) {
     try {
       const response = await pool.query(
         `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
@@ -530,9 +488,27 @@ const helpers = {
     }
   },
 
+  getUserTypeByUserEmail: async function (email) {
+    try {
+      await pool.query(`BEGIN`);
+      const result = await pool.query(
+        `SELECT users.type_id, usertypes.type FROM users 
+        JOIN usertypes ON users.type_id = usertypes.type_id 
+        WHERE user_email = $1;`,
+        [email],
+      );
+      await pool.query(`COMMIT`);
+      return result.rows;
+    } catch (error) {
+      await pool.query(`ROLLBACK`);
+      console.error("Error retrieving user by email:", error);
+      throw error;
+    }
+  },
+
   patchUserType: async function (user_email, type) {
     try {
-      await pool.query((`UPDATE users SET type_id = $1 WHERE user_email = $2`), [
+      await pool.query(`UPDATE users SET type_id = $1 WHERE user_email = $2`, [
         type,
         user_email,
       ]);
@@ -542,25 +518,70 @@ const helpers = {
     }
   },
 
-  patchUserAddress: async function (user_email, street_name, city, province, post_code, country) {
+  patchUserAddress: async function (
+    user_email,
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+  ) {
     try {
-      const response = await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`, [street_name, city, province, post_code, country]);
-      await pool.query(`UPDATE userInfo SET address_id = $1 WHERE user_email = $2;`, [response.rows[0].address_id, user_email]);
+      const response = await pool.query(
+        `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
+        [street_name, city, province, post_code, country],
+      );
+      await pool.query(
+        `UPDATE userInfo SET address_id = $1 WHERE user_email = $2;`,
+        [response.rows[0].address_id, user_email],
+      );
     } catch (error) {
       console.error("Error updating user address:", error);
       throw error;
     }
   },
-  
-  deleteUserCartByPidUserEmail: async function (user_email, product_id) {
+
+  postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query( `DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `, [user_email, product_id]);
+      await pool.query(
+        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+        [user_email, product_id, quantity],
+      );
     } catch (error) {
-      console.error("Error removing item from cart:", error);
+      console.error("Error adding item to wish list:", error);
       throw error;
     }
-  }
-  ,
+  },
+
+  getUserWishlistByUserEmail: async function (email) {
+    try {
+      const query = `
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_imgsrc,
+            productprice.base_price, 
+            productprice.current_price, 
+            userwishlist.quantity
+        FROM product
+        JOIN userwishlist ON product.product_id = userwishlist.product_id
+        JOIN productprice ON product.product_id = productprice.product_id
+        WHERE userwishlist.user_email = $1;
+        `;
+      const values = [email];
+      const result = await pool.query(query, values);
+      return result.rows.length
+        ? result.rows
+        : {
+            message: "No products found in the user's wishlist",
+          };
+    } catch (error) {
+      console.error("Error retrieving wish list products by email:", error);
+      throw error;
+    }
+  },
+
   deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
@@ -585,14 +606,43 @@ const helpers = {
     }
   },
 
-  postProductToUserWishlist: async function (user_email, product_id, quantity) {
+  getUserCartByUserEmail: async function (email) {
+    try {
+      const query = `
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_imgsrc,
+            productprice.base_price, 
+            productprice.current_price, 
+            usercart.quantity
+        FROM product
+        JOIN usercart ON product.product_id = usercart.product_id
+        JOIN productprice ON product.product_id = productprice.product_id
+        WHERE usercart.user_email = $1;
+        `;
+      const values = [email];
+      const result = await pool.query(query, values);
+      return result.rows.length > 0
+        ? result.rows
+        : {
+            message: "No products found in the user's cart",
+          };
+    } catch (error) {
+      console.error("Error retrieving user cart by email:", error);
+      throw error;
+    }
+  },
+
+  deleteUserCartByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
+        `DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `,
+        [user_email, product_id],
       );
     } catch (error) {
-      console.error("Error adding item to wish list:", error);
+      console.error("Error removing item from cart:", error);
       throw error;
     }
   },
