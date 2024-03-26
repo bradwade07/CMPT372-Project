@@ -1,4 +1,4 @@
-import { Product } from "./product.types";
+import { Product, ProductListing } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
@@ -84,4 +84,15 @@ export async function getFilteredProducts(
 
     return [];
   }
+}
+
+// Creates a new product listing
+export async function createProductListing(formData: ProductListing) {
+  try {
+    await axios.post(`/TODO`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {}
 }

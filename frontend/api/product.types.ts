@@ -15,3 +15,8 @@ export type ShoppingCartEntry = {
 export type WishlistEntry = {
   quantity: number;
 } & Product;
+
+export type ProductListing = {
+  main_product_img: File | null;
+  additional_product_img: File[];
+} & Omit<Product, "product_id" | "product_date_added" | "product_imgsrc">;
