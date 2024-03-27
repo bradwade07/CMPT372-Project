@@ -34,8 +34,13 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         />
         {product.current_price < product.base_price ? (
           <p>
-            <span className="line-through">${product.base_price}</span>&nbsp;
-            <span className="text-red-500">${product.current_price}</span>
+            <span className="line-through">
+              ${product.base_price.toFixed(2)}
+            </span>
+            &nbsp;
+            <span className="text-red-500">
+              ${product.current_price.toFixed(2)}
+            </span>
           </p>
         ) : (
           <p>${product.base_price}</p>
