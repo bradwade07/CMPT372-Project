@@ -2,6 +2,7 @@ import { Product, ProductListing } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
+import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
 export async function getProduct(product_id: number): Promise<Product | null> {
@@ -88,11 +89,35 @@ export async function getFilteredProducts(
 
 // Creates a new product listing
 export async function createProductListing(formData: ProductListing) {
-  try {
-    await axios.post(`/TODO`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  } catch (error) {}
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    const { additional_product_img, ...rest } = formData;
+    const postFormData = {
+      ...formData,
+      additional_product_img_num: formData.additional_product_img.length,
+      user_email: user_email,
+    };
+
+    try {
+      await axios.post(
+        `/createProductListing`,
+        {
+          ...postFormData,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.error("Could not create product listing");
+  }
 }
