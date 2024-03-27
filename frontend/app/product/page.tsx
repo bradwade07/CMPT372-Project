@@ -26,6 +26,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   // queryClient and query invalidation used to force shopping cart and wishlist to refetch the updated contents
   const queryClient = useQueryClient();
 
+  // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
     try {
       await addToShoppingCart(searchParams.product_id, selectedQuantity);
@@ -36,6 +37,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     }
   }
 
+  // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
     try {
       await addToWishlist(searchParams.product_id, selectedQuantity);

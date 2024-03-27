@@ -23,19 +23,24 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
       }}
     >
       <CardHeader className="py-2 px-4 flex-col items-start">
-        <h4 className="font-bold text-xl">{product && product.product_name}</h4>
+        <h4 className="font-bold text-xl">{product.product_name}</h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2">
         <img
-          alt="Card background"
+          alt="Product Image"
           className="object-cover rounded-xl pb-2"
-          src={(product && product.product_imgsrc) || "/images/grey.jpg"}
+          src={product.product_imgsrc || "/images/grey.jpg"}
           width={270}
         />
-        <p>
-          ${product && product.base_price} ${product && product.current_price}
-        </p>
-        <p>{product && product.product_description}</p>
+        {product.current_price < product.base_price ? (
+          <p>
+            <span className="line-through">${product.base_price}</span>&nbsp;
+            <span className="text-red-500">${product.current_price}</span>
+          </p>
+        ) : (
+          <p>${product.base_price}</p>
+        )}
+        <p>{product.product_description}</p>
       </CardBody>
     </Card>
   );
