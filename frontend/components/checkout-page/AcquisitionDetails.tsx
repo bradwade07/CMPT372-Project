@@ -50,6 +50,7 @@ export function DeliveryDetails({
     post_code: "",
     city: "",
     province: "BC",
+    country: "",
   });
 
   // updates a specific attribute in the user's address whenever they type something
@@ -136,6 +137,15 @@ export function DeliveryDetails({
               </SelectItem>
             ))}
           </Select>
+          <Input
+            className="mb-1"
+            label="Country"
+            name="country"
+            placeholder="Enter your country"
+            isRequired
+            onChange={handleInputChange}
+            defaultValue={deliveryFormData.country}
+          />
           <Button
             type="submit"
             color="primary"
@@ -178,6 +188,7 @@ export function DeliveryDetails({
         <p>Postal Code: {deliveryFormData.post_code}</p>
         <p>City: {deliveryFormData.city}</p>
         <p>Province: {deliveryFormData.province}</p>
+        <p>Country: {deliveryFormData.country}</p>
         <Button
           type="submit"
           className="w-fit self-center mt-3"

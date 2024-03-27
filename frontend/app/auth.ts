@@ -121,19 +121,14 @@ export async function logout() {
 }
 
 // Refreshes the current session, effectively resetting the expiry time
-export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
+export async function updateSession() {
+  const session = await getSession();
   if (!session) return;
 
   // Refresh the session so it doesn't expire
-  const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + cookieLength);
-  const res = NextResponse.next();
-  res.cookies.set({
-    name: "session",
-    value: await encrypt(parsed),
-    httpOnly: true,
-    expires: parsed.expires,
-  });
-  return res;
+  const expires = new Date(Date.now() + cookieLength);
+  session.expires = expires;
+
+  // Save the new session in a cookie
+  cookies().set("session", session, { expires, httpOnly: true });
 }

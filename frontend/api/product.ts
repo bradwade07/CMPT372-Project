@@ -91,18 +91,13 @@ export async function getFilteredProducts(
 export async function createProductListing(formData: ProductListing) {
   const user_email = await getSessionUserEmail();
   if (user_email) {
-    const { additional_product_img, ...rest } = formData;
-    const postFormData = {
-      ...formData,
-      additional_product_img_num: formData.additional_product_img.length,
-      user_email: user_email,
-    };
-
     try {
       await axios.post(
         `/createProductListing`,
         {
-          ...postFormData,
+          ...formData,
+          additional_product_img_num: formData.additional_product_img.length,
+          user_email: user_email,
         },
         {
           headers: {

@@ -23,4 +23,5 @@ export type UserAddress = {
   post_code: string;
   city: string;
   province: string;
+  country: string;
 };
