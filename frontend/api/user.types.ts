@@ -19,7 +19,7 @@ export function getUserTypeFromString(
 }
 
 export type UserAddress = {
-  street_address: string;
+  street_name: string;
   post_code: string;
   city: string;
   province: string;

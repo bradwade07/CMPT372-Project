@@ -75,7 +75,6 @@ export async function updateUserAddress(
     await axios.patch("/patchUserAddress", {
       user_email: user_email,
       ...address,
-      street_name: address.street_address,
     });
   } catch (error) {
     if (isAxiosError(error)) {

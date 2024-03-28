@@ -29,7 +29,7 @@ export function DeliveryDetails({
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [deliveryFormData, setDeliveryFormData] = useState<UserAddress>({
-    street_address: "",
+    street_name: "",
     post_code: "",
     city: "",
     province: "BC",
@@ -82,11 +82,11 @@ export function DeliveryDetails({
           <Input
             className="mb-1"
             label="Street Address"
-            name="street_address"
+            name="street_name"
             placeholder="Enter your street address"
             isRequired
             onChange={handleInputChange}
-            defaultValue={deliveryFormData.street_address}
+            defaultValue={deliveryFormData.street_name}
           />
           <Input
             className="mb-1"
@@ -167,7 +167,7 @@ export function DeliveryDetails({
     return (
       <div>
         <p className="mb-1">Shipping Details:</p>
-        <p>Address: {deliveryFormData.street_address}</p>
+        <p>Address: {deliveryFormData.street_name}</p>
         <p>Postal Code: {deliveryFormData.post_code}</p>
         <p>City: {deliveryFormData.city}</p>
         <p>Province: {deliveryFormData.province}</p>

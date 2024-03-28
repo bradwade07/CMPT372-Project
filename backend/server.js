@@ -281,7 +281,7 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-  let { user_email, type: user_type } = req.body;
+  let { user_email, user_type } = req.body;
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
   user_email = user_email.trim();
