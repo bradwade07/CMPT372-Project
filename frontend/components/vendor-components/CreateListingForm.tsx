@@ -38,7 +38,7 @@ export function CreateListingForm() {
             id={`additional_img_${i + 1}`}
             name={`additional_img_${i + 1}`}
             type="file"
-            accept="image/png, image/jpeg"
+            accept="image/jpeg"
             required
             onChange={handleInputChange}
           />
