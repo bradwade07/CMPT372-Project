@@ -3,6 +3,7 @@
 import { getProduct } from "@/api/product";
 import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
+import ImageSelector from "@/components/ImageSelector/ImageSelector"
 import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -59,19 +60,22 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           className="object-contain w-full h-full"
         />
       </div>
-      <div className="w-full mt-4">IMAGE SELECTOR</div>
+      <div className="w-full mt-4">
+        <ImageSelector />
+      </div>
+      
     </div>
     <div className="flex flex-col justify-center items-center text-center md:w-3/5">
       <p className="font-bold text-xl">{data?.product_name}</p>
       <p className="text-lg">${data?.base_price}</p>
       <p className="mb-8">{data?.product_description}</p>
       <div className="flex flex-col gap-4 mb-8">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={addItemToShoppingCart}>
+        <Button className="bg-blue-500 hover:bg-blue-700 text-white" onClick={addItemToShoppingCart}>
           ADD TO CART
-        </button>
-        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onClick={addItemToWishlist}>
+        </Button>
+        <Button onClick={addItemToWishlist}>
           ADD TO WISHLIST
-        </button>
+        </Button>
         <p>Quantity: 1</p>
       </div>
       <p className="mb-8">SPECIFICATIONS</p>
