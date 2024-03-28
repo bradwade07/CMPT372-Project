@@ -56,6 +56,9 @@ const helpers = {
     await pool.query(
       "CREATE TABLE IF NOT EXISTS warehousestock (warehouse_id INTEGER, product_id INTEGER, PRIMARY KEY (warehouse_id, product_id), quantity INTEGER, FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
     );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS ratings (rating_id SERIAL PRIMARY KEY, product_id INTEGER NOT NULL, rating SMALLINT NOT NULL CHECK (rating >= 1 AND rating <= 5), comment TEXT, rating_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (product_id) REFERENCES product(product_id));",
+    );
     await pool.query(`COMMIT`);
   },
   insertTestData: async function () {
