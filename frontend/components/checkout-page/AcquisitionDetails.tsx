@@ -1,4 +1,4 @@
-import { AcquisitionMethod } from "@/api/checkout.types";
+import { AcquisitionMethod, PROVINCES } from "@/api/checkout.types";
 import { ShoppingCartEntry } from "@/api/product.types";
 import { UserAddress } from "@/api/user.types";
 import {
@@ -11,22 +11,6 @@ import {
 } from "@nextui-org/react";
 import React, { useState } from "react";
 
-const provinces = [
-  "BC",
-  "AB",
-  "SK",
-  "MB",
-  "QC",
-  "ON",
-  "NL",
-  "NB",
-  "NS",
-  "PEI",
-  "YT",
-  "NT",
-  "NU",
-];
-
 type DeliveryDetailsProps = {
   data: undefined | ShoppingCartEntry[];
   onInfoSubmit: (
@@ -36,7 +20,6 @@ type DeliveryDetailsProps = {
   onInfoEdit: () => void;
 };
 
-// TODO: figure out a better way to manage the form and get the values when submitting
 export function DeliveryDetails({
   data,
   onInfoSubmit,
@@ -131,7 +114,7 @@ export function DeliveryDetails({
             onChange={handleInputChange}
             defaultSelectedKeys={[deliveryFormData.province]}
           >
-            {provinces.map((province) => (
+            {PROVINCES.map((province) => (
               <SelectItem key={province} value={province}>
                 {province}
               </SelectItem>

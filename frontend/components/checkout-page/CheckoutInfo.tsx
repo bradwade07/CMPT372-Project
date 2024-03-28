@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { UserAddress } from "@/api/user.types";
 import { AcquisitionMethod } from "@/api/checkout.types";
+import { updateUserAddress } from "@/api/user";
+import { getSessionUserEmail } from "@/app/auth";
 
 // displays 3 "sections"
 // 1) all the items' in the users cart which will be purchased
@@ -16,7 +18,6 @@ import { AcquisitionMethod } from "@/api/checkout.types";
 export function CheckoutInfo() {
   const [acquisitionMethod, setAcquisitionMethod] =
     useState<AcquisitionMethod>();
-  const [userAddress, setUserAddress] = useState<UserAddress>();
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["Shopping Cart"],
@@ -24,16 +25,20 @@ export function CheckoutInfo() {
   });
 
   // performs actions depending on whether the user chooses "delivery" or "pickup"
-  function onInfoSubmit(
+  async function onInfoSubmit(
     acquisitionMethod: AcquisitionMethod,
     deliveryDetails?: UserAddress,
   ) {
-    if (acquisitionMethod == "delivery") {
-      setUserAddress(deliveryDetails);
+    if (acquisitionMethod == "delivery" && deliveryDetails) {
       setAcquisitionMethod("delivery");
-      // TODO: POST the new user's address to the backend
-    } else {
+      const user_email = await getSessionUserEmail();
+      if (user_email) {
+        await updateUserAddress(user_email, deliveryDetails);
+      }
+    } else if (acquisitionMethod == "pickup") {
       setAcquisitionMethod("pickup");
+    } else {
+      throw Error("An error occurred");
     }
   }
 
