@@ -618,17 +618,7 @@ const helpers = {
   },
 
 
-  // postProductToUserCart: async function (user_email, product_id, quantity) {
-  //   try {
-  //     await pool.query(
-  //       `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-  //       [user_email, product_id, quantity],
-  //     );
-  //   } catch (error) {
-  //     console.error("Error adding item to cart:", error);
-  //     throw error;
-  //   }
-  // },
+ 
   postProductToUserCart: async function (user_email, product_id, quantity) {
     try {
      
