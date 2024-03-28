@@ -1,10 +1,10 @@
-const path = require("path");
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const { helpers } = require("./models/db");
 const fetch = require("node-fetch");
 require("dotenv").config(); // allows using the environment variables from .env file
+const upload = require("express-fileupload");
 
 const port = 8080;
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
@@ -13,6 +13,7 @@ const paypal_base = "https://api-m.sandbox.paypal.com";
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(upload());
 
 // Testing related endpoints
 app.post("/insertTestData", async (req, res) => {
@@ -649,6 +650,39 @@ app.post("/api/orders/:orderID/capture", async (req, res) => {
     res.status(500).json({ error: "Failed to capture order." });
   }
 });
+
+app.post("/createProductListing", async (req, res) => {
+    // how to get all elements from the request
+    const {
+      product_name,
+      product_description,
+      base_price,
+      current_price,
+      additional_product_img_num,
+      user_email,
+    } = req.body;
+    const { main_product_img } = req.files;
+    const additional_product_img = req.files["additional_product_img[]"];
+  
+    // showing how to access everything, remove during implementation
+    console.log(
+      product_name,
+      base_price,
+      current_price,
+      product_description,
+      additional_product_img_num,
+      user_email,
+    );
+    console.log(main_product_img);
+  
+    if (additional_product_img_num > 2) {
+      additional_product_img.forEach((item) => {
+        console.log(item);
+      });
+    } else {
+      console.log(additional_product_img); // will be undefined if additional_product_img_num is 0
+    }
+  });
 
 // Server initialization
 try {
