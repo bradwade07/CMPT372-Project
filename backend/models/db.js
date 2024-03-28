@@ -2,11 +2,18 @@ const { Pool } = require("pg");
 
 //var pool;
 
+// pool = new Pool({
+//   TODO: connection string
+//   user: "postgres",
+//   host: "db",
+//   password: "root"
+// });
 pool = new Pool({
   //TODO: connection string
-  user: "postgres",
-  host: "db",
-  password: "root"
+  user: "ashrafulislam",
+  host: "localhost",
+ // password: "root",
+  port: "5432",
 });
 
 
@@ -548,5 +555,71 @@ const helpers = {
   landingBackendFn: async function(req, res){
 
   }
+  ,
+  deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
+    try {
+      await pool.query(
+        "DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2",
+        [user_email, product_id],
+      );
+    } catch (error) {
+      console.error("Error removing item from wish list:", error);
+      throw error;
+    }
+  },
+
+  postProductToUserCart: async function (user_email, product_id, quantity) {
+    try {
+     const existingItem = await pool.query(
+      'SELECT quantity FROM usercart WHERE user_email = $1 AND product_id = $2;',
+       [user_email,product_id]
+     );
+     if(existingItem.rows.length > 0){
+      const newQuantity = existingItem.rows[0].quantity + quantity;
+      await pool.query('UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3',
+      [newQuantity, user_email,product_id]);
+     }else{
+      await pool.query(
+        'INSERT INTO usercart(user_email,product_id, quantity) VALUES ($1, $2, $3);',
+        [user_email, product_id, quantity]
+        );
+     }
+    } catch (error) {
+      console.error("Error updating user cart:", error);
+      throw error;
+    }
+  },
+
+  postProductToUserWishlist: async function (user_email, product_id, quantity) {
+    try {
+      await pool.query(
+        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+        [user_email, product_id, quantity],
+      );
+    } catch (error) {
+      console.error("Error adding item to wish list:", error);
+      throw error;
+    }
+  },
+
+  patchWarehouseStock: async function (warehouse_id, product_id, quantity) {
+    try {
+      let response = await pool.query(
+        `SELECT quantity FROM warehousestock WHERE warehouse_id = $1 AND product_id = $2;`,
+        [warehouse_id, product_id],
+      );
+      if (response.rows[0].quantity >= quantity) {
+        await pool.query(
+          `UPDATE warehousestock SET quantity = quantity - $3 WHERE warehouse_id = $1 AND product_id = $2;`,
+          [warehouse_id, product_id, quantity],
+        );
+        return 1;
+      }
+      return 0;
+    } catch (error) {
+      console.error("Error adjusting warehouse stock:", error);
+      throw error;
+    }
+  },
 };
 module.exports = { helpers };
