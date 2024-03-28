@@ -1,7 +1,10 @@
 const path = require("path");
 const express = require("express");
+
 const app = express();
 const cors = require('cors');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 const { helpers } = require('./models/db')
 
 const port = 8080;
@@ -12,6 +15,9 @@ app.use(express.urlencoded({ extended: false }))
 app.get('/', (req, res) => {
     res.send('Welcome to my server!');
   });
+
+ 
+  
   
 
 app.get("/landingBackend", async (req, res) =>{
@@ -155,6 +161,36 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
 		res.status(500).send({ error: "Server failed to get products!" });
 	}
 });
+app.get('/image/:productId', async (req, res) => {
+    const { productId } = req.params;
+  
+    try {
+      const result = await pool.query('SELECT image FROM product WHERE product_id = $1', [productId]);
+      if (result.rows.length > 0) {
+        const image = result.rows[0].image;
+        res.type('jpg'); // Set this according to your image's MIME type
+        res.send(image);
+      } else {
+        res.status(404).send('Image not found');
+      }
+    } catch (error) {
+      console.error('Failed to retrieve image from database', error);
+      res.status(500).send('Failed to retrieve image');
+    }
+  });
+  
+app.post('/upload', upload.single('image'), async (req, res) => {
+    const imageBuffer = req.file.buffer; 
+    const productId = req.body.productId;
+  
+    try {
+      await pool.query('UPDATE product SET image = $1 WHERE product_id = $2', [imageBuffer, productId]);
+      res.send('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Failed to store image in database', error);
+      res.status(500).send('Failed to upload image');
+    }
+  });
 app.post("/postUser", async (req, res) => {
 	let { street_name, city, province, post_code, country, user_email, type } =
 		req.body;
