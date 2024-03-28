@@ -50,56 +50,44 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     <>
       <TopNavbar />
       <main className="flex flex-col min-h-screen py-20">
-        <div className="flex w-full">
-          <div
-            className="flex flex-col justify-center items-center text-center border border-blue-500"
-            style={{ flexGrow: 0.4, minHeight: "500px" }}
-          >
-            <div
-              className="relative flex justify-center items-center border border-blue-500 w-full object-contain"
-              style={{ flexGrow: 0.85 }}
-            >
-              <img
-                src={"/images/grey.jpg"} // TODO: properly display image
-                alt="Product Image"
-              />
-            </div>
-            <div
-              className="flex justify-center items-center border border-blue-500 w-full"
-              style={{ flexGrow: 0.15 }}
-            >
-              IMAGE SELECTOR
-            </div>
-          </div>
-          <div
-            className="flex flex-col gap-y-8 items-center text-center border border-blue-500"
-            style={{ flexGrow: 0.6 }}
-          >
-            <p className="font-bold text-xl">{data?.product_name}</p>
-            <p className="text-large">${data?.base_price}</p>
-            <p className="mb-32">{data?.product_description}</p>
-            <div className="flex flex-col mb-32 gap-4">
-              <Button color="primary" onClick={addItemToShoppingCart}>
-                ADD TO CART
-              </Button>
-              <Button color="secondary" onClick={addItemToWishlist}>
-                ADD TO WISHLIST
-              </Button>
-              <p>Quantity: 1</p>
-            </div>
-            <p className="mb-40">SPECIFICATIONS</p>
-          </div>
-        </div>
-        <div className="flex justify-center items-center text-center border border-blue-500 h-32">
-          REVIEWS
-        </div>
-        <div className="flex justify-center items-center text-center border border-blue-500 h-96">
-          WAREHOUSE MAP
-        </div>
-        <div className="flex justify-center items-center text-center border border-blue-500 h-60">
-          ALSO LIKE THIS PRODUCT
-        </div>
-      </main>
+  <div className="container mx-auto flex flex-col md:flex-row">
+    <div className="flex flex-col justify-center items-center text-center md:w-2/5">
+      <div className="relative w-full h-96">
+        <img
+          src={"/images/grey.jpg"} // TODO: properly display image
+          alt="Product Image"
+          className="object-contain w-full h-full"
+        />
+      </div>
+      <div className="w-full mt-4">IMAGE SELECTOR</div>
+    </div>
+    <div className="flex flex-col justify-center items-center text-center md:w-3/5">
+      <p className="font-bold text-xl">{data?.product_name}</p>
+      <p className="text-lg">${data?.base_price}</p>
+      <p className="mb-8">{data?.product_description}</p>
+      <div className="flex flex-col gap-4 mb-8">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={addItemToShoppingCart}>
+          ADD TO CART
+        </button>
+        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onClick={addItemToWishlist}>
+          ADD TO WISHLIST
+        </button>
+        <p>Quantity: 1</p>
+      </div>
+      <p className="mb-8">SPECIFICATIONS</p>
+    </div>
+  </div>
+  <div className="flex justify-center items-center text-center mt-8">
+    REVIEWS
+  </div>
+  <div className="flex justify-center items-center text-center mt-8">
+    WAREHOUSE MAP
+  </div>
+  <div className="flex justify-center items-center text-center mt-8">
+    ALSO LIKE THIS PRODUCT
+  </div>
+</main>
+
     </>
   );
 }
