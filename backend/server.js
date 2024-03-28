@@ -304,7 +304,7 @@ app.post("/postProductToUserCart", async (req, res) => {
 	}
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
-	//TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
+	//fixed
 	let { user_email, product_id, quantity } = req.body;
 	user_email
 		? user_email.trim()

@@ -592,10 +592,26 @@ const helpers = {
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
-      );
+      const checkQuery = `
+      SELECT quantity FROM userwishlist 
+      WHERE user_email = $1 AND product_id = $2;
+    `;
+    const checkResult = await pool.query(checkQuery, [user_email, product_id]);
+
+    if (checkResult.rows.length > 0) {
+      const updateQuery = `
+        UPDATE userwishlist 
+        SET quantity = quantity + $1 
+        WHERE user_email = $2 AND product_id = $3;
+      `;
+      await pool.query(updateQuery, [quantity, user_email, product_id]);
+    } else {
+      const insertQuery = `
+        INSERT INTO userwishlist (user_email, product_id, quantity) 
+        VALUES($1, $2, $3);
+      `;
+      await pool.query(insertQuery, [user_email, product_id, quantity]);
+    }
     } catch (error) {
       console.error("Error adding item to wish list:", error);
       throw error;
