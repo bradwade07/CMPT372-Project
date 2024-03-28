@@ -621,17 +621,25 @@ const helpers = {
   patchWarehouseStock: async function (warehouse_id, product_id, quantity) {
     try {
       let response = await pool.query(
-        `SELECT quantity FROM warehousestock WHERE warehouse_id = $1 AND product_id = $2;`,
-        [warehouse_id, product_id],
+          `SELECT quantity FROM warehousestock WHERE warehouse_id = $1 AND product_id = $2;`,
+          [warehouse_id, product_id],
       );
-      if (response.rows[0].quantity >= quantity) {
-        await pool.query(
-          `UPDATE warehousestock SET quantity = quantity - $3 WHERE warehouse_id = $1 AND product_id = $2;`,
-          [warehouse_id, product_id, quantity],
-        );
-        return 1;
+
+      if (response.rows.length > 0) {
+          const currentQuantity = response.rows[0].quantity;
+
+          if (currentQuantity >= quantity) {
+              await pool.query(
+                  `UPDATE warehousestock SET quantity = quantity - $3 WHERE warehouse_id = $1 AND product_id = $2;`,
+                  [warehouse_id, product_id, quantity],
+              );
+              return 1; 
+          } else {
+              return -1; 
+          }
+      } else {
+          return 0; 
       }
-      return 0;
     } catch (error) {
       console.error("Error adjusting warehouse stock:", error);
       throw error;

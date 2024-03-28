@@ -324,7 +324,7 @@ app.post("/postProductToUserWishlist", async (req, res) => {
 	}
 });
 app.patch("/patchWarehouseStock", async (req, res) => {
-	//TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
+	//Fixed by ashraf
 	let { warehouse_id, product_id, quantity } = req.body;
 	warehouse_id = warehouse_id
 		? parseInt(warehouse_id)
