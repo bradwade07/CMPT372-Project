@@ -59,6 +59,13 @@ const helpers = {
     await pool.query(
       "CREATE TABLE IF NOT EXISTS ratings (rating_id SERIAL PRIMARY KEY, product_id INTEGER NOT NULL, rating SMALLINT NOT NULL CHECK (rating >= 1 AND rating <= 5), comment TEXT, rating_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (product_id) REFERENCES product(product_id));",
     );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS orders (order_id SERIAL PRIMARY KEY, user_email VARCHAR(255) NOT NULL, order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, delivery_address_id INTEGER NOT NULL, FOREIGN KEY (delivery_address_id) REFERENCES address(address_id),  FOREIGN KEY (user_email) REFERENCES userinfo(user_email));",
+    );
+    //order items cuz, a order might have many items(products)
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS order_items (order_item_id SERIAL PRIMARY KEY, order_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(order_id),  FOREIGN KEY (product_id) REFERENCES product(product_id));",
+    );
     await pool.query(`COMMIT`);
   },
   insertTestData: async function () {
