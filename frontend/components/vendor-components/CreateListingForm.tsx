@@ -1,7 +1,7 @@
 "use client";
 
 import { createProductListing } from "@/api/product";
-import { ProductListing } from "@/api/product.types";
+import { ProductListingCreation } from "@/api/product.types";
 import { Button, Input, Textarea } from "@nextui-org/react";
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,13 +11,13 @@ export function CreateListingForm() {
   const MAX_ADDITIONAL_IMG = 10;
 
   const [numOfAdditionalImg, setNumOfAdditionalImg] = useState(0);
-  const [formData, setFormData] = useState<ProductListing>({
+  const [formData, setFormData] = useState<ProductListingCreation>({
     product_name: "",
     product_description: "",
     base_price: 0,
     current_price: 0,
-    main_product_img: null,
-    additional_product_img: [],
+    main_product_img_file: null,
+    additional_product_img_files: [],
   });
 
   const renderAdditonalImgInput = () => {
@@ -74,9 +74,9 @@ export function CreateListingForm() {
       // If matches above regex, then sets the appropriate index in the additional_product_img to the file data
       if (match && file) {
         const index = parseInt(match[1], 10);
-        const newArray = [...formData.additional_product_img];
+        const newArray = [...formData.additional_product_img_files];
         newArray[index - 1] = file;
-        setFormData({ ...formData, additional_product_img: newArray });
+        setFormData({ ...formData, additional_product_img_files: newArray });
       }
       // If no match, just set the appropriate attribute as the file data
       else {
@@ -186,11 +186,13 @@ export function CreateListingForm() {
               isIconOnly
               onClick={() => {
                 setNumOfAdditionalImg(numOfAdditionalImg - 1);
-                const newArray = [...formData.additional_product_img].slice(
-                  0,
-                  numOfAdditionalImg - 1,
-                );
-                setFormData({ ...formData, additional_product_img: newArray });
+                const newArray = [
+                  ...formData.additional_product_img_files,
+                ].slice(0, numOfAdditionalImg - 1);
+                setFormData({
+                  ...formData,
+                  additional_product_img_files: newArray,
+                });
               }}
             >
               <RemoveIcon />

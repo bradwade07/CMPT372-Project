@@ -1,4 +1,4 @@
-import { Product, ProductListing } from "./product.types";
+import { Product, ProductListingCreation } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
@@ -88,7 +88,7 @@ export async function getFilteredProducts(
 }
 
 // Creates a new product listing
-export async function createProductListing(formData: ProductListing) {
+export async function createProductListing(formData: ProductListingCreation) {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     try {
@@ -96,7 +96,12 @@ export async function createProductListing(formData: ProductListing) {
         `/createProductListing`,
         {
           ...formData,
-          additional_product_img_num: formData.additional_product_img.length,
+          additional_product_image: [
+            formData.main_product_img_file,
+            ...formData.additional_product_img_files,
+          ],
+          additional_product_img_num:
+            formData.additional_product_img_files.length,
           user_email: user_email,
         },
         {
