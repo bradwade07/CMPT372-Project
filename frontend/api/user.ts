@@ -1,6 +1,11 @@
 import { isAxiosError } from "axios";
 import { axios } from "./axios";
-import { UserAddress, UserTypes, getUserTypeFromString } from "./user.types";
+import {
+  UserAddress,
+  UserTypes,
+  BecomeVendorRequest,
+  getUserTypeFromString,
+} from "./user.types";
 
 export async function createNewUser(
   user_email: string,
@@ -45,6 +50,7 @@ export async function getUserType(
     } else {
       console.error(error);
     }
+
     return null;
   }
 }
@@ -88,7 +94,50 @@ export async function updateUserAddress(
 export async function applyToBecomeVendor(user_email: string): Promise<void> {
   try {
     await axios.post("/???", {
+      //FIXME: backend url
       user_email: user_email,
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+export async function getBecomeVendorRequests(): Promise<
+  BecomeVendorRequest[]
+> {
+  try {
+    const thing: BecomeVendorRequest[] = [];
+    for (let i = 0; i < 30; i++) {
+      thing.push({ user_email: `user${i}@gmail.com` });
+    }
+    return thing;
+
+    let response = await axios.get("/???"); //FIXME: backend url
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+
+    return [];
+  }
+}
+
+export async function removeVendorRequest(user_email: string): Promise<void> {
+  try {
+    await axios.delete("/???", {
+      //FIXME: backend url
+      data: {
+        user_email: user_email,
+      },
     });
   } catch (error) {
     if (isAxiosError(error)) {
