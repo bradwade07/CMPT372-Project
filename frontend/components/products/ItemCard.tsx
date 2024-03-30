@@ -31,7 +31,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
           className="object-cover rounded-xl pb-2"
           src={
             product.main_product_img
-              ? URL.createObjectURL(product.main_product_img)
+              ? product.main_product_img
               : "/images/grey.jpg"
           }
           width={270}

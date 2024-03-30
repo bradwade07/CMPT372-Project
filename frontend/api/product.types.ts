@@ -1,3 +1,6 @@
+type Base64<imageType extends string> =
+  `data:image/${imageType};base64, ${string}`;
+
 export type Product = {
   product_id: number;
   product_name: string;
@@ -6,7 +9,7 @@ export type Product = {
   base_price: number;
   current_price: number;
   product_date_added: number;
-  main_product_img: Blob;
+  main_product_img: Base64<"jpeg">;
 };
 
 export type ProductFull = {

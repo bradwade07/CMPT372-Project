@@ -149,17 +149,17 @@ export function CreateListingForm() {
       <div className="flex flex-col w-fit mb-4">
         <label
           className="text-sm pb-[6px] hover:cursor-pointer"
-          htmlFor="main_product_img"
+          htmlFor="main_product_img_file"
           aria-required
         >
           Product Main Image <span className="text-red-500">*</span>
         </label>
         <input
           className="text-sm hover:cursor-pointer"
-          id="main_product_img"
-          name="main_product_img"
+          id="main_product_img_file"
+          name="main_product_img_file"
           type="file"
-          accept="image/png, image/jpeg"
+          accept="image/jpeg"
           required
           onChange={handleInputChange}
         />

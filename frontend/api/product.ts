@@ -91,17 +91,22 @@ export async function getFilteredProducts(
 export async function createProductListing(formData: ProductListingCreation) {
   const user_email = await getSessionUserEmail();
   if (user_email) {
+    const { main_product_img_file, additional_product_img_files, ...rest } =
+      formData;
     try {
       await axios.post(
         `/createProductListing`,
         {
-          ...formData,
-          additional_product_image: [
-            formData.main_product_img_file,
-            ...formData.additional_product_img_files,
+          ...rest,
+          product_images: [
+            main_product_img_file,
+            ...additional_product_img_files,
+            new File(
+              [new Blob([], { type: "image/jpeg" })],
+              "placeholder.jpg",
+              { type: "image/jpeg" },
+            ),
           ],
-          additional_product_img_num:
-            formData.additional_product_img_files.length,
           user_email: user_email,
         },
         {
