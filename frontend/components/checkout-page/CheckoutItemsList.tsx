@@ -23,7 +23,19 @@ export function CheckoutItemsList({ data }: CheckoutItemsListProps) {
                   />
                   <div>
                     <p>{item.product_name}</p>
-                    <p>Price: ${item.base_price.toFixed(2)}</p>
+                    {item.current_price < item.base_price ? (
+                      <p>
+                        <span className="line-through">
+                          ${item.base_price.toFixed(2)}
+                        </span>
+                        &nbsp;
+                        <span className="text-red-500">
+                          ${item.current_price.toFixed(2)}
+                        </span>
+                      </p>
+                    ) : (
+                      <p>${item.base_price}</p>
+                    )}
                     <p>Quantity: {item.quantity}</p>
                   </div>
                 </div>
