@@ -1,3 +1,4 @@
+const { error } = require("console");
 const { Pool } = require("pg");
 
 var pool;
@@ -26,7 +27,7 @@ const helpers = {
       "CREATE TABLE IF NOT EXISTS userinfo (user_email VARCHAR(255) PRIMARY KEY, address_id INTEGER, FOREIGN KEY (address_id) REFERENCES address(address_id));",
     );
     await pool.query(
-      "CREATE TABLE IF NOT EXISTS product (product_id SERIAL PRIMARY KEY, product_name VARCHAR(255), product_imgsrc VARCHAR(255), product_description VARCHAR(255), product_date_added bigINT, user_email VARCHAR(255), product_avg_rating FLOAT, FOREIGN KEY (user_email) REFERENCES userInfo(user_email));",
+      "CREATE TABLE IF NOT EXISTS product (product_id SERIAL PRIMARY KEY, product_name VARCHAR(255), product_main_img BYTEA, product_description VARCHAR(255), product_date_added bigINT, user_email VARCHAR(255), product_avg_rating FLOAT, FOREIGN KEY (user_email) REFERENCES userInfo(user_email));",
     );
     await pool.query(
       "CREATE TABLE IF NOT EXISTS productprice (product_id INTEGER PRIMARY KEY, base_price FLOAT, current_price FLOAT, FOREIGN KEY (product_id) REFERENCES product(product_id));",
@@ -36,9 +37,6 @@ const helpers = {
     );
     await pool.query(
       "CREATE TABLE IF NOT EXISTS producttags (product_id INTEGER, tag_id INTEGER, PRIMARY KEY (product_id, tag_id), FOREIGN KEY (product_id) REFERENCES product(product_id), FOREIGN KEY (tag_id) REFERENCES tag(tag_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS usercart (user_email VARCHAR(255), product_id INTEGER, quantity INTEGER, PRIMARY KEY (user_email, product_id), FOREIGN KEY (user_email) REFERENCES userInfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));",
     );
     await pool.query(
       "CREATE TABLE IF NOT EXISTS usertypes (type_id SERIAL PRIMARY KEY, type VARCHAR(255));",
@@ -55,11 +53,29 @@ const helpers = {
     await pool.query(
       "CREATE TABLE IF NOT EXISTS warehousestock (warehouse_id INTEGER, product_id INTEGER, PRIMARY KEY (warehouse_id, product_id), quantity INTEGER, FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
     );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS usercart (user_email VARCHAR(255), product_id INTEGER, quantity INTEGER, delivery BOOLEAN, warehouse_id INTEGER, PRIMARY KEY (user_email, product_id), FOREIGN KEY (user_email) REFERENCES userInfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id), FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id));",
+    );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS image (product_id INTEGER, image_id SERIAL, image BYTEA, PRIMARY KEY (product_id, image_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
+    );
+    const response = await pool.query(`SELECT * FROM usertypes;`);
+    if (response.rows.length === 0) {
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
+    }
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS review (review_id SERIAL, product_id INTEGER, user_email VARCHAR(255), comment VARCHAR(255), PRIMARY KEY (review_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));",
+    );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS vendorrequest ( request_id SERIAL PRIMARY KEY, user_email VARCHAR(255), approve BOOLEAN, FOREIGN KEY (user_email) REFERENCES userinfo(user_email));",
+    );
     await pool.query(`COMMIT`);
   },
 
   insertTestData: async function () {
-    //TODO: remove testing
+    //depricated and used for the users
     await pool.query(`BEGIN`);
     await pool.query(
       "INSERT INTO address (street_name, city, province, post_code, country) VALUES ('123 Example Street', 'City', 'Province', 'PostalCode', 'Country');",
@@ -396,7 +412,7 @@ const helpers = {
   getProductsOnSaleByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_imgsrc, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE pp.current_price < pp.base_price
@@ -419,7 +435,7 @@ const helpers = {
   getNewestProductsByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_imgsrc, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         ORDER BY p.product_date_added DESC
@@ -560,7 +576,7 @@ const helpers = {
             product.product_id, 
             product.product_name, 
             product.product_description, 
-            product.product_imgsrc,
+            product.product_main_img,
             productprice.base_price, 
             productprice.current_price, 
             userwishlist.quantity
@@ -596,10 +612,24 @@ const helpers = {
 
   postProductToUserCart: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(
-        `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
+      await pool.query(`BEGIN`);
+      const response = await pool.query(
+        `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
+        [user_email, product_id],
       );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
+      } else {
+        await pool.query(
+          `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+          [user_email, product_id, quantity],
+        );
+      }
+      await pool.query(`COMMIT`);
     } catch (error) {
       console.error("Error adding item to cart:", error);
       throw error;
@@ -613,7 +643,7 @@ const helpers = {
             product.product_id, 
             product.product_name, 
             product.product_description, 
-            product.product_imgsrc,
+            product.product_main_img,
             productprice.base_price, 
             productprice.current_price, 
             usercart.quantity
@@ -663,6 +693,137 @@ const helpers = {
       return 0;
     } catch (error) {
       console.error("Error adjusting warehouse stock:", error);
+      throw error;
+    }
+  },
+  createProductListing: async function (
+    product_name,
+    product_description,
+    base_price,
+    current_price,
+    user_email,
+    warehouse_ids,
+    quantities,
+    product_images,
+  ) {
+    try {
+      const product_date_added = Math.floor(new Date().getTime() / 1000);
+      await pool.query(`BEGIN`);
+      response = await pool.query(
+        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
+            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
+        [
+          product_name,
+          product_images[0],
+          product_description,
+          new Date().getTime(),
+          user_email,
+          0.0,
+        ],
+      );
+      let product_id = response.rows[0].product_id;
+      await pool.query(
+        `INSERT INTO productprice (product_id, base_price, current_price)
+            VALUES ($1, $2, $3);`,
+        [product_id, base_price, current_price],
+      );
+      if (product_images.length > 1) {
+        for (let i = 1; i < product_images.length; i++) {
+          await pool.query(
+            `INSERT INTO image (product_id, image)
+                    VALUES ($1, $2);`,
+            [product_id, product_images[i]],
+          );
+        }
+      }
+      for (let i = 0; i < warehouse_ids.length; i++) {
+        let response = await pool.query(
+          `SELECT warehouse_id FROM warehouse WHERE warehouse_id = $1;`,
+          [warehouse_ids[i]],
+        );
+        if (response.rows.length === 0) {
+          throw new Error("Warehouse id not found");
+        }
+        await pool.query(
+          `INSERT INTO warehousestock (warehouse_id, product_id, quantity)
+                VALUES ($1, $2, $3);`,
+          [warehouse_ids[i], product_id, quantities[i]],
+        );
+      }
+      await pool.query(`COMMIT`);
+    } catch (error) {
+      console.error("Error adjusting warehouse stock:", error);
+      throw error;
+    }
+  },
+  clearUserCart: async function (user_email) {
+    try {
+      await pool.query(
+        `DELETE FROM usercart
+            WHERE user_email = $1;`,
+        [user_email],
+      );
+    } catch (error) {
+      console.error("Error adjusting warehouse stock:", error);
+      throw error;
+    }
+  },
+  handleResponse: async function (response) {
+    try {
+      const jsonResponse = await response.json();
+      return { jsonResponse, httpStatusCode: response.status };
+    } catch (err) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
+    }
+  },
+  postReviewsByUserEmail: async function (product_id, user_email, comment) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+            FROM product
+            WHERE user_email = $1;`,
+        [user_email],
+      );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO review(product_id, user_email, comment)
+                VALUES ($1, $2, $3);`,
+          [product_id, user_email, comment],
+        );
+      }
+    } catch (error) {
+      console.error("Error creating review:", error);
+      throw error;
+    }
+  },
+  postVendorRequestsByUserEmail: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `SELECT *
+            FROM vendorrequest
+            WHERE user_email = $1;`,
+        [user_email],
+      );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO vendorrequest(user_email, approve)
+                VALUES ($1, $2);`,
+          [user_email, 0],
+        );
+      }
+    } catch (error) {
+      console.error("Error creating vendor request:", error);
+      throw error;
+    }
+  },
+  getAllVendorRequests: async function () {
+    try {
+      const response = await pool.query(`SELECT *
+            FROM vendorrequest;`);
+      return response.rows;
+    } catch (error) {
+      console.error("Error creating vendor request:", error);
       throw error;
     }
   },
