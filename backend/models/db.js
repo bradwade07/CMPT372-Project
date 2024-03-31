@@ -152,6 +152,9 @@ const helpers = {
       await pool.query(`DROP TABLE IF EXISTS product CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS image CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS review CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS vendorrequest CASCADE;`);
 
       await pool.query(`COMMIT`);
       console.log("All tables deleted successfully.");
