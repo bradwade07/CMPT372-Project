@@ -4,51 +4,21 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
 import { getSessionUserEmail } from "@/app/auth";
-import { axios } from "@/api/axios";
-import { isAxiosError } from "axios";
-import { getProduct } from "@/api/product";
+import { getFilteredProducts } from "@/api/product";
+import { Product } from "@/api/product.types";
 
-type ItemType = {
-  productId: number;
-  name: string;
-  imgSrc: string;
-  description: string;
-  addedOn: Date;
-  basePrice: number;
-  currentPrice: number;
-};
-
-async function getProductsByEmail() {
+async function fetchProducts() {
   const user_email = await getSessionUserEmail();
   if (user_email) {
-    try {
-      let response = await axios.get(`/getProductIdByUserEmail/${user_email}`);
-
-      return response.data;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        console.error(error.response?.data || error.response || error);
-      } else {
-        console.error(error);
-      }
-
-      return [];
-    }
+    return await getFilteredProducts({ user_email: user_email });
   } else {
     console.error("Could not retrieve vendor's products");
     return [];
   }
 }
 
-async function fetchProducts() {
-  const items = await getProductsByEmail();
-
-  const productList = items.map((productId: number) => getProduct(productId));
-  return productList;
-}
-
 function page() {
-  const [list, setList] = useState<ItemType[] | undefined>();
+  const [list, setList] = useState<Product[] | undefined>();
 
   useEffect(() => {
     fetchProducts().then(setList);
@@ -81,14 +51,14 @@ function page() {
                   shadow="sm"
                   radius="lg"
                   width="100%"
-                  alt={item.name}
+                  alt={item.product_name}
                   className="w-full object-cover h-[140px]"
-                  src={item.imgSrc}
+                  src={item.main_product_img}
                 />
               </CardBody>
               <CardFooter className="text-small justify-between">
-                <b>{item.name}</b>
-                <p className="text-default-500">{item.currentPrice}</p>
+                <b>{item.product_name}</b>
+                <p className="text-default-500">{item.current_price}</p>
               </CardFooter>
             </Card>
           ))}

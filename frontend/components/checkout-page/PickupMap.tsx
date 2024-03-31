@@ -27,14 +27,13 @@ export default function PickupMap({ data }: PickupMapProps) {
 
     data?.forEach(async (item) => {
       if (item.delivery == false && item.warehouse_id) {
-        const warehouse = await getWarehouse(item.warehouse_id);
         if (
-          warehouse &&
           !warehouses.find((warehouse: Warehouse) => {
             return warehouse.warehouse_id == item.warehouse_id;
           })
         ) {
-          warehouses.push(warehouse);
+          const warehouse = await getWarehouse(item.warehouse_id);
+          if (warehouse) warehouses.push(warehouse);
         }
       }
     });

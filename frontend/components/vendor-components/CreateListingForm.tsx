@@ -7,6 +7,11 @@ import React, { useState } from "react";
 import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
+import dynamic from "next/dynamic";
+const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
+  loading: () => null,
+  ssr: false,
+});
 
 export function CreateListingForm() {
   const [formData, setFormData] = useState<ProductListingCreation>({
@@ -201,6 +206,9 @@ export function CreateListingForm() {
         />
       </div>
       <div className="flex flex-col mt-2 mb-4">
+        <div className="h-96 mb-16">
+          <WarehouseMap />
+        </div>
         <WarehousesInput
           handleInputChange={handleInputChange}
           onAmountDecrease={(curAmount) => {
