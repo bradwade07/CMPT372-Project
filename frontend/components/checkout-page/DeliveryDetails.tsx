@@ -1,22 +1,17 @@
-import { AcquisitionMethod, PROVINCES } from "@/api/checkout.types";
+import { PROVINCES } from "@/api/checkout.types";
 import { ShoppingCartEntry } from "@/api/product.types";
 import { UserAddress } from "@/api/user.types";
-import {
-  Button,
-  Input,
-  Radio,
-  RadioGroup,
-  Select,
-  SelectItem,
-} from "@nextui-org/react";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
+const PickupMap = dynamic(() => import("./PickupMap"), {
+  loading: () => null,
+  ssr: false,
+});
 
 type DeliveryDetailsProps = {
-  data: undefined | ShoppingCartEntry[];
-  onInfoSubmit: (
-    acquisitionMethod: AcquisitionMethod,
-    deliveryDetails?: UserAddress,
-  ) => void;
+  data: ShoppingCartEntry[] | undefined;
+  onInfoSubmit: (deliveryDetails?: UserAddress) => void;
   onInfoEdit: () => void;
 };
 
@@ -25,7 +20,6 @@ export function DeliveryDetails({
   onInfoSubmit,
   onInfoEdit,
 }: DeliveryDetailsProps) {
-  const [selectedOption, setSelectedOption] = useState("delivery");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [deliveryFormData, setDeliveryFormData] = useState<UserAddress>({
@@ -47,25 +41,20 @@ export function DeliveryDetails({
     setDeliveryFormData({ ...deliveryFormData, [name]: value });
   };
 
-  // if option chosen was "pickup", then simply sets the forrm as submitted. if option chosen was "delivery", validates the info and then sets the form as submitted
+  // validates the delivery address form info and then sets the form as submitted
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (selectedOption == "pickup") {
-      onInfoSubmit("pickup");
-      setFormSubmitted(true);
-    } else {
-      let validForm = true;
-      Object.values(deliveryFormData).forEach((value, index) => {
-        if (value === "") {
-          validForm = false;
-        }
-      });
-
-      if (validForm) {
-        onInfoSubmit("delivery", deliveryFormData);
-        setFormSubmitted(true);
+    let validForm = true;
+    Object.values(deliveryFormData).forEach((value, index) => {
+      if (value === "") {
+        validForm = false;
       }
+    });
+
+    if (validForm) {
+      onInfoSubmit(deliveryFormData);
+      setFormSubmitted(true);
     }
   };
 
@@ -73,11 +62,9 @@ export function DeliveryDetails({
   function getDeliveryDetails(): React.JSX.Element {
     return (
       <div>
-        <p className="mb-3">
-          (Please enter your address so we can calculate shipping costs, your
-          actual shipping address will be provided through PayPal)
+        <p className="mb-3 text-lg">
+          Please enter the address you want the shipped items to be shipped to:
         </p>
-        <p className="mb-1">Shipping Details:</p>
         <form onSubmit={handleSubmit} className="flex flex-col">
           <Input
             className="mb-1"
@@ -141,32 +128,11 @@ export function DeliveryDetails({
     );
   }
 
-  // confirms with the user the address of warehouse(s) to pick up items from
-  function getPickupDetails(): React.JSX.Element {
-    return (
-      <div>
-        <p>Addresses of warehouses to pick items:</p>
-        <p className="mt-4 text-center">TODO</p>
-        <Button
-          type="submit"
-          color="primary"
-          className="w-fit self-center mt-3"
-          onClick={() => {
-            setFormSubmitted(true);
-            onInfoSubmit("pickup");
-          }}
-        >
-          Save
-        </Button>
-      </div>
-    );
-  }
-
   // displays the address info that the user entered previously
   function displayDeliveryDetails(): React.JSX.Element {
     return (
       <div>
-        <p className="mb-1">Shipping Details:</p>
+        <p className="mb-1 text-lg">Shipping Details:</p>
         <p>Address: {deliveryFormData.street_name}</p>
         <p>Postal Code: {deliveryFormData.post_code}</p>
         <p>City: {deliveryFormData.city}</p>
@@ -186,49 +152,18 @@ export function DeliveryDetails({
     );
   }
 
-  // displays the pickup info that the user confirmed previously
-  function displayPickupDetails(): React.JSX.Element {
-    return (
-      <div>
-        <p>Addresses of warehouses to pick items:</p>
-        <p className="mt-4 text-center">TODO</p>
-        <Button
-          type="submit"
-          className="w-fit self-center mt-3"
-          onClick={() => {
-            setFormSubmitted(false);
-            onInfoEdit();
-          }}
-        >
-          Edit
-        </Button>
-      </div>
-    );
-  }
-
-  // user can choose either delivery or pickup and confirm/fill out a form depending on the option chosen
-  // after the form is submitted, displays a confirmation of the info that the user entered/confirmed for either delivery or pickup
-  return !formSubmitted ? (
+  // Displays a form for user to fill out their address, as well as a map with the locations of the warehouses to pick up their items
+  return (
     <div>
-      <h3 className="text-xl flex justify-center mb-2">
-        Choose how to receive your purchase:
-      </h3>
-      <div className="flex justify-center mb-2">
-        <RadioGroup
-          onValueChange={setSelectedOption}
-          defaultValue={selectedOption}
-        >
-          <Radio value="delivery">Delivery</Radio>
-          <Radio value="pickup">Pickup</Radio>
-        </RadioGroup>
+      <div className="mb-8">
+        <h3 className="text-xl flex justify-center mb-2">
+          Item delivery details:
+        </h3>
+        {!formSubmitted ? getDeliveryDetails() : displayDeliveryDetails()}
       </div>
-      {selectedOption == "delivery" && getDeliveryDetails()}
-      {selectedOption == "pickup" && getPickupDetails()}
-    </div>
-  ) : (
-    <div>
-      {selectedOption == "delivery" && displayDeliveryDetails()}
-      {selectedOption == "pickup" && displayPickupDetails()}
+      <div className="w-full h-96">
+        <PickupMap data={data} />
+      </div>
     </div>
   );
 }

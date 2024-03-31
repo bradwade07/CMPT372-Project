@@ -18,11 +18,7 @@ assert(
   "env variable not set or made publically available: PAYPAL_CLIENT_ID",
 );
 
-type PayPalType = {
-  acquisitionMethod: AcquisitionMethod | undefined;
-};
-
-export function PayPal({ acquisitionMethod }: PayPalType) {
+export function PayPal() {
   const router = useRouter();
 
   const initialOptions = {
@@ -46,10 +42,7 @@ export function PayPal({ acquisitionMethod }: PayPalType) {
           }}
           createOrder={async () => {
             try {
-              if (!acquisitionMethod) {
-                throw Error("Delivery or pickup option has not been chosen");
-              }
-              const orderData = await createOrder(acquisitionMethod);
+              const orderData = await createOrder();
 
               if (orderData.id) {
                 return orderData.id;

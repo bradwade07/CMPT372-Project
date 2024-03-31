@@ -5,11 +5,11 @@ import { Warehouse } from "./warehouse.types";
 export async function getAllWarehouses(): Promise<Warehouse[]> {
   try {
     const warehouses: Warehouse[] = [
-      { warehouse_id: 1, latitude: 1, longitude: 1 },
-      { warehouse_id: 2, latitude: 2, longitude: 2 },
-      { warehouse_id: 3, latitude: 3, longitude: 3 },
-      { warehouse_id: 4, latitude: 4, longitude: 4 },
-      { warehouse_id: 5, latitude: 5, longitude: 5 },
+      { warehouse_id: 1, lat: 49.283353, long: -123.122444 },
+      { warehouse_id: 2, lat: 49.223287, long: -122.959533 },
+      { warehouse_id: 3, lat: 49.22174, long: -122.600351 },
+      { warehouse_id: 4, lat: 49.049775, long: -122.322996 },
+      { warehouse_id: 5, lat: 49.162727, long: -121.948495 },
     ];
 
     return warehouses;

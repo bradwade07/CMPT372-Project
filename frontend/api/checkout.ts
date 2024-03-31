@@ -1,18 +1,17 @@
 import { OnApproveData } from "@paypal/paypal-js";
 import { axios } from "./axios";
 import { getSessionUserData } from "@/app/auth";
-import { AcquisitionMethod } from "./checkout.types";
 import { isAxiosError } from "axios";
 
 // Creates a new paypal order
-export async function createOrder(acquisitionMethod: AcquisitionMethod) {
+// TODO: fix the acquisitionmethod removal in backend
+export async function createOrder() {
   const user_email = (await getSessionUserData())?.email;
 
   if (user_email) {
     try {
       const response = await axios.post(`/api/orders`, {
         user_email: user_email,
-        acquisitionMethod: acquisitionMethod,
       });
 
       return response.data;
