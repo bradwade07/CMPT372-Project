@@ -5,10 +5,10 @@ import { AcquisitionMethod } from "@/api/checkout.types";
 
 type OrderTotalProps = {
   data: undefined | ShoppingCartEntry[];
-  acquisitionMethod: AcquisitionMethod | undefined;
+  deliveryFormSubmitted: boolean;
 };
 
-export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
+export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
   const shippingPercentage = 0.15;
 
@@ -25,17 +25,8 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
       }
       setTotalSubprice(Number(subtotal.toFixed(2)));
 
-      if (acquisitionMethod) {
-        if (acquisitionMethod == "delivery") {
-          setTotalPrice(
-            Number(
-              (subtotal * (1 + taxPercentage + shippingPercentage)).toFixed(2),
-            ),
-          );
-        } else if (acquisitionMethod == "pickup") {
-          setTotalPrice(Number((subtotal * (1 + taxPercentage)).toFixed(2)));
-        }
-
+      if (deliveryFormSubmitted) {
+        setTotalPrice(Number((subtotal * (1 + taxPercentage)).toFixed(2)));
         setTotalPriceVisible(true);
       } else {
         setTotalPriceVisible(false);
@@ -43,7 +34,7 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
     } else {
       setTotalPriceVisible(false);
     }
-  }, [data, acquisitionMethod]);
+  }, [data, deliveryFormSubmitted]);
 
   function getSubtotalPrice(): React.JSX.Element {
     return (
@@ -68,12 +59,6 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
           Tax (%{taxPercentage * 100}): $
           {(totalSubprice * taxPercentage).toFixed(2)}
         </p>
-        {acquisitionMethod == "delivery" && (
-          <p>
-            Shipping cost (%{shippingPercentage * 100}): $
-            {(totalSubprice * shippingPercentage).toFixed(2)}
-          </p>
-        )}
         <p>Total after tax: ${totalPrice}</p>
       </div>
     );
@@ -88,13 +73,13 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
           {getTotalPrice()}
           {data && (
             <div className="mt-4">
-              <PayPal acquisitionMethod={acquisitionMethod} />
+              <PayPal />
             </div>
           )}
         </>
       ) : (
         <div className="mt-4">
-          <p>Please choose delivery or pickup to see total price and pay</p>
+          <p>Please confirm your delivery details to see total price and pay</p>
         </div>
       )}
     </div>

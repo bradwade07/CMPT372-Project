@@ -3,9 +3,7 @@
 import { CredentialResponse } from "@react-oauth/google";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { createNewUser, getUserType } from "@/api/user";
 import { UserTypes } from "@/api/user.types";
 
 if (!process.env.SECRET_KEY) {
@@ -15,7 +13,7 @@ if (!process.env.SECRET_KEY) {
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
-const cookieLength = 1000 * 60 * 60 * 3; // 3 hours
+const cookieLength = 1000 * 60 * 60 * 24; // 24 hours
 
 export type GoogleCredentials = {
   email: string;

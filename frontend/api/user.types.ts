@@ -25,3 +25,7 @@ export type UserAddress = {
   province: string;
   country: string;
 };
+
+export type BecomeVendorRequest = {
+  user_email: string;
+};
