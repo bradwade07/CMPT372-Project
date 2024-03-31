@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 const cors = require("cors");
 const {helpers} = require("./models/db");
 const fetch = require("node-fetch");

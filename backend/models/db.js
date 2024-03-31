@@ -39,7 +39,7 @@ const helpers = {
       await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
       await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
     }
-    await pool.query("CREATE TABLE IF NOT EXISTS review (review_id SERIAL, product_id INTEGER, user_email INTEGER, comment VARCHAR(255), PRIMARY KEY (review_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));");
+    await pool.query("CREATE TABLE IF NOT EXISTS review (review_id SERIAL, product_id INTEGER, user_email VARCHAR(255), comment VARCHAR(255), PRIMARY KEY (review_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));");
     await pool.query("CREATE TABLE IF NOT EXISTS vendorrequest ( request_id SERIAL PRIMARY KEY, user_email VARCHAR(255), FOREIGN KEY (user_email) REFERENCES userinfo(user_email));");
     await pool.query(`COMMIT`);
   },
