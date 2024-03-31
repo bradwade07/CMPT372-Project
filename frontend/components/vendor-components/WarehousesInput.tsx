@@ -49,7 +49,8 @@ export function WarehousesInput({
               data.map((item) => (
                 <SelectItem
                   key={item.warehouse_id}
-                  textValue={`${item.warehouse_id}`}
+                  value={item.warehouse_id}
+                  textValue={item.warehouse_id.toString()}
                 >
                   {item.warehouse_id}
                 </SelectItem>

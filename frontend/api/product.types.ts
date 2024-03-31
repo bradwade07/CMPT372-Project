@@ -32,6 +32,7 @@ export type ProductListingCreation = {
   product_description: string;
   base_price: number;
   current_price: number;
+  product_tags: string[];
   main_product_img_file: File | null;
   additional_product_img_files: File[];
   warehouse_ids: number[];

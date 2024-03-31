@@ -21,7 +21,7 @@ export function TopNavbar({ highlightLink }: TopNavbarProps) {
         <NavbarBrand>
           <Link href="/" className="font-bold text-inherit">
             <img src={"/logo.jpg"} alt={"Logo Icon"} width={50} height={50} />
-            <h3 className="ml-2 text-large">NAME</h3>
+            <h3 className="ml-2 text-large">CTAT</h3>
           </Link>
         </NavbarBrand>
       </NavbarContent>

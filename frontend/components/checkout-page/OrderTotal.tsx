@@ -21,7 +21,7 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
     if (data) {
       let subtotal = 0;
       for (let item of data) {
-        subtotal += item.quantity * item.base_price;
+        subtotal += item.quantity * item.current_price;
       }
       setTotalSubprice(Number(subtotal.toFixed(2)));
 
@@ -41,10 +41,10 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
       <div>
         {data?.map((item) => (
           <div key={item.product_id} className="flex flex-row gap-2">
-            <p>${item.base_price.toFixed(2)}</p>
+            <p>${item.current_price.toFixed(2)}</p>
             <p>x</p>
             <p>{item.quantity}</p>
-            <p>= ${(item.base_price * item.quantity).toFixed(2)}</p>
+            <p>= ${(item.current_price * item.quantity).toFixed(2)}</p>
           </div>
         ))}
         <p>Total before taxes: ${totalSubprice.toFixed(2)}</p>
@@ -59,7 +59,7 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
           Tax (%{taxPercentage * 100}): $
           {(totalSubprice * taxPercentage).toFixed(2)}
         </p>
-        <p>Total after tax: ${totalPrice}</p>
+        <p>Total after tax: ${totalPrice.toFixed(2)}</p>
       </div>
     );
   }

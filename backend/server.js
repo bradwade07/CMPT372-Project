@@ -604,6 +604,7 @@ app.post("/createProductListing", async (req, res) => {
     product_images.pop();
     warehouse_ids.pop();
     quantities.pop();
+    product_tags.pop();
     await helpers.createProductListing(product_name, product_description, base_price, current_price, user_email, warehouse_ids, quantities, product_images, product_tags);
     console.log("Product Created Successfully!");
     res.status(200);

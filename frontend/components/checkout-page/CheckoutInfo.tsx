@@ -15,7 +15,7 @@ import { useState } from "react";
 // 2) a form asking if a user wanted delivery or pickup, and then displays relevant information
 // 3) the order total amount and paypal payment buttons
 export function CheckoutInfo() {
-  const [deliveryFormSubmitted, setDeliveryFromSubmitted] = useState(false)
+  const [deliveryFormSubmitted, setDeliveryFromSubmitted] = useState(false);
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["Shopping Cart"],
@@ -23,9 +23,7 @@ export function CheckoutInfo() {
   });
 
   // when the user submits their delivery info, updates their address and allows them to pay for their order
-  async function onInfoSubmit(
-    deliveryDetails?: UserAddress,
-  ) {
+  async function onInfoSubmit(deliveryDetails?: UserAddress) {
     const user_email = await getSessionUserEmail();
     if (user_email && deliveryDetails) {
       await updateUserAddress(user_email, deliveryDetails);
@@ -53,7 +51,10 @@ export function CheckoutInfo() {
           />
         </div>
         <div className="flex flex-col w-1/3 mx-4">
-          <OrderTotal data={data} deliveryFormSubmitted={deliveryFormSubmitted} />
+          <OrderTotal
+            data={data}
+            deliveryFormSubmitted={deliveryFormSubmitted}
+          />
         </div>
       </div>
     </div>

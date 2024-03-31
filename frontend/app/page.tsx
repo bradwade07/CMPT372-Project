@@ -6,7 +6,7 @@ function Home() {
     <>
       <TopNavbar />
       <main className="flex flex-col items-center text-center min-h-screen min-w-full">
-        <div className="flex justify-center items-center text-center min-h-screen w-full border border-blue-500 mb-10">
+        <div className="flex justify-center items-center text-center h-96 w-full border border-blue-500 mb-10">
           Insert some kind of representative image here
         </div>
         <div className="p-4 w-full">

@@ -146,7 +146,7 @@ const helpers = {
         );`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS orderinfo (
-        order_id SERIAL PRIMARY KEY,
+        order_id SERIAL,
         user_email VARCHAR(255),
         product_id INTEGER,
         quantity INTEGER,
@@ -156,7 +156,7 @@ const helpers = {
         PRIMARY KEY (order_id, user_email, order_date, product_id, warehouse_id),
         FOREIGN KEY (product_id) REFERENCES product(product_id),
         FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
-        FOREIGN KEY (user_email) REFERENCES warehouse(warehouse_id)
+        FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
         );`);
     await pool.query(`COMMIT`);
   },

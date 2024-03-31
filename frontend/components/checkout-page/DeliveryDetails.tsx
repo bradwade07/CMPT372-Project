@@ -5,15 +5,13 @@ import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 const PickupMap = dynamic(() => import("./PickupMap"), {
-	loading: () => null,
-	ssr: false,
+  loading: () => null,
+  ssr: false,
 });
 
 type DeliveryDetailsProps = {
   data: ShoppingCartEntry[] | undefined;
-  onInfoSubmit: (
-    deliveryDetails?: UserAddress,
-  ) => void;
+  onInfoSubmit: (deliveryDetails?: UserAddress) => void;
   onInfoEdit: () => void;
 };
 
@@ -58,7 +56,7 @@ export function DeliveryDetails({
       onInfoSubmit(deliveryFormData);
       setFormSubmitted(true);
     }
-  }
+  };
 
   // a form that asks for the user's address
   function getDeliveryDetails(): React.JSX.Element {
@@ -163,7 +161,7 @@ export function DeliveryDetails({
         </h3>
         {!formSubmitted ? getDeliveryDetails() : displayDeliveryDetails()}
       </div>
-      <div className="w-96 h-96">
+      <div className="w-full h-96">
         <PickupMap data={data} />
       </div>
     </div>
