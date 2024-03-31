@@ -52,7 +52,6 @@ async function fetchProducts(){
 }
 
 function page() {
-  // TODO: implement
 
   const [list, setList] = useState<ItemType[] | undefined>()
 
