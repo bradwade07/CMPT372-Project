@@ -92,6 +92,7 @@ export async function createProductListing(formData: ProductListingCreation) {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     const {
+      product_tags,
       main_product_img_file,
       additional_product_img_files,
       warehouse_ids,
@@ -99,25 +100,23 @@ export async function createProductListing(formData: ProductListingCreation) {
       ...rest
     } = formData;
 
-    // console.log(
-    //   {
-    //     ...rest,
-    //     warehouse_ids: [...warehouse_ids, -1],
-    //     quantities: [...quantities, -1],
-    //     product_images: [
-    //       main_product_img_file,
-    //       ...additional_product_img_files,
-    //       // this empty file ensures that there will be at least 2 elements in this array and forces this array to be posted as an array.
-    //       // when there's only 1 item in the array it gets posted as an object instead of a single element array
-    //       new File(
-    //         [new Blob([], { type: "image/jpeg" })],
-    //         "placeholder.jpg",
-    //         { type: "image/jpeg" },
-    //       ),
-    //     ],
-    //     user_email: user_email,
-    //   },
-    // )
+    // console.log({
+    //   ...rest,
+    //   user_email: user_email,
+    //   // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
+    //   // forces this array to be posted as an array.
+    //   // when there's only 1 item in the array it gets posted as an object instead of a single element array
+    //   product_tags: [...product_tags, "placeholdertag"],
+    //   warehouse_ids: [...warehouse_ids, -1],
+    //   quantities: [...quantities, -1],
+    //   product_images: [
+    //     main_product_img_file,
+    //     ...additional_product_img_files,
+    //     new File([new Blob([], { type: "image/jpeg" })], "placeholder.jpg", {
+    //       type: "image/jpeg",
+    //     }),
+    //   ],
+    // });
 
     try {
       await axios.post(
@@ -128,6 +127,7 @@ export async function createProductListing(formData: ProductListingCreation) {
           // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
           // forces this array to be posted as an array.
           // when there's only 1 item in the array it gets posted as an object instead of a single element array
+          product_tags: [...product_tags, "placeholdertag"],
           warehouse_ids: [...warehouse_ids, -1],
           quantities: [...quantities, -1],
           product_images: [
@@ -136,7 +136,9 @@ export async function createProductListing(formData: ProductListingCreation) {
             new File(
               [new Blob([], { type: "image/jpeg" })],
               "placeholder.jpg",
-              { type: "image/jpeg" },
+              {
+                type: "image/jpeg",
+              },
             ),
           ],
         },

@@ -65,7 +65,7 @@ export async function updateUserType(
   try {
     await axios.patch("/patchUserType", {
       user_email: user_email,
-      user_type: user_type,
+      type: user_type,
     });
   } catch (error) {
     if (isAxiosError(error)) {

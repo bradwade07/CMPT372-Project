@@ -6,6 +6,7 @@ import { Button, Input, Textarea } from "@nextui-org/react";
 import React, { useState } from "react";
 import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
+import TagsInput from "./TagsInput";
 
 export function CreateListingForm() {
   const [formData, setFormData] = useState<ProductListingCreation>({
@@ -13,6 +14,7 @@ export function CreateListingForm() {
     product_description: "",
     base_price: 0,
     current_price: 0,
+    product_tags: [],
     main_product_img_file: null,
     additional_product_img_files: [],
     warehouse_ids: [],
@@ -158,7 +160,14 @@ export function CreateListingForm() {
         min={0}
         onChange={handleInputChange}
       />
-      <div className="flex flex-col w-fit mb-4">
+      <div className="flex flex-col mb-4">
+        <TagsInput
+          handleInputChange={(value) => {
+            setFormData({ ...formData, product_tags: value });
+          }}
+        />
+      </div>
+      <div className="flex flex-col mb-4">
         <label
           className="text-sm pb-[6px] hover:cursor-pointer"
           htmlFor="main_product_img_file"
