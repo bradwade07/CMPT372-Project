@@ -40,7 +40,7 @@ const helpers = {
       await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
     }
     await pool.query("CREATE TABLE IF NOT EXISTS review (review_id SERIAL, product_id INTEGER, user_email INTEGER, comment VARCHAR(255), PRIMARY KEY (review_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));");
-    await pool.query("CREATE TABLE IF NOT EXISTS vendorrequest ( request_id SERIAL PRIMARY KEY, user_email VARCHAR(255), approve BOOLEAN, FOREIGN KEY (user_email) REFERENCES userinfo(user_email));");
+    await pool.query("CREATE TABLE IF NOT EXISTS vendorrequest ( request_id SERIAL PRIMARY KEY, user_email VARCHAR(255), FOREIGN KEY (user_email) REFERENCES userinfo(user_email));");
     await pool.query(`COMMIT`);
   },
 
@@ -573,8 +573,8 @@ const helpers = {
             FROM vendorrequest
             WHERE user_email = $1;`, [user_email]);
       if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO vendorrequest(user_email, approve)
-                VALUES ($1, $2);`, [user_email, 0]);
+        await pool.query(`INSERT INTO vendorrequest(user_email)
+                VALUES ($1);`, [user_email]);
       }
     } catch (error) {
       console.error("Error creating vendor request:", error);
@@ -585,6 +585,17 @@ const helpers = {
     try {
       const response = await pool.query(`SELECT *
             FROM vendorrequest;`);
+      return response.rows;
+    } catch (error) {
+      console.error("Error creating vendor request:", error);
+      throw error;
+    }
+  },
+  getAllActiveVendorRequests: async function () {
+    try {
+      const response = await pool.query(`SELECT *
+            FROM vendorrequest
+            WHERE approve;`);
       return response.rows;
     } catch (error) {
       console.error("Error creating vendor request:", error);

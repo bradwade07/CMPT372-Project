@@ -4,15 +4,12 @@ const cors = require("cors");
 const {helpers} = require("./models/db");
 const fetch = require("node-fetch");
 require("dotenv").config(); // allows using the environment variables from .env file
-//const multer = require('multer');
 const upload = require("express-fileupload");
 
 const app = express();
 const port = 8080;
 const {PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET} = process.env;
 const paypal_base = "https://api-m.sandbox.paypal.com";
-// const upload = multer({ storage: multer.memoryStorage() });
-// const upload = multer({ dest: 'uploads/' });
 
 app.use(upload());
 app.use(cors());
@@ -658,6 +655,15 @@ app.post("/postReviewsByUserEmail", async (req, res) => {
     } catch (error) {
       console.error("Failed to get all vendor request:", error);
       res.status(500).json({error: "Failed to get all vendor request."});
+    }
+  });
+  app.get("/getAllActiveVendorRequests", async (req, res) => {
+    try {
+      const response = await helpers.getAllActiveVendorRequests();
+      res.status(200).json(response);
+    } catch (error) {
+      console.error("Failed to get all active vendor request:", error);
+      res.status(500).json({error: "Failed to get all active vendor request."});
     }
   });
 
