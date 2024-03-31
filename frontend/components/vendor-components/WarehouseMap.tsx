@@ -39,7 +39,11 @@ export default function WarehouseMap() {
         />
         {data &&
           data.map((warehouse: Warehouse) => (
-            <Marker position={[warehouse.lat, warehouse.long]} icon={icon}>
+            <Marker
+              position={[warehouse.lat, warehouse.long]}
+              icon={icon}
+              key={warehouse.warehouse_id}
+            >
               <Popup>Warehouse ID: {warehouse.warehouse_id}</Popup>
             </Marker>
           ))}

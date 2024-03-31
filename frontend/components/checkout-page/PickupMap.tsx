@@ -55,7 +55,11 @@ export default function PickupMap({ data }: PickupMapProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {warehouses.map((warehouse: Warehouse) => (
-          <Marker position={[warehouse.lat, warehouse.long]} icon={icon}>
+          <Marker
+            position={[warehouse.lat, warehouse.long]}
+            icon={icon}
+            key={warehouse.warehouse_id}
+          >
             <Popup>Warehouse ID: {warehouse.warehouse_id}</Popup>
           </Marker>
         ))}

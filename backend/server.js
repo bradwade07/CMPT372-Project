@@ -1,18 +1,14 @@
 const express = require("express");
-const path = require("path");
 const cors = require("cors");
 const { helpers } = require("./models/db");
 const fetch = require("node-fetch");
 require("dotenv").config(); // allows using the environment variables from .env file
-//const multer = require('multer');
 const upload = require("express-fileupload");
 
 const app = express();
 const port = 8080;
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 const paypal_base = "https://api-m.sandbox.paypal.com";
-// const upload = multer({ storage: multer.memoryStorage() });
-// const upload = multer({ dest: 'uploads/' });
 
 app.use(upload());
 app.use(cors());
@@ -32,19 +28,7 @@ app.post("/insertTestData", async (req, res) => {
   }
 });
 
-app.post("/deleteTestData", async (req, res) => {
-  //testing
-  try {
-    helpers.deleteTestData();
-    console.log("Success: Data deleted succesfully!");
-    return res.status(201).send("Success: Data deleted succesfully!");
-  } catch (error) {
-    console.error("Error: Data Not deleted.", error);
-    return res.status(500).send("Error: Data Not deleted.");
-  }
-});
-
-app.post("/deleteAllTables", async (req, res) => {
+app.delete("/deleteAllTables", async (req, res) => {
   //testing
   try {
     helpers.deleteAllTables();
@@ -58,8 +42,9 @@ app.post("/deleteAllTables", async (req, res) => {
 
 // Products related endpoints
 app.get("/getProduct/:product_id", async (req, res) => {
-  if (!req.params.product_id)
+  if (!req.params.product_id) {
     return res.status(400).send({ error: "Invalid product id!" });
+  }
   let product_id = parseInt(req.params.product_id);
 
   try {
@@ -247,7 +232,7 @@ app.post("/postUser", async (req, res) => {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2;
 
   try {
     await helpers.postUser(
@@ -287,11 +272,14 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let { user_email, type: user_type } = req.body;
-  if (!user_email)
+  if (!user_email) {
     return res.status(400).send({ error: "Invalid user email!" });
+  }
   user_email = user_email.trim();
 
-  if (!user_type) return res.status(400).send({ error: "Invalid type!" });
+  if (!user_type) {
+    return res.status(400).send({ error: "Invalid type!" });
+  }
   user_type = user_type.trim().toLowerCase();
 
   if (user_type !== "customer" && user_type !== "vendor") {
@@ -613,21 +601,8 @@ const captureOrder = async (orderID) => {
     },
   });
 
-  return handleResponse(response);
+  return helpers.handleResponse(response);
 };
-
-async function handleResponse(response) {
-  try {
-    const jsonResponse = await response.json();
-    return {
-      jsonResponse,
-      httpStatusCode: response.status,
-    };
-  } catch (err) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage);
-  }
-}
 
 app.post("/api/orders", async (req, res) => {
   try {
@@ -666,6 +641,7 @@ app.post("/createProductListing", async (req, res) => {
     let product_images = [];
     let warehouse_ids = [];
     let quantities = [];
+    let product_tags = [];
     req.files["product_images[]"].forEach((obj) => {
       product_images.push(obj.data);
     });
@@ -675,9 +651,13 @@ app.post("/createProductListing", async (req, res) => {
     req.body["quantities[]"].forEach((quantity) => {
       quantities.push(parseInt(quantity));
     });
+    req.body["product_tags[]"].forEach((tag) => {
+      product_tags.push(tag);
+    });
     product_images.pop();
     warehouse_ids.pop();
     quantities.pop();
+    product_tags.pop();
     await helpers.createProductListing(
       product_name,
       product_description,
@@ -687,6 +667,7 @@ app.post("/createProductListing", async (req, res) => {
       warehouse_ids,
       quantities,
       product_images,
+      product_tags,
     );
     console.log("Product Created Successfully!");
     res.status(200);
@@ -726,6 +707,18 @@ app.get("/getAllVendorRequests", async (req, res) => {
   } catch (error) {
     console.error("Failed to get all vendor request:", error);
     res.status(500).json({ error: "Failed to get all vendor request." });
+  }
+});
+
+app.delete("/deleteVendorRequest", async (req, res) => {
+  try {
+    const { user_email } = req.body;
+    await helpers.deleteVendorRequestByUserEmail(user_email);
+    console.log("Review Deleted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to delete vendor request:", error);
+    res.status(500).json({ error: "Failed to delete vendor request." });
   }
 });
 

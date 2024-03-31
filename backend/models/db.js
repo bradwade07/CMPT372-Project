@@ -20,57 +20,144 @@ pool = new Pool({
 const helpers = {
   init: async function () {
     await pool.query(`BEGIN`);
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS address (address_id SERIAL PRIMARY KEY, street_name VARCHAR(255), city VARCHAR(255), province VARCHAR(255), post_code VARCHAR(255), country VARCHAR(255));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS userinfo (user_email VARCHAR(255) PRIMARY KEY, address_id INTEGER, FOREIGN KEY (address_id) REFERENCES address(address_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS product (product_id SERIAL PRIMARY KEY, product_name VARCHAR(255), product_main_img BYTEA, product_description VARCHAR(255), product_date_added bigINT, user_email VARCHAR(255), product_avg_rating FLOAT, FOREIGN KEY (user_email) REFERENCES userInfo(user_email));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS productprice (product_id INTEGER PRIMARY KEY, base_price FLOAT, current_price FLOAT, FOREIGN KEY (product_id) REFERENCES product(product_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS tag (tag_id SERIAL PRIMARY KEY, tag_name VARCHAR(255));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS producttags (product_id INTEGER, tag_id INTEGER, PRIMARY KEY (product_id, tag_id), FOREIGN KEY (product_id) REFERENCES product(product_id), FOREIGN KEY (tag_id) REFERENCES tag(tag_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS usertypes (type_id SERIAL PRIMARY KEY, type VARCHAR(255));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS users (user_email VARCHAR(255) PRIMARY KEY, type_id INTEGER, FOREIGN KEY (user_email) REFERENCES userInfo(user_email), FOREIGN KEY (type_id) REFERENCES userTypes(type_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS userwishlist (user_email VARCHAR(255), product_id INTEGER, quantity INTEGER , PRIMARY KEY (user_email, product_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS warehouse (warehouse_id SERIAL PRIMARY KEY, lat FLOAT, long FLOAT);",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS warehousestock (warehouse_id INTEGER, product_id INTEGER, PRIMARY KEY (warehouse_id, product_id), quantity INTEGER, FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS usercart (user_email VARCHAR(255), product_id INTEGER, quantity INTEGER, delivery BOOLEAN, warehouse_id INTEGER, PRIMARY KEY (user_email, product_id), FOREIGN KEY (user_email) REFERENCES userInfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id), FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS image (product_id INTEGER, image_id SERIAL, image BYTEA, PRIMARY KEY (product_id, image_id), FOREIGN KEY (product_id) REFERENCES product(product_id));",
-    );
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS address (
+        address_id SERIAL PRIMARY KEY,
+        street_name VARCHAR(255),
+        city VARCHAR(255),
+        province VARCHAR(255),
+        post_code VARCHAR(255),
+        country VARCHAR(255)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS userinfo (
+        user_email VARCHAR(255) PRIMARY KEY,
+        address_id INTEGER,
+        FOREIGN KEY (address_id) REFERENCES address(address_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS product (
+        product_id SERIAL PRIMARY KEY,
+        product_name VARCHAR(255),
+        product_main_img BYTEA,
+        product_description VARCHAR(255),
+        product_date_added bigINT,
+        user_email VARCHAR(255),
+        product_avg_rating FLOAT,
+        FOREIGN KEY (user_email) REFERENCES userInfo(user_email)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS productprice (
+        product_id INTEGER PRIMARY KEY,
+        base_price FLOAT,
+        current_price FLOAT,
+        FOREIGN KEY (product_id) REFERENCES product(product_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS tag (
+        tag_id SERIAL PRIMARY KEY,
+        tag_name VARCHAR(255)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS producttags (
+        product_id INTEGER,
+        tag_id INTEGER,
+        PRIMARY KEY (product_id, tag_id),
+        FOREIGN KEY (product_id) REFERENCES product(product_id),
+        FOREIGN KEY (tag_id) REFERENCES tag(tag_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS usertypes (
+        type_id SERIAL PRIMARY KEY,
+        type VARCHAR(255)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+        user_email VARCHAR(255) PRIMARY KEY,
+        type_id INTEGER,
+        FOREIGN KEY (user_email) REFERENCES userInfo(user_email),
+        FOREIGN KEY (type_id) REFERENCES userTypes(type_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS userwishlist (
+        user_email VARCHAR(255),
+        product_id INTEGER,
+        quantity INTEGER,
+        PRIMARY KEY (user_email, product_id),
+        FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
+        FOREIGN KEY (product_id) REFERENCES product(product_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS warehouse (
+        warehouse_id SERIAL PRIMARY KEY,
+        lat FLOAT,
+        long FLOAT
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS warehousestock (
+        warehouse_id INTEGER,
+        product_id INTEGER,
+        PRIMARY KEY (warehouse_id, product_id),
+        quantity INTEGER,
+        FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id),
+        FOREIGN KEY (product_id) REFERENCES product(product_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS usercart (
+        user_email VARCHAR(255),
+        product_id INTEGER,
+        quantity INTEGER,
+        delivery BOOLEAN,
+        warehouse_id INTEGER,
+        PRIMARY KEY (user_email, product_id),
+        FOREIGN KEY (user_email) REFERENCES userInfo(user_email),
+        FOREIGN KEY (product_id) REFERENCES product(product_id),
+        FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS image (
+        product_id INTEGER,
+        image_id SERIAL,
+        image BYTEA,
+        PRIMARY KEY (product_id, image_id),
+        FOREIGN KEY (product_id) REFERENCES product(product_id)
+        );`);
     const response = await pool.query(`SELECT * FROM usertypes;`);
     if (response.rows.length === 0) {
       await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
       await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
       await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
     }
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS review (review_id SERIAL, product_id INTEGER, user_email VARCHAR(255), comment VARCHAR(255), PRIMARY KEY (review_id), FOREIGN KEY (user_email) REFERENCES userinfo(user_email), FOREIGN KEY (product_id) REFERENCES product(product_id));",
-    );
-    await pool.query(
-      "CREATE TABLE IF NOT EXISTS vendorrequest ( request_id SERIAL PRIMARY KEY, user_email VARCHAR(255), approve BOOLEAN, FOREIGN KEY (user_email) REFERENCES userinfo(user_email));",
-    );
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS review (
+        review_id SERIAL,
+        product_id INTEGER,
+        user_email VARCHAR(255),
+        comment VARCHAR(255),
+        PRIMARY KEY (review_id),
+        FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
+        FOREIGN KEY (product_id) REFERENCES product(product_id)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS vendorrequest (
+        request_id SERIAL PRIMARY KEY,
+        user_email VARCHAR(255),
+        FOREIGN KEY (user_email) REFERENCES userinfo(user_email)
+        );`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS orderinfo (
+        order_id SERIAL,
+        user_email VARCHAR(255),
+        product_id INTEGER,
+        quantity INTEGER,
+        delivery BOOLEAN,
+        warehouse_id INTEGER,
+        order_date BIGINT,
+        PRIMARY KEY (order_id, user_email, order_date, product_id, warehouse_id),
+        FOREIGN KEY (product_id) REFERENCES product(product_id),
+        FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
+        FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
+        );`);
     await pool.query(`COMMIT`);
   },
 
@@ -212,38 +299,9 @@ const helpers = {
     //////////////////////////
   },
 
-  deleteTestData: async function () {
-    try {
-      await pool.query(`BEGIN`);
-
-      // Delete data from tables with foreign key constraints first
-      await pool.query(`DELETE FROM usercart;`);
-      await pool.query(`DELETE FROM userwishlist;`);
-      await pool.query(`DELETE FROM warehousestock;`);
-      await pool.query(`DELETE FROM producttags;`);
-      await pool.query(`DELETE FROM productprice;`);
-      await pool.query(`DELETE FROM product;`);
-      await pool.query(`DELETE FROM users;`);
-      await pool.query(`DELETE FROM usertypes;`);
-      await pool.query(`DELETE FROM userinfo;`);
-      await pool.query(`DELETE FROM address;`);
-      await pool.query(`DELETE FROM tag;`);
-      await pool.query(`DELETE FROM warehouse;`);
-
-      await pool.query(`COMMIT`);
-      console.log("Test data and tables deleted successfully.");
-    } catch (error) {
-      await pool.query(`ROLLBACK`);
-      console.error("Error deleting test data:", error);
-      throw error;
-    }
-  },
-
   deleteAllTables: async function () {
     try {
       await pool.query(`BEGIN`);
-
-      // Drop tables in reverse order of dependency
       await pool.query(`DROP TABLE IF EXISTS warehousestock CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS warehouse CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS userwishlist CASCADE;`);
@@ -256,13 +314,15 @@ const helpers = {
       await pool.query(`DROP TABLE IF EXISTS product CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
-
+      await pool.query(`DROP TABLE IF EXISTS image CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS review CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS vendorrequest CASCADE;`);
+      await pool.query(`DROP TABLE IF EXISTS orderinfo CASCADE;`);
       await pool.query(`COMMIT`);
       console.log("All tables deleted successfully.");
     } catch (error) {
       await pool.query(`ROLLBACK`);
       console.error("Error deleting tables:", error);
-      throw error;
     }
   },
 
@@ -278,7 +338,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error retrieving product information:", error);
-      throw error;
     }
   },
 
@@ -296,7 +355,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByName:", error);
-      throw error;
     }
   },
 
@@ -316,7 +374,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByRating:", error);
-      throw error;
     }
   },
 
@@ -333,7 +390,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByPrice:", error);
-      throw error;
     }
   },
 
@@ -353,7 +409,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByDateAdded:", error);
-      throw error;
     }
   },
 
@@ -371,7 +426,6 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByUserEmail:", error);
-      throw error;
     }
   },
 
@@ -405,7 +459,6 @@ const helpers = {
       }
     } catch (error) {
       console.error("Error in getProductIdByTags:", error);
-      throw error;
     }
   },
 
@@ -428,7 +481,6 @@ const helpers = {
       }
     } catch (error) {
       console.error("Error retrieving products on sale:", error);
-      throw error;
     }
   },
 
@@ -450,7 +502,6 @@ const helpers = {
       }
     } catch (error) {
       console.error("Error retrieving newest products:", error);
-      throw error;
     }
   },
 
@@ -481,7 +532,6 @@ const helpers = {
       );
     } catch (error) {
       console.error("Error adding user:", error);
-      throw error;
     }
   },
 
@@ -500,7 +550,23 @@ const helpers = {
       return response.rows[0].address_id;
     } catch (error) {
       console.error("Error adding address:", error);
-      throw error;
+    }
+  },
+
+  getUserTypeByUserEmail: async function (email) {
+    try {
+      await pool.query(`BEGIN`);
+      const result = await pool.query(
+        `SELECT users.type_id, usertypes.type FROM users 
+        JOIN usertypes ON users.type_id = usertypes.type_id 
+        WHERE user_email = $1;`,
+        [email],
+      );
+      await pool.query(`COMMIT`);
+      return result.rows;
+    } catch (error) {
+      await pool.query(`ROLLBACK`);
+      console.error("Error retrieving user by email:", error);
     }
   },
 
@@ -530,7 +596,6 @@ const helpers = {
       ]);
     } catch (error) {
       console.error("Error updating user type:", error);
-      throw error;
     }
   },
 
@@ -553,86 +618,6 @@ const helpers = {
       );
     } catch (error) {
       console.error("Error updating user address:", error);
-      throw error;
-    }
-  },
-
-  postProductToUserWishlist: async function (user_email, product_id, quantity) {
-    try {
-      await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
-      );
-    } catch (error) {
-      console.error("Error adding item to wish list:", error);
-      throw error;
-    }
-  },
-
-  getUserWishlistByUserEmail: async function (email) {
-    try {
-      const query = `
-        SELECT 
-            product.product_id, 
-            product.product_name, 
-            product.product_description, 
-            product.product_main_img,
-            productprice.base_price, 
-            productprice.current_price, 
-            userwishlist.quantity
-        FROM product
-        JOIN userwishlist ON product.product_id = userwishlist.product_id
-        JOIN productprice ON product.product_id = productprice.product_id
-        WHERE userwishlist.user_email = $1;
-        `;
-      const values = [email];
-      const result = await pool.query(query, values);
-      return result.rows.length
-        ? result.rows
-        : {
-            message: "No products found in the user's wishlist",
-          };
-    } catch (error) {
-      console.error("Error retrieving wish list products by email:", error);
-      throw error;
-    }
-  },
-
-  deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
-    try {
-      await pool.query(
-        "DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2",
-        [user_email, product_id],
-      );
-    } catch (error) {
-      console.error("Error removing item from wish list:", error);
-      throw error;
-    }
-  },
-
-  postProductToUserCart: async function (user_email, product_id, quantity) {
-    try {
-      await pool.query(`BEGIN`);
-      const response = await pool.query(
-        `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
-        [user_email, product_id],
-      );
-      if (response.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-          [user_email, product_id, quantity],
-        );
-      } else {
-        await pool.query(
-          `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
-          [response.rows[0].quantity + quantity, user_email, product_id],
-          [user_email, product_id, quantity],
-        );
-      }
-      await pool.query(`COMMIT`);
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-      throw error;
     }
   },
 
@@ -668,12 +653,114 @@ const helpers = {
   deleteUserCartByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
+        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+        [user_email, product_id, quantity],
+      );
+    } catch (error) {
+      console.error("Error adding item to wish list:", error);
+    }
+  },
+
+  getUserWishlistByUserEmail: async function (email) {
+    try {
+      const query = `
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_main_img,
+            productprice.base_price, 
+            productprice.current_price, 
+            userwishlist.quantity
+        FROM product
+        JOIN userwishlist ON product.product_id = userwishlist.product_id
+        JOIN productprice ON product.product_id = productprice.product_id
+        WHERE userwishlist.user_email = $1;
+        `;
+      const values = [email];
+      const result = await pool.query(query, values);
+      return result.rows.length
+        ? result.rows
+        : {
+            message: "No products found in the user's wishlist",
+          };
+    } catch (error) {
+      console.error("Error retrieving wish list products by email:", error);
+    }
+  },
+
+  deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
+    try {
+      await pool.query(
+        "DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2",
+        [user_email, product_id],
+      );
+    } catch (error) {
+      console.error("Error removing item from wish list:", error);
+    }
+  },
+
+  postProductToUserCart: async function (user_email, product_id, quantity) {
+    try {
+      await pool.query(`BEGIN`);
+      const response = await pool.query(
+        `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
+        [user_email, product_id],
+      );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
+      } else {
+        await pool.query(
+          `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+          [user_email, product_id, quantity],
+        );
+      }
+      await pool.query(`COMMIT`);
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
+  },
+
+  getUserCartByUserEmail: async function (email) {
+    try {
+      const query = `
+        SELECT 
+            product.product_id, 
+            product.product_name, 
+            product.product_description, 
+            product.product_main_img,
+            productprice.base_price, 
+            productprice.current_price, 
+            usercart.quantity
+        FROM product
+        JOIN usercart ON product.product_id = usercart.product_id
+        JOIN productprice ON product.product_id = productprice.product_id
+        WHERE usercart.user_email = $1;
+        `;
+      const values = [email];
+      const result = await pool.query(query, values);
+      return result.rows.length > 0
+        ? result.rows
+        : {
+            message: "No products found in the user's cart",
+          };
+    } catch (error) {
+      console.error("Error retrieving user cart by email:", error);
+    }
+  },
+
+  deleteUserCartByPidUserEmail: async function (user_email, product_id) {
+    try {
+      await pool.query(
         `DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `,
         [user_email, product_id],
       );
     } catch (error) {
       console.error("Error removing item from cart:", error);
-      throw error;
     }
   },
 
@@ -693,7 +780,6 @@ const helpers = {
       return 0;
     } catch (error) {
       console.error("Error adjusting warehouse stock:", error);
-      throw error;
     }
   },
   createProductListing: async function (
@@ -705,11 +791,12 @@ const helpers = {
     warehouse_ids,
     quantities,
     product_images,
+    product_tags,
   ) {
     try {
       const product_date_added = Math.floor(new Date().getTime() / 1000);
       await pool.query(`BEGIN`);
-      response = await pool.query(
+      let response = await pool.query(
         `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
             VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
         [
@@ -721,7 +808,7 @@ const helpers = {
           0.0,
         ],
       );
-      let product_id = response.rows[0].product_id;
+      const product_id = response.rows[0].product_id;
       await pool.query(
         `INSERT INTO productprice (product_id, base_price, current_price)
             VALUES ($1, $2, $3);`,
@@ -750,10 +837,34 @@ const helpers = {
           [warehouse_ids[i], product_id, quantities[i]],
         );
       }
+      let tag_id;
+      for (let i = 0; i < product_tags.length; i++) {
+        response = await pool.query(
+          `SELECT * 
+            FROM tag
+            WHERE tag_name = $1;`,
+          [product_tags[i]],
+        );
+        if (response.rows.length === 0) {
+          resp = await pool.query(
+            `INSERT INTO tag(tag_name)
+                VALUES ($1)
+                RETURNING tag_id;`,
+            [product_tags[i]],
+          );
+          tag_id = resp.rows[0].tag_id;
+        } else {
+          tag_id = response.rows[0].tag_id;
+        }
+        await pool.query(
+          `INSERT INTO producttags(product_id, tag_id)
+                VALUES ($1, $2);`,
+          [product_id, tag_id],
+        );
+      }
       await pool.query(`COMMIT`);
     } catch (error) {
-      console.error("Error adjusting warehouse stock:", error);
-      throw error;
+      console.error("Error creating product listing:", error);
     }
   },
   clearUserCart: async function (user_email) {
@@ -765,7 +876,6 @@ const helpers = {
       );
     } catch (error) {
       console.error("Error adjusting warehouse stock:", error);
-      throw error;
     }
   },
   handleResponse: async function (response) {
@@ -794,7 +904,6 @@ const helpers = {
       }
     } catch (error) {
       console.error("Error creating review:", error);
-      throw error;
     }
   },
   postVendorRequestsByUserEmail: async function (user_email) {
@@ -807,14 +916,13 @@ const helpers = {
       );
       if (response.rows.length === 0) {
         await pool.query(
-          `INSERT INTO vendorrequest(user_email, approve)
-                VALUES ($1, $2);`,
-          [user_email, 0],
+          `INSERT INTO vendorrequest(user_email)
+                VALUES ($1);`,
+          [user_email],
         );
       }
     } catch (error) {
       console.error("Error creating vendor request:", error);
-      throw error;
     }
   },
   getAllVendorRequests: async function () {
@@ -824,7 +932,18 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error creating vendor request:", error);
-      throw error;
+    }
+  },
+  deleteVendorRequestByUserEmail: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `DELETE FROM vendorrequest
+      WHERE user_email = $1;`,
+        [user_email],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error deleting vendor request:", error);
     }
   },
 };
