@@ -1,8 +1,8 @@
-'use client';
+"use client";
 import { getProduct } from "@/api/product";
 import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
-import ImageSelector from "@/components/ImageSelector/ImageSelector"
+import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ type SearchParams = {
 
 function page({ searchParams }: { searchParams: SearchParams }) {
   const router = useRouter();
-  const [selectedQuantity, setSelectedQuantity] = useState(1); 
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["Product", searchParams.product_id],
@@ -81,15 +81,23 @@ function page({ searchParams }: { searchParams: SearchParams }) {
             <p className="text-lg">${data?.base_price}</p>
             <p className="mb-8">{data?.product_description}</p>
             <div className="flex flex-col gap-4 mb-8">
-              <Button className="bg-blue-500 hover:bg-blue-700 text-white" onClick={addItemToShoppingCart}>
+              <Button
+                className="bg-blue-500 hover:bg-blue-700 text-white"
+                onClick={addItemToShoppingCart}
+              >
                 ADD TO CART
               </Button>
-              <Button onClick={addItemToWishlist}>
-                ADD TO WISHLIST
-              </Button>
+              <Button onClick={addItemToWishlist}>ADD TO WISHLIST</Button>
               <div className="grid grid-cols-2 gap-3 place-items-center h-10">
                 <p>Quantity: </p>
-                <input  className="rounded-md max-w-10 bg-slate-100 ring-2 ring-blue-500" type="number" min="0" step="1" value={selectedQuantity} onChange={handleQuantityChange} />
+                <input
+                  className="rounded-md max-w-10 bg-slate-100 ring-2 ring-blue-500"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={selectedQuantity}
+                  onChange={handleQuantityChange}
+                />
               </div>
             </div>
             <p className="mb-8">SPECIFICATIONS</p>

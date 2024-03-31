@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import Image from 'next/image'
+import { useState } from "react";
+import Image from "next/image";
 
 export default function ImageSelector() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -15,13 +15,17 @@ export default function ImageSelector() {
             height={100}
             src={`/images/grey.jpg`}
             alt={`grey.jpg`}
-
-            className={`cursor-pointer ${selectedImage === `/images/grey.jpg` ? 'border-2 border-blue-500' : ''}`} ////images/image${index}.jpg
+            className={`cursor-pointer ${selectedImage === `/images/grey.jpg` ? "border-2 border-blue-500" : ""}`} ////images/image${index}.jpg
           />
         ))}
       </div>
       <div className="mt-2">
-        Selected Image: {selectedImage ? <img src={selectedImage} alt="Selected Image" className="w-20 h-20" /> : "None"}
+        Selected Image:{" "}
+        {selectedImage ? (
+          <img src={selectedImage} alt="Selected Image" className="w-20 h-20" />
+        ) : (
+          "None"
+        )}
       </div>
     </div>
   );
