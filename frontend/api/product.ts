@@ -7,7 +7,7 @@ import { getSessionUserEmail } from "@/app/auth";
 // given a product's id, returns all that product's info
 export async function getProduct(product_id: number): Promise<Product | null> {
   try {
-    let response = await axios.get<Product[]>(`/getProduct/${product_id}`, {});
+    let response = await axios.get<Product[]>(`/getProduct/${product_id}`);
 
     return response.data[0];
   } catch (error) {
@@ -87,7 +87,7 @@ export async function getFilteredProducts(
   }
 }
 
-// Creates a new product listing
+// Creates a new product listing using the submitted form data
 export async function createProductListing(formData: ProductListingCreation) {
   const user_email = await getSessionUserEmail();
   if (user_email) {
@@ -101,6 +101,8 @@ export async function createProductListing(formData: ProductListingCreation) {
           product_images: [
             main_product_img_file,
             ...additional_product_img_files,
+            // this empty file ensures that there will be at least 2 elements in this array and forces this array to be posted as an array.
+            // when there's only 1 item in the array it gets posted as an object instead of a single element array
             new File(
               [new Blob([], { type: "image/jpeg" })],
               "placeholder.jpg",

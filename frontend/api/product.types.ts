@@ -19,6 +19,8 @@ export type ProductFull = {
 
 export type ShoppingCartEntry = {
   quantity: number;
+  delivery: boolean;
+  warehouse_id: number | null;
 } & Product;
 
 export type WishlistEntry = {

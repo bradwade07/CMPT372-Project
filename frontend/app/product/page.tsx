@@ -29,7 +29,13 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
     try {
-      await addToShoppingCart(searchParams.product_id, selectedQuantity);
+      // TODO: provide actual "delivery" and "warehouse_id" values
+      await addToShoppingCart(
+        searchParams.product_id,
+        selectedQuantity,
+        false,
+        1,
+      );
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
     } catch (error) {
       router.push("/signin");

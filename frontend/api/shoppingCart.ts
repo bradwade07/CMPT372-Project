@@ -32,6 +32,8 @@ export async function getShoppingCartProducts(): Promise<ShoppingCartEntry[]> {
 export default async function addToShoppingCart(
   product_id: number,
   quantity: number,
+  delivery: boolean,
+  warehouse_id?: number,
 ): Promise<void> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
@@ -40,6 +42,8 @@ export default async function addToShoppingCart(
         user_email: user_email,
         product_id: product_id,
         quantity: quantity,
+        delivery: delivery,
+        warehouse_id: warehouse_id,
       });
     } catch (error) {
       if (isAxiosError(error)) {
