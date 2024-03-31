@@ -34,4 +34,6 @@ export type ProductListingCreation = {
   current_price: number;
   main_product_img_file: File | null;
   additional_product_img_files: File[];
+  warehouse_ids: number[];
+  quantities: number[];
 };
