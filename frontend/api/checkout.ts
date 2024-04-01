@@ -1,12 +1,12 @@
 import { OnApproveData } from "@paypal/paypal-js";
 import { axios } from "./axios";
-import { getSessionUserData } from "@/app/auth";
+import { getSessionUserEmail } from "@/app/auth";
 import { isAxiosError } from "axios";
 
 // Creates a new paypal order
 // TODO: fix the acquisitionmethod removal in backend
 export async function createOrder() {
-  const user_email = (await getSessionUserData())?.email;
+  const user_email = await getSessionUserEmail();
 
   if (user_email) {
     try {
@@ -34,20 +34,26 @@ export async function createOrder() {
 
 // Gets information after a paypal payment is approved
 export async function onTransactionApprove(data: OnApproveData) {
-  try {
-    const response = await axios.post(`/api/orders/${data.orderID}/capture`);
+  const user_email = await getSessionUserEmail();
 
-    return response.data;
-  } catch (error) {
-    if (isAxiosError(error)) {
-      // The request was made and the server responded with a status code
-      console.error("Paypal error status:", error.response?.status);
-      console.error("Paypal error data:", error.response?.data);
+  if (user_email) {
+    try {
+      const response = await axios.post(`/api/orders/${data.orderID}/capture`, {
+        user_email: user_email,
+      });
 
-      // Returning error message
-      return error.response?.data;
-    } else {
-      console.error("Paypal error occurred: ", error);
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        // The request was made and the server responded with a status code
+        console.error("Paypal error status:", error.response?.status);
+        console.error("Paypal error data:", error.response?.data);
+
+        // Returning error message
+        return error.response?.data;
+      } else {
+        console.error("Paypal error occurred: ", error);
+      }
     }
   }
 }
