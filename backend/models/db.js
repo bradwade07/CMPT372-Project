@@ -1,4 +1,5 @@
 const { error } = require("console");
+const { resolve } = require("path");
 const { Pool } = require("pg");
 
 var pool;
@@ -20,6 +21,8 @@ pool = new Pool({
 const helpers = {
   init: async function () {
     await pool.query(`BEGIN`);
+
+    //Tables
     await pool.query(`
         CREATE TABLE IF NOT EXISTS address (
         address_id SERIAL PRIMARY KEY,
@@ -122,18 +125,13 @@ const helpers = {
         PRIMARY KEY (product_id, image_id),
         FOREIGN KEY (product_id) REFERENCES product(product_id)
         );`);
-    const response = await pool.query(`SELECT * FROM usertypes;`);
-    if (response.rows.length === 0) {
-      await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
-      await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
-      await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
-    }
     await pool.query(`
         CREATE TABLE IF NOT EXISTS review (
         review_id SERIAL,
         product_id INTEGER,
         user_email VARCHAR(255),
         comment VARCHAR(255),
+        rating FLOAT,
         PRIMARY KEY (review_id),
         FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
         FOREIGN KEY (product_id) REFERENCES product(product_id)
@@ -153,150 +151,148 @@ const helpers = {
         delivery BOOLEAN,
         warehouse_id INTEGER,
         order_date BIGINT,
-        PRIMARY KEY (order_id, user_email, order_date, product_id, warehouse_id),
+        total INTEGER,
+        PRIMARY KEY (order_id, user_email, product_id, warehouse_id),
         FOREIGN KEY (product_id) REFERENCES product(product_id),
         FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
         FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
         );`);
+    //User Types
+    const response = await pool.query(`SELECT * FROM usertypes;`);
+    if (response.rows.length === 0) {
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
+      await pool.query(`INSERT INTO usertypes (type) VALUES ('admin');`);
+    }
+
+    //Placeholder Address
+    await pool.query(
+      `INSERT INTO address (street_name, city, province, post_code, country) VALUES ('This is a placeholder for when the customer does not give address', 'placeholder', 'placeholder', 'placeholder', 'placeholder');`,
+    ); //Cameron
+
+    //Admins
+    await pool.query(
+      `INSERT INTO userinfo (user_email, address_id) VALUES ('catchet101@gmail.com', 1);`,
+    ); //Cameron
+    await pool.query(
+      `INSERT INTO userinfo (user_email, address_id) VALUES ('bradwade7@gmail.com', 1);`,
+    ); //Tawheed
+    await pool.query(
+      `INSERT INTO users (user_email, type_id) VALUES ('catchet101@gmail.com', 3);`,
+    ); //Cameron
+    await pool.query(
+      `INSERT INTO users (user_email, type_id) VALUES ('bradwade7@gmail.com', 3);`,
+    ); //Tawheed
     await pool.query(`COMMIT`);
   },
 
   insertTestData: async function () {
     //depricated and used for the users
-    await pool.query(`BEGIN`);
-    await pool.query(
-      "INSERT INTO address (street_name, city, province, post_code, country) VALUES ('123 Example Street', 'City', 'Province', 'PostalCode', 'Country');",
-    );
-    await pool.query(
-      "INSERT INTO address (street_name, city, province, post_code, country) VALUES ('456 Another Road', 'City', 'Province', 'PostalCode', 'Country');",
-    );
-    await pool.query(
-      "INSERT INTO userinfo (user_email, address_id) VALUES ('user1@example.com', 1);",
-    );
-    await pool.query(
-      "INSERT INTO userinfo (user_email, address_id) VALUES ('user2@example.com', 2);",
-    );
-    await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
-    await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
-    await pool.query(
-      "INSERT INTO users (user_email, type_id) VALUES ('user1@example.com', 1);",
-    );
-    await pool.query(
-      "INSERT INTO users (user_email, type_id) VALUES ('user2@example.com', 2);",
-    );
-    await pool.query(
-      "INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product A', 'imgsrcA.jpg', 'Description of product A.', 1617181920, 'user1@example.com', 1.0);",
-    );
-    await pool.query(
-      "INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product B', 'imgsrcB.jpg', 'Description of product B.', 1617181930, 'user1@example.com', 3.2);",
-    );
-    await pool.query(
-      "INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product C', 'imgsrcC.jpg', 'Description of product C.', 1617181940, 'user2@example.com', 1.1);",
-    );
-    await pool.query(
-      "INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product D', 'imgsrcD.jpg', 'Description of product D.', 1617181950, 'user2@example.com', 3.2);",
-    );
-    await pool.query(
-      "INSERT INTO product (product_name, product_imgsrc, product_description, product_date_added, user_email, product_avg_rating) VALUES ('Product E', 'imgsrcE.jpg', 'Description of product E.', 1617181960, 'user2@example.com', 4);",
-    );
-    await pool.query(
-      "INSERT INTO productprice (product_id, base_price, current_price) VALUES (1, 100.00, 90.00);",
-    );
-    await pool.query(
-      "INSERT INTO productprice (product_id, base_price, current_price) VALUES (2, 200.00, 180.00);",
-    );
-    await pool.query(
-      "INSERT INTO productprice (product_id, base_price, current_price) VALUES (3, 150.00, 145.00);",
-    );
-    await pool.query(
-      "INSERT INTO productprice (product_id, base_price, current_price) VALUES (4, 250.00, 230.00);",
-    );
-    await pool.query(
-      "INSERT INTO productprice (product_id, base_price, current_price) VALUES (5, 300.00, 280.00);",
-    );
-    await pool.query(`INSERT INTO tag (tag_name) VALUES ('electronics');`);
-    await pool.query(`INSERT INTO tag (tag_name) VALUES ('home');`);
-    await pool.query(`INSERT INTO tag (tag_name) VALUES ('garden');`);
-    await pool.query(`INSERT INTO tag (tag_name) VALUES ('fashion');`);
-    await pool.query(`INSERT INTO tag (tag_name) VALUES ('toys');`);
+    try {
+      await pool.query(`BEGIN`);
+      //Tag Table
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('New Arrival');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Best Seller');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Eco-Friendly');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Tech Innovations');`,
+      );
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Smart Home');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Outdoor Gear');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Gaming');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Limited Edition');`,
+      );
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Fitness & Health');`,
+      );
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Fashion Trends');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Pet Care');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Educational');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Organic & Natural');`,
+      );
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Travel Essentials');`,
+      );
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Vintage');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('DIY & Crafts');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Professional Tools');`,
+      );
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Music & Audio');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Automotive Accessories');`,
+      );
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Home Decor');`);
 
-    // Associating products with tags
-    // Assuming product IDs 1 to 5 have been inserted as before
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (1, 1);",
-    ); // Product A is Electronics
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (2, 2);",
-    ); // Product B is Home
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (3, 3);",
-    ); // Product C is Garden
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (4, 4);",
-    ); // Product D is Fashion
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (5, 5);",
-    ); // Product E is Toys
+      //warehouse Table
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (34.0522, -118.2437);`,
+      ); // Los Angeles
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (40.7128, -74.0060);`,
+      ); // New York
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (37.7749, -122.4194);`,
+      ); // San Francisco
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (51.5074, -0.1278);`,
+      ); // London
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (35.6895, 139.6917);`,
+      ); // Tokyo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-33.8688, 151.2093);`,
+      ); // Sydney
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (48.8566, 2.3522);`,
+      ); // Paris
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (52.5200, 13.4050);`,
+      ); // Berlin
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (55.7558, 37.6173);`,
+      ); // Moscow
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-23.5505, -46.6333);`,
+      ); // Sao Paulo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (19.4326, -99.1332);`,
+      ); // Mexico City
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (22.3193, 114.1694);`,
+      ); // Hong Kong
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (39.9042, 116.4074);`,
+      ); // Beijing
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (28.6139, 77.2090);`,
+      ); // New Delhi
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-34.6037, -58.3816);`,
+      ); // Buenos Aires
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (41.8781, -87.6298);`,
+      ); // Chicago
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (34.6937, 135.5023);`,
+      ); // Osaka
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (30.0444, 31.2357);`,
+      ); // Cairo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (31.2304, 121.4737);`,
+      ); // Shanghai
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (47.6062, -122.3321);`,
+      ); // Seattle
 
-    // Demonstrating products can have multiple tags
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (1, 2);",
-    ); // Product A also belongs to Home
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (2, 3);",
-    ); // Product B also belongs to Garden
-    await pool.query(
-      "INSERT INTO producttags (product_id, tag_id) VALUES (3, 1);",
-    ); // Product C also belongs to Electronics
-
-    //Inserting multiple items into user carts
-    await pool.query(
-      "INSERT INTO usercart (user_email, product_id, quantity) VALUES ('user1@example.com', 1, 1);",
-    ); // User 1 adds Product A
-    await pool.query(
-      "INSERT INTO usercart (user_email, product_id, quantity) VALUES ('user1@example.com', 3, 2);",
-    ); // User 1 adds 2 of Product C
-    await pool.query(
-      "INSERT INTO usercart (user_email, product_id, quantity) VALUES ('user2@example.com', 2, 1);",
-    ); // User 2 adds Product B
-    await pool.query(
-      "INSERT INTO usercart (user_email, product_id, quantity) VALUES ('user2@example.com', 5, 3);",
-    ); // User 2 adds 3 of Product E
-
-    //Inserting items into user wishlists
-    await pool.query(
-      "INSERT INTO userwishlist (user_email, product_id, quantity) VALUES ('user1@example.com', 4, 1);",
-    ); // User 1 wishes for Product D
-    await pool.query(
-      "INSERT INTO userwishlist (user_email, product_id, quantity) VALUES ('user2@example.com', 1, 2);",
-    ); // User 2 wishes for Product A
-
-    //Inserting multiple warehouses
-    await pool.query(
-      "INSERT INTO warehouse (lat, long) VALUES (40.7128, -74.0060);",
-    ); // Warehouse 1 in New York
-    await pool.query(
-      "INSERT INTO warehouse (lat, long) VALUES (34.0522, -118.2437);",
-    ); // Warehouse 2 in Los Angeles
-
-    //Inserting warehouse stock accordingly
-    await pool.query(
-      "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (1, 1, 20);",
-    ); // 20 of Product A in Warehouse 1
-    await pool.query(
-      "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (1, 2, 15);",
-    ); // 15 of Product B in Warehouse 1
-    await pool.query(
-      "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (2, 3, 25);",
-    ); // 25 of Product C in Warehouse 2
-    await pool.query(
-      "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (2, 4, 10);",
-    ); // 10 of Product D in Warehouse 2
-    await pool.query(
-      "INSERT INTO warehousestock (warehouse_id, product_id, quantity) VALUES (2, 5, 30);",
-    ); // 30 of Product E in Warehouse 2
-    await pool.query(`COMMIT`);
-    //////////////////////////
+      await pool.query(`COMMIT`);
+    } catch (error) {
+      await pool.query(`ROLLBACK`);
+      console.error("Failed to insert test data", error);
+    }
   },
 
   deleteAllTables: async function () {
@@ -328,14 +324,58 @@ const helpers = {
 
   getProductInfoByPid: async function (id) {
     try {
-      const response = await pool.query(
-        `SELECT * 
-        FROM product 
-        JOIN productprice ON product.product_id = productprice.product_id 
-        WHERE product.product_id = $1;`,
+      let productResponse = await pool.query(
+        `
+        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, pp.base_price, pp.current_price
+        FROM product p
+        JOIN productprice pp ON p.product_id = pp.product_id
+        WHERE p.product_id = $1;
+      `,
         [id],
       );
-      return response.rows;
+      let reply = {};
+      if (productResponse.rows.length > 0) {
+        let product = productResponse.rows[0];
+        reply = {
+          product_id: product.product_id,
+          product_name: product.product_name,
+          product_main_img: product.product_main_img.toString("base64"),
+          product_description: product.product_description,
+          product_date_added: product.product_date_added,
+          user_email: product.user_email,
+          product_avg_rating: product.product_avg_rating,
+          base_price: product.base_price,
+          current_price: product.current_price,
+          tags: [],
+          additional_img: [],
+        };
+        let tagsResponse = await pool.query(
+          `
+          SELECT pt.tag_id, t.tag_name 
+          FROM producttags pt
+          JOIN tag t ON pt.tag_id = t.tag_id
+          WHERE pt.product_id = $1;
+        `,
+          [id],
+        );
+        reply.tags = tagsResponse.rows.map((tag) => ({
+          id: tag.tag_id,
+          tag: tag.tag_name,
+        }));
+        let imagesResponse = await pool.query(
+          `
+          SELECT image 
+          FROM image
+          WHERE product_id = $1;
+        `,
+          [id],
+        );
+        reply.additional_img = imagesResponse.rows.map((imgRow) =>
+          imgRow.image.toString("base64"),
+        );
+      }
+
+      return reply;
     } catch (error) {
       console.error("Error retrieving product information:", error);
     }
@@ -513,15 +553,19 @@ const helpers = {
     country,
     user_email,
     type_id,
+    addressGiven,
   ) {
     try {
-      const address_id = await helpers.postAddress(
-        street_name,
-        city,
-        province,
-        post_code,
-        country,
-      );
+      let address_id = 1;
+      if (addressGiven === 1) {
+        address_id = await helpers.postAddress(
+          street_name,
+          city,
+          province,
+          post_code,
+          country,
+        );
+      }
       await pool.query(
         `INSERT INTO userinfo (user_email, address_id) VALUES ($1, $2);`,
         [user_email, address_id],
@@ -570,24 +614,6 @@ const helpers = {
     }
   },
 
-  getUserTypeByUserEmail: async function (email) {
-    try {
-      await pool.query(`BEGIN`);
-      const result = await pool.query(
-        `SELECT users.type_id, usertypes.type FROM users 
-        JOIN usertypes ON users.type_id = usertypes.type_id 
-        WHERE user_email = $1;`,
-        [email],
-      );
-      await pool.query(`COMMIT`);
-      return result.rows;
-    } catch (error) {
-      await pool.query(`ROLLBACK`);
-      console.error("Error retrieving user by email:", error);
-      throw error;
-    }
-  },
-
   patchUserType: async function (user_email, type) {
     try {
       await pool.query(`UPDATE users SET type_id = $1 WHERE user_email = $2`, [
@@ -621,36 +647,7 @@ const helpers = {
     }
   },
 
-  getUserCartByUserEmail: async function (email) {
-    try {
-      const query = `
-        SELECT 
-            product.product_id, 
-            product.product_name, 
-            product.product_description, 
-            product.product_main_img,
-            productprice.base_price, 
-            productprice.current_price, 
-            usercart.quantity
-        FROM product
-        JOIN usercart ON product.product_id = usercart.product_id
-        JOIN productprice ON product.product_id = productprice.product_id
-        WHERE usercart.user_email = $1;
-        `;
-      const values = [email];
-      const result = await pool.query(query, values);
-      return result.rows.length > 0
-        ? result.rows
-        : {
-            message: "No products found in the user's cart",
-          };
-    } catch (error) {
-      console.error("Error retrieving user cart by email:", error);
-      throw error;
-    }
-  },
-
-  deleteUserCartByPidUserEmail: async function (user_email, product_id) {
+  postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
       await pool.query(
         `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
@@ -897,7 +894,7 @@ const helpers = {
       );
       if (response.rows.length === 0) {
         await pool.query(
-          `INSERT INTO review(product_id, user_email, comment)
+          `INSERT INTO review(product_id, user_email, comment, rating)
                 VALUES ($1, $2, $3);`,
           [product_id, user_email, comment],
         );
@@ -944,6 +941,74 @@ const helpers = {
       return response.rows;
     } catch (error) {
       console.error("Error deleting vendor request:", error);
+    }
+  },
+  getInStockWarehouses: async function (product_id, quantity) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM WarehouseStock
+      WHERE product_id = $1 AND quantity = $2;`,
+        [product_id, quantity],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting warehouse stock:", error);
+    }
+  },
+  getWarehouseInfo: async function (warehouse_id) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM warehouse
+      WHERE warehouse_id = $1;`,
+        [warehouse_id],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting warehouse info:", error);
+    }
+  },
+  getAllWarehouseInfo: async function () {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM warehouse;`,
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting all warehouse info:", error);
+    }
+  },
+  getOrderTotal: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM usercart
+      WHERE user_email = $1;`,
+        [user_email],
+      );
+      let total = 0;
+      for (let i = 0; i < response.rows.length; i++) {
+        let { product_id, quantity, delivery } = response.rows[i];
+        let current_price = await pool.query(
+          `SELECT current_price
+        FROM productprice
+        WHERE product_id = $1`,
+          [product_id],
+        );
+        current_price = current_price.rows[0].current_price;
+        if (delivery === 1) {
+          delivery = 1.1; // 10% delivery
+        } else {
+          delivery = 1;
+        }
+        let subTotal = current_price * quantity * delivery * 1.11; //1.11 for taxes
+        total += subTotal;
+      }
+      return total;
+    } catch (error) {
+      console.error("Error getting all warehouse info:", error);
     }
   },
 };

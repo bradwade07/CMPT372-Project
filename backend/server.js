@@ -147,13 +147,15 @@ app.get("/getProductsByFilters", async (req, res) => {
         reply.push({
           product_id: row.product_id,
           product_name: row.product_name,
-          product_imgsrc: row.product_imgsrc,
+          product_main_img: row.product_main_img,
           product_description: row.product_description,
           product_date_added: row.product_date_added,
           product_avg_rating: row.product_avg_rating,
           user_email: row.user_email,
           base_price: row.base_price,
           current_price: row.current_price,
+          tags: row.tags,
+          additional_img: row.additional_img,
         });
       });
     }
@@ -205,26 +207,20 @@ app.post("/postUser", async (req, res) => {
     user_email,
     user_type,
   } = req.body;
-  if (!user_email)
+  let addressGiven = 1;
+  if (!user_email) {
     return res.status(400).send({ error: "Invalid user email!" });
-  user_email = user_email.trim();
-
-  if (!street_name)
-    return res.status(400).send({ error: "Invalid street name!" });
-  street_name = street_name.trim();
-
-  if (!city) return res.status(400).send({ error: "Invalid city!" });
-  city = city.trim();
-
-  if (!province) return res.status(400).send({ error: "Invalid province!" });
-  province = province.trim();
-
-  if (!post_code) return res.status(400).send({ error: "Invalid post code!" });
-  post_code = post_code.trim();
-
-  if (!country) return res.status(400).send({ error: "Invalid country!" });
-  country = country.trim();
-
+    user_email = user_email.trim();
+  }
+  if (!street_name || !city || !province || !post_code || !country) {
+    addressGiven = 0;
+  } else {
+    street_name = street_name.trim();
+    city = city.trim();
+    province = province.trim();
+    post_code = post_code.trim();
+    country = country.trim();
+  }
   if (!user_type) return res.status(400).send({ error: "Invalid type!" });
   user_type = user_type.trim().toLowerCase();
 
@@ -243,6 +239,7 @@ app.post("/postUser", async (req, res) => {
       country,
       user_email,
       type_id,
+      addressGiven,
     );
     return res.status(201).json({ success: "Product added successfully!" });
   } catch (error) {
@@ -271,7 +268,7 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
 // FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-  let { user_email, type: user_type } = req.body;
+  let { user_email, user_type } = req.body;
   if (!user_email) {
     return res.status(400).send({ error: "Invalid user email!" });
   }
@@ -544,11 +541,8 @@ const generateAccessToken = async () => {
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
  */
-const createOrder = async (user_email, acquisitionMethod) => {
-  // TODO: using user_email, get the user's shopping cart, total it up, add fees (depending on delivery or pickup, and address of delivery), and pass the total to the paypal API
-  // user_email: user's email
-  // acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
-
+const createOrder = async (user_email) => {
+  const total = await helpers.getOrderTotal(user_email);
   const accessToken = await generateAccessToken();
   const url = `${paypal_base}/v2/checkout/orders`;
   const payload = {
@@ -557,7 +551,7 @@ const createOrder = async (user_email, acquisitionMethod) => {
       {
         amount: {
           currency_code: "CAD",
-          value: "123.45",
+          value: total.toFixed(2).toString(),
         },
       },
     ],
@@ -577,7 +571,7 @@ const createOrder = async (user_email, acquisitionMethod) => {
     body: JSON.stringify(payload),
   });
 
-  return handleResponse(response);
+  return helpers.handleResponse(response);
 };
 
 /**
@@ -621,7 +615,11 @@ app.post("/api/orders", async (req, res) => {
 app.post("/api/orders/:orderID/capture", async (req, res) => {
   try {
     const { orderID } = req.params;
+    const { user_email } = req.body;
     const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
+    if (httpStatusCode === 201) {
+      await helpers.clearUserCart(user_email);
+    }
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
     console.error("Failed to create order:", error);
@@ -692,7 +690,7 @@ app.post("/postVendorRequestsByUserEmail", async (req, res) => {
   try {
     const { user_email } = req.body;
     await helpers.postVendorRequestsByUserEmail(user_email);
-    console.log("Review Posted Successfully!");
+    console.log("Vendor Request Posted Successfully!");
     res.status(200);
   } catch (error) {
     console.error("Failed to post vendor request:", error);
@@ -710,15 +708,47 @@ app.get("/getAllVendorRequests", async (req, res) => {
   }
 });
 
-app.delete("/deleteVendorRequest", async (req, res) => {
+app.delete("/deleteVendorRequestByUserEmail", async (req, res) => {
   try {
     const { user_email } = req.body;
     await helpers.deleteVendorRequestByUserEmail(user_email);
-    console.log("Review Deleted Successfully!");
+    console.log("Vendor Request Deleted Successfully!");
     res.status(200);
   } catch (error) {
     console.error("Failed to delete vendor request:", error);
     res.status(500).json({ error: "Failed to delete vendor request." });
+  }
+});
+
+app.get("/getInStockWarehouses/:product_id/:quantity", async (req, res) => {
+  try {
+    const { product_id, quantity } = req.params;
+    const response = await helpers.getInStockWarehouses(product_id, quantity);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse stock:", error);
+    res.status(500).json({ error: "Failed to get warehouse stock." });
+  }
+});
+
+app.get("/getWarehouseInfo/:warehouse_id", async (req, res) => {
+  try {
+    const { warehouse_id } = req.params;
+    const response = await helpers.getWarehouseInfo(warehouse_id);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse info:", error);
+    res.status(500).json({ error: "Failed to get warehouse info." });
+  }
+});
+
+app.get("/getAllWarehouseInfo", async (req, res) => {
+  try {
+    const response = await helpers.getAllWarehouseInfo();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get All warehouse info:", error);
+    res.status(500).json({ error: "Failed to All get warehouse info." });
   }
 });
 

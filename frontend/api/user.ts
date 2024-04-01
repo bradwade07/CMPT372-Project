@@ -60,7 +60,7 @@ export async function updateUserType(
   try {
     await axios.patch("/patchUserType", {
       user_email: user_email,
-      type: user_type,
+      user_type: user_type,
     });
   } catch (error) {
     if (isAxiosError(error)) {
@@ -96,6 +96,7 @@ export async function applyToBecomeVendor(user_email: string): Promise<void> {
     await axios.post("/postVendorRequestsByUserEmail", {
       user_email: user_email,
     });
+    console.log("test3");
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
@@ -130,7 +131,7 @@ export async function getBecomeVendorRequests(): Promise<
 // removes the application for the user with user_email to become a vendor
 export async function removeVendorRequest(user_email: string): Promise<void> {
   try {
-    await axios.delete("/deleteVendorRequest", {
+    await axios.delete("/deleteVendorRequestByUserEmail", {
       data: {
         user_email: user_email,
       },

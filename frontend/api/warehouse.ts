@@ -2,19 +2,9 @@ import { isAxiosError } from "axios";
 import { axios } from "./axios";
 import { Warehouse } from "./warehouse.types";
 
-const warehouses: Warehouse[] = [
-  { warehouse_id: 1, lat: 49.283353, long: -123.122444 },
-  { warehouse_id: 2, lat: 49.223287, long: -122.959533 },
-  { warehouse_id: 3, lat: 49.22174, long: -122.600351 },
-  { warehouse_id: 4, lat: 49.049775, long: -122.322996 },
-  { warehouse_id: 5, lat: 49.162727, long: -121.948495 },
-];
-
 export async function getAllWarehouses(): Promise<Warehouse[]> {
   try {
-    return warehouses;
-
-    let response = await axios.get<Warehouse[]>("???"); // FIXME: backend url
+    let response = await axios.get<Warehouse[]>("/getAllWarehouseInfo");
 
     return response.data;
   } catch (error) {
@@ -33,13 +23,9 @@ export async function getWarehouse(
   warehouse_id: number,
 ): Promise<Warehouse | null> {
   try {
-    return (
-      warehouses.find((warehouse) => {
-        return (warehouse.warehouse_id = warehouse_id);
-      }) || null
+    let response = await axios.get<Warehouse[]>(
+      `/getWarehouseInfo/${warehouse_id}`,
     );
-
-    let response = await axios.get<Warehouse[]>("???"); // FIXME: backend url
 
     return response.data[0];
   } catch (error) {
@@ -59,9 +45,9 @@ export async function getInStockWarehouses(
   quantity: number,
 ): Promise<Warehouse[]> {
   try {
-    return warehouses;
-
-    let response = await axios.get<Warehouse[]>("???"); // FIXME: backend url
+    let response = await axios.get<Warehouse[]>(
+      `/getInStockWarehouses/${product_id}/${quantity}`,
+    );
 
     return response.data;
   } catch (error) {

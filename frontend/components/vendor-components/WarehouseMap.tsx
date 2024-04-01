@@ -1,8 +1,8 @@
 "use client";
 
-import { getAllWarehouses, getWarehouse } from "@/api/warehouse";
+import { getAllWarehouses } from "@/api/warehouse";
 import { Warehouse } from "@/api/warehouse.types";
-import React, { useEffect } from "react";
+import React from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
