@@ -1,16 +1,16 @@
 import { ShoppingCartEntry } from "@/api/product.types";
 import { useEffect, useState } from "react";
 import { PayPal } from "./PayPal";
-import { AcquisitionMethod } from "@/api/checkout.types";
 
 type OrderTotalProps = {
   data: undefined | ShoppingCartEntry[];
-  acquisitionMethod: AcquisitionMethod | undefined;
+  deliveryFormSubmitted: boolean;
 };
 
-export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
+// TODO: properly display delivery fees for products being delivered
+export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
-  const shippingPercentage = 0.15;
+  const shippingPercentage = 0.1;
 
   const [totalSubprice, setTotalSubprice] = useState(-1);
   const [totalPrice, setTotalPrice] = useState(-1);
@@ -21,21 +21,12 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
     if (data) {
       let subtotal = 0;
       for (let item of data) {
-        subtotal += item.quantity * item.base_price;
+        subtotal += item.quantity * item.current_price;
       }
       setTotalSubprice(Number(subtotal.toFixed(2)));
 
-      if (acquisitionMethod) {
-        if (acquisitionMethod == "delivery") {
-          setTotalPrice(
-            Number(
-              (subtotal * (1 + taxPercentage + shippingPercentage)).toFixed(2),
-            ),
-          );
-        } else if (acquisitionMethod == "pickup") {
-          setTotalPrice(Number((subtotal * (1 + taxPercentage)).toFixed(2)));
-        }
-
+      if (deliveryFormSubmitted) {
+        setTotalPrice(Number((subtotal * (1 + taxPercentage)).toFixed(2)));
         setTotalPriceVisible(true);
       } else {
         setTotalPriceVisible(false);
@@ -43,17 +34,17 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
     } else {
       setTotalPriceVisible(false);
     }
-  }, [data, acquisitionMethod]);
+  }, [data, deliveryFormSubmitted]);
 
   function getSubtotalPrice(): React.JSX.Element {
     return (
       <div>
         {data?.map((item) => (
           <div key={item.product_id} className="flex flex-row gap-2">
-            <p>${item.base_price.toFixed(2)}</p>
+            <p>${item.current_price.toFixed(2)}</p>
             <p>x</p>
             <p>{item.quantity}</p>
-            <p>= ${(item.base_price * item.quantity).toFixed(2)}</p>
+            <p>= ${(item.current_price * item.quantity).toFixed(2)}</p>
           </div>
         ))}
         <p>Total before taxes: ${totalSubprice.toFixed(2)}</p>
@@ -68,13 +59,7 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
           Tax (%{taxPercentage * 100}): $
           {(totalSubprice * taxPercentage).toFixed(2)}
         </p>
-        {acquisitionMethod == "delivery" && (
-          <p>
-            Shipping cost (%{shippingPercentage * 100}): $
-            {(totalSubprice * shippingPercentage).toFixed(2)}
-          </p>
-        )}
-        <p>Total after tax: ${totalPrice}</p>
+        <p>Total after tax: ${totalPrice.toFixed(2)}</p>
       </div>
     );
   }
@@ -88,13 +73,13 @@ export function OrderTotal({ data, acquisitionMethod }: OrderTotalProps) {
           {getTotalPrice()}
           {data && (
             <div className="mt-4">
-              <PayPal acquisitionMethod={acquisitionMethod} />
+              <PayPal />
             </div>
           )}
         </>
       ) : (
         <div className="mt-4">
-          <p>Please choose delivery or pickup to see total price and pay</p>
+          <p>Please confirm your delivery details to see total price and pay</p>
         </div>
       )}
     </div>

@@ -1,14 +1,19 @@
-import { Product } from "./product.types";
+import { Product, ProductFull, ProductListingCreation } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
+import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
-export async function getProduct(product_id: number): Promise<Product | null> {
+export async function getProduct(
+  product_id: number,
+): Promise<ProductFull | null> {
   try {
-    let response = await axios.get<Product[]>(`/getProduct/${product_id}`, {});
+    let response = await axios.get<ProductFull>(`/getProduct/${product_id}`);
 
-    return response.data[0];
+    console.log(response.data);
+
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
@@ -26,6 +31,8 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
     let response = await axios.get<Product[]>(
       `/getNewestProductsByLimit/${limit}`,
     );
+
+    console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -83,5 +90,78 @@ export async function getFilteredProducts(
     }
 
     return [];
+  }
+}
+
+// Creates a new product listing using the submitted form data
+export async function createProductListing(formData: ProductListingCreation) {
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    const {
+      product_tags,
+      main_product_img_file,
+      additional_product_img_files,
+      warehouse_ids,
+      quantities,
+      ...rest
+    } = formData;
+
+    // console.log({
+    //   ...rest,
+    //   user_email: user_email,
+    //   // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
+    //   // forces this array to be posted as an array.
+    //   // when there's only 1 item in the array it gets posted as an object instead of a single element array
+    //   product_tags: [...product_tags, "placeholdertag"],
+    //   warehouse_ids: [...warehouse_ids, -1],
+    //   quantities: [...quantities, -1],
+    //   product_images: [
+    //     main_product_img_file,
+    //     ...additional_product_img_files,
+    //     new File([new Blob([], { type: "image/jpeg" })], "placeholder.jpg", {
+    //       type: "image/jpeg",
+    //     }),
+    //   ],
+    // });
+
+    try {
+      await axios.post(
+        `/createProductListing`,
+        {
+          ...rest,
+          user_email: user_email,
+          // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
+          // forces this array to be posted as an array.
+          // when there's only 1 item in the array it gets posted as an object instead of a single element array
+          product_tags: [...product_tags, "placeholdertag"],
+          warehouse_ids: [...warehouse_ids, -1],
+          quantities: [...quantities, -1],
+          product_images: [
+            main_product_img_file,
+            ...additional_product_img_files,
+            new File(
+              [new Blob([], { type: "image/jpeg" })],
+              "placeholder.jpg",
+              {
+                type: "image/jpeg",
+              },
+            ),
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.error("Could not create product listing");
   }
 }

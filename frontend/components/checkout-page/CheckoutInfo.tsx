@@ -3,43 +3,37 @@
 import { getShoppingCartProducts } from "@/api/shoppingCart";
 import { CheckoutItemsList } from "./CheckoutItemsList";
 import { OrderTotal } from "./OrderTotal";
-import { DeliveryDetails } from "./AcquisitionDetails";
+import { DeliveryDetails } from "./DeliveryDetails";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { UserAddress } from "@/api/user.types";
-import { AcquisitionMethod } from "@/api/checkout.types";
+import { updateUserAddress } from "@/api/user";
+import { getSessionUserEmail } from "@/app/auth";
+import { useState } from "react";
 
 // displays 3 "sections"
 // 1) all the items' in the users cart which will be purchased
 // 2) a form asking if a user wanted delivery or pickup, and then displays relevant information
 // 3) the order total amount and paypal payment buttons
 export function CheckoutInfo() {
-  const [acquisitionMethod, setAcquisitionMethod] =
-    useState<AcquisitionMethod>();
-  const [userAddress, setUserAddress] = useState<UserAddress>();
+  const [deliveryFormSubmitted, setDeliveryFromSubmitted] = useState(false);
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["Shopping Cart"],
     queryFn: getShoppingCartProducts,
   });
 
-  // performs actions depending on whether the user chooses "delivery" or "pickup"
-  function onInfoSubmit(
-    acquisitionMethod: AcquisitionMethod,
-    deliveryDetails?: UserAddress,
-  ) {
-    if (acquisitionMethod == "delivery") {
-      setUserAddress(deliveryDetails);
-      setAcquisitionMethod("delivery");
-      // TODO: POST the new user's address to the backend
-    } else {
-      setAcquisitionMethod("pickup");
+  // when the user submits their delivery info, updates their address and allows them to pay for their order
+  async function onInfoSubmit(deliveryDetails?: UserAddress) {
+    const user_email = await getSessionUserEmail();
+    if (user_email && deliveryDetails) {
+      await updateUserAddress(user_email, deliveryDetails);
+      setDeliveryFromSubmitted(true);
     }
   }
 
   // triggers when the user goes to edit their delivery or pickup information, causes the paypal payment to no longer be visible
   function onInfoEdit() {
-    setAcquisitionMethod(undefined);
+    setDeliveryFromSubmitted(false);
   }
 
   return (
@@ -57,7 +51,10 @@ export function CheckoutInfo() {
           />
         </div>
         <div className="flex flex-col w-1/3 mx-4">
-          <OrderTotal data={data} acquisitionMethod={acquisitionMethod} />
+          <OrderTotal
+            data={data}
+            deliveryFormSubmitted={deliveryFormSubmitted}
+          />
         </div>
       </div>
     </div>
