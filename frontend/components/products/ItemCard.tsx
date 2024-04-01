@@ -29,11 +29,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         <img
           alt="Product Image"
           className="object-cover rounded-xl pb-2"
-          src={
-            product.main_product_img
-              ? product.main_product_img
-              : "/images/grey.jpg"
-          }
+          src={`data:image/jpeg;base64, ${product.product_main_img}`}
           width={270}
         />
         {product.current_price < product.base_price ? (

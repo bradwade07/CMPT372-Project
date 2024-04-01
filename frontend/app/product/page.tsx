@@ -7,7 +7,7 @@ import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type SearchParams = {
   product_id: number;
@@ -59,6 +59,11 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     }
   };
 
+  useEffect(() => {
+    console.log(data);
+    console.log(data?.product_main_img);
+  }, [data]);
+
   return (
     <>
       <TopNavbar />
@@ -67,7 +72,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
             <div className="relative w-full h-96">
               <img
-                src={"/images/grey.jpg"} // TODO: properly display image
+                src={`data:image/jpeg;base64, ${data?.product_main_img}`}
                 alt="Product Image"
                 className="object-contain w-full h-full"
               />

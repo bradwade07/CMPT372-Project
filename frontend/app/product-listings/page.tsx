@@ -53,7 +53,7 @@ function page() {
                   width="100%"
                   alt={item.product_name}
                   className="w-full object-cover h-[140px]"
-                  src={item.main_product_img}
+                  src={`data:image/jpeg;base64, ${item?.product_main_img}`}
                 />
               </CardBody>
               <CardFooter className="text-small justify-between">

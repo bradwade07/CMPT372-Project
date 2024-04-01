@@ -17,7 +17,7 @@ export function ShoppingCartItem({
         <CardBody className="flex flex-row justify-between items-end">
           <div className="flex items-center">
             <img
-              src={(item && item.product_imgsrc) || "/images/grey.jpg"}
+              src={`data:image/jpeg;base64, ${item.product_main_img}`}
               alt={`${item.product_name} image`}
               width={50}
               height={50}
