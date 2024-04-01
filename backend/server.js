@@ -143,20 +143,18 @@ app.get("/getProductsByFilters", async (req, res) => {
     let reply = [];
     for (id of responseIds) {
       response = await helpers.getProductInfoByPid(id);
-      response.forEach((row) => {
-        reply.push({
-          product_id: row.product_id,
-          product_name: row.product_name,
-          product_main_img: row.product_main_img,
-          product_description: row.product_description,
-          product_date_added: row.product_date_added,
-          product_avg_rating: row.product_avg_rating,
-          user_email: row.user_email,
-          base_price: row.base_price,
-          current_price: row.current_price,
-          tags: row.tags,
-          additional_img: row.additional_img,
-        });
+      reply.push({
+        product_id: response.product_id,
+        product_name: response.product_name,
+        product_main_img: response.product_main_img.toString("base64"),
+        product_description: response.product_description,
+        product_date_added: response.product_date_added,
+        product_avg_rating: response.product_avg_rating,
+        user_email: response.user_email,
+        base_price: response.base_price,
+        current_price: response.current_price,
+        tags: response.tags,
+        additional_img: response.additional_img,
       });
     }
 

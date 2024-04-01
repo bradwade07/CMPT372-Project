@@ -10,6 +10,7 @@ import { Product } from "@/api/product.types";
 async function fetchProducts() {
   const user_email = await getSessionUserEmail();
   if (user_email) {
+    console.log(getFilteredProducts({ user_email: user_email }));
     return await getFilteredProducts({ user_email: user_email });
   } else {
     console.error("Could not retrieve vendor's products");
