@@ -16,11 +16,6 @@ export async function createNewUser(
     await axios.post("/postUser", {
       user_email: user_email,
       user_type: user_type,
-      street_name: "1234 Smith Street",
-      city: "Burnaby",
-      province: "BC",
-      post_code: "1A2 B3C",
-      country: "Canada",
     });
   } catch (error) {
     if (isAxiosError(error)) {

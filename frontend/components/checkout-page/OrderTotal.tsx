@@ -1,16 +1,16 @@
 import { ShoppingCartEntry } from "@/api/product.types";
 import { useEffect, useState } from "react";
 import { PayPal } from "./PayPal";
-import { AcquisitionMethod } from "@/api/checkout.types";
 
 type OrderTotalProps = {
   data: undefined | ShoppingCartEntry[];
   deliveryFormSubmitted: boolean;
 };
 
+// TODO: properly display delivery fees for products being delivered
 export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
-  const shippingPercentage = 0.15;
+  const shippingPercentage = 0.1;
 
   const [totalSubprice, setTotalSubprice] = useState(-1);
   const [totalPrice, setTotalPrice] = useState(-1);

@@ -172,7 +172,7 @@ export function CreateListingForm() {
           }}
         />
       </div>
-      <div className="flex flex-col mb-4">
+      <div className="flex flex-col mb-4 w-fit md:w-1/2 lg:w-5/12 xl:w-1/3">
         <label
           className="text-sm pb-[6px] hover:cursor-pointer"
           htmlFor="main_product_img_file"

@@ -24,7 +24,10 @@ export function AdditionalImgInput({
     const elements = [];
     for (let i = 0; i < numOfAdditionalImg; i++) {
       elements.push(
-        <div className="flex flex-col w-fit mb-2" key={i}>
+        <div
+          className="flex flex-col mb-2 w-fit md:w-1/2 lg:w-5/12 xl:w-1/3"
+          key={i}
+        >
           <label
             className="text-sm pb-[6px] hover:cursor-pointer"
             htmlFor={`additional_img_${i + 1}`}

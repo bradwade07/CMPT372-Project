@@ -3,7 +3,7 @@
 import { ShoppingCartEntry } from "@/api/product.types";
 import { getWarehouse } from "@/api/warehouse";
 import { Warehouse } from "@/api/warehouse.types";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -20,23 +20,25 @@ type PickupMapProps = {
 };
 
 export default function PickupMap({ data }: PickupMapProps) {
-  let warehouses: Warehouse[] = [];
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
   useEffect(() => {
-    warehouses = [];
+    let warehouseList: Warehouse[] = [];
 
     data?.forEach(async (item) => {
       if (item.delivery == false && item.warehouse_id) {
         if (
-          !warehouses.find((warehouse: Warehouse) => {
+          !warehouseList.find((warehouse: Warehouse) => {
             return warehouse.warehouse_id == item.warehouse_id;
           })
         ) {
-          const warehouse = await getWarehouse(item.warehouse_id);
-          if (warehouse) warehouses.push(warehouse);
+          const newWarehouse = await getWarehouse(item.warehouse_id);
+          if (newWarehouse) warehouseList.push(newWarehouse);
         }
       }
     });
+
+    setWarehouses(warehouseList);
   }, [data]);
 
   return (
