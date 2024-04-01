@@ -158,7 +158,7 @@ const helpers = {
         FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
         );`);
     //User Types
-    const response = await pool.query(`SELECT * FROM usertypes;`);
+    let response = await pool.query(`SELECT * FROM usertypes;`);
     if (response.rows.length === 0) {
       await pool.query(`INSERT INTO usertypes (type) VALUES ('vendor');`);
       await pool.query(`INSERT INTO usertypes (type) VALUES ('customer');`);
@@ -166,23 +166,30 @@ const helpers = {
     }
 
     //Placeholder Address
-    await pool.query(
-      `INSERT INTO address (street_name, city, province, post_code, country) VALUES ('This is a placeholder for when the customer does not give address', 'placeholder', 'placeholder', 'placeholder', 'placeholder');`,
-    ); //Cameron
+    response = await pool.query(`SELECT * FROM address;`);
+    if (response.rows.length === 0) {
+      await pool.query(
+        `INSERT INTO address (street_name, city, province, post_code, country) VALUES ('This is a placeholder for when the customer does not give address', 'placeholder', 'placeholder', 'placeholder', 'placeholder');`,
+      ); //Cameron
+    }
 
     //Admins
-    await pool.query(
-      `INSERT INTO userinfo (user_email, address_id) VALUES ('catchet101@gmail.com', 1);`,
-    ); //Cameron
-    await pool.query(
-      `INSERT INTO userinfo (user_email, address_id) VALUES ('bradwade7@gmail.com', 1);`,
-    ); //Tawheed
-    await pool.query(
-      `INSERT INTO users (user_email, type_id) VALUES ('catchet101@gmail.com', 3);`,
-    ); //Cameron
-    await pool.query(
-      `INSERT INTO users (user_email, type_id) VALUES ('bradwade7@gmail.com', 3);`,
-    ); //Tawheed
+    response = await pool.query(`SELECT * FROM userinfo;`);
+    let response1 = await pool.query(`SELECT * FROM users;`);
+    if (response.rows.length === 0 && response1.rows.length === 0) {
+      await pool.query(
+        `INSERT INTO userinfo (user_email, address_id) VALUES ('catchet101@gmail.com', 1);`,
+      ); //Cameron
+      await pool.query(
+        `INSERT INTO userinfo (user_email, address_id) VALUES ('bradwade7@gmail.com', 1);`,
+      ); //Tawheed
+      await pool.query(
+        `INSERT INTO users (user_email, type_id) VALUES ('catchet101@gmail.com', 3);`,
+      ); //Cameron
+      await pool.query(
+        `INSERT INTO users (user_email, type_id) VALUES ('bradwade7@gmail.com', 3);`,
+      ); //Tawheed
+    }
     await pool.query(`COMMIT`);
   },
 
@@ -514,9 +521,15 @@ const helpers = {
       if (limit >= 0) {
         query += ` LIMIT $1;`;
         const result = await pool.query(query, [limit]);
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       } else {
         const result = await pool.query(query);
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       }
     } catch (error) {
@@ -535,9 +548,15 @@ const helpers = {
       if (limit >= 0) {
         query += ` LIMIT $1;`;
         const result = await pool.query(query, [limit]);
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       } else {
         const result = await pool.query(query);
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       }
     } catch (error) {
@@ -676,11 +695,12 @@ const helpers = {
         `;
       const values = [email];
       const result = await pool.query(query, values);
-      return result.rows.length
-        ? result.rows
-        : {
-            message: "No products found in the user's wishlist",
-          };
+      if (result.rows.length > 0) {
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
+        return result.rows;
+      } else return { message: "No products found in the user's wishlist" };
     } catch (error) {
       console.error("Error retrieving wish list products by email:", error);
     }
@@ -740,11 +760,12 @@ const helpers = {
         `;
       const values = [email];
       const result = await pool.query(query, values);
-      return result.rows.length > 0
-        ? result.rows
-        : {
-            message: "No products found in the user's cart",
-          };
+      if (result.rows.length > 0) {
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
+        return result.rows;
+      } else return { message: "No products found in the user's wishlist" };
     } catch (error) {
       console.error("Error retrieving user cart by email:", error);
     }

@@ -147,7 +147,7 @@ app.get("/getProductsByFilters", async (req, res) => {
         reply.push({
           product_id: row.product_id,
           product_name: row.product_name,
-          product_main_img: row.product_main_img,
+          product_main_img: row.product_main_img.toString("base64"),
           product_description: row.product_description,
           product_date_added: row.product_date_added,
           product_avg_rating: row.product_avg_rating,
