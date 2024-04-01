@@ -134,6 +134,7 @@ const helpers = {
         product_id INTEGER,
         user_email VARCHAR(255),
         comment VARCHAR(255),
+        rating FLOAT,
         PRIMARY KEY (review_id),
         FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
         FOREIGN KEY (product_id) REFERENCES product(product_id)
@@ -254,11 +255,44 @@ const helpers = {
 
   getProductInfoByPid: async function (id) {
     try {
-      const response = await pool.query(`SELECT * 
-        FROM product 
-        JOIN productprice ON product.product_id = productprice.product_id 
-        WHERE product.product_id = $1;`, [id]);
-      return response.rows;
+      let productResponse = await pool.query(`
+        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, pp.base_price, pp.current_price
+        FROM product p
+        JOIN productprice pp ON p.product_id = pp.product_id
+        WHERE p.product_id = $1;
+      `, [id]);
+      let reply = {};
+      if (productResponse.rows.length > 0) {
+        let product = productResponse.rows[0];
+        reply = {
+          product_id: product.product_id,
+          product_name: product.product_name,
+          product_main_img: product.product_main_img.toString('base64'),
+          product_description: product.product_description,
+          product_date_added: product.product_date_added,
+          user_email: product.user_email,
+          product_avg_rating: product.product_avg_rating,
+          base_price: product.base_price,
+          current_price: product.current_price,
+          tags: [],
+          additional_img: []
+        };
+        let tagsResponse = await pool.query(`
+          SELECT pt.tag_id, t.tag_name 
+          FROM producttags pt
+          JOIN tag t ON pt.tag_id = t.tag_id
+          WHERE pt.product_id = $1;
+        `, [id]);
+        reply.tags = tagsResponse.rows.map(tag => ({ id: tag.tag_id, tag: tag.tag_name }));
+        let imagesResponse = await pool.query(`
+          SELECT image 
+          FROM image
+          WHERE product_id = $1;
+        `, [id]);
+        reply.additional_img = imagesResponse.rows.map(imgRow => imgRow.image.toString('base64'));
+      }
+  
+      return reply;
     } catch (error) {
       console.error("Error retrieving product information:", error);
     }
@@ -644,7 +678,7 @@ const helpers = {
             FROM product
             WHERE user_email = $1;`, [user_email]);
       if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO review(product_id, user_email, comment)
+        await pool.query(`INSERT INTO review(product_id, user_email, comment, rating)
                 VALUES ($1, $2, $3);`, [product_id, user_email, comment]);
       }
     } catch (error) {

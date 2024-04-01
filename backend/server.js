@@ -128,13 +128,15 @@ app.get("/getProductsByFilters", async (req, res) => {
         reply.push({
           product_id: row.product_id,
           product_name: row.product_name,
-          product_imgsrc: row.product_imgsrc,
+          product_main_img: row.product_main_img,
           product_description: row.product_description,
           product_date_added: row.product_date_added,
           product_avg_rating: row.product_avg_rating,
           user_email: row.user_email,
           base_price: row.base_price,
-          current_price: row.current_price
+          current_price: row.current_price,
+          tags: row.tags,
+          additional_img: row.additional_img
         });
       });
     }
