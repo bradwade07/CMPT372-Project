@@ -7,7 +7,7 @@ import { TopNavbar } from "@/components/navbar";
 import { Button } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type SearchParams = {
   product_id: number;
@@ -58,11 +58,6 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       setSelectedQuantity(parseInt(value));
     }
   };
-
-  useEffect(() => {
-    console.log(data);
-    console.log(data?.product_main_img);
-  }, [data]);
 
   return (
     <>

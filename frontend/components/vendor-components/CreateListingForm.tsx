@@ -30,7 +30,7 @@ export function CreateListingForm() {
   // TODO: error check base_price >= current_price
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(formData);
+    // console.log(formData);
 
     createProductListing(formData);
   };

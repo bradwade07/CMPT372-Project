@@ -9,9 +9,9 @@ export async function getProduct(
   product_id: number,
 ): Promise<ProductFull | null> {
   try {
-    let response = await axios.get<ProductFull[]>(`/getProduct/${product_id}`);
+    let response = await axios.get<ProductFull>(`/getProduct/${product_id}`);
 
-    return response.data[0];
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
