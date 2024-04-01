@@ -1,4 +1,5 @@
 const {error} = require("console");
+const { resolve } = require("path");
 const {Pool} = require("pg");
 
 var pool;
@@ -151,7 +152,7 @@ const helpers = {
         warehouse_id INTEGER,
         order_date BIGINT,
         total INTEGER,
-        PRIMARY KEY (order_id, user_email, order_date, product_id, warehouse_id),
+        PRIMARY KEY (order_id, user_email, product_id, warehouse_id),
         FOREIGN KEY (product_id) REFERENCES product(product_id),
         FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
         FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
@@ -749,6 +750,34 @@ const helpers = {
       `SELECT * 
       FROM warehouse;`);
       return response.rows;
+    } catch (error) {
+      console.error("Error getting all warehouse info:", error);
+    }
+  },
+  getOrderTotal: async function (user_email) {
+    try {
+      const response = await pool.query(
+      `SELECT * 
+      FROM usercart
+      WHERE user_email = $1;`, [user_email]);
+      let total = 0;
+      for(let i = 0; i < response.rows.length; i++){
+        let {product_id, quantity, delivery} = response.rows[i];
+        let current_price = await pool.query(
+        `SELECT current_price
+        FROM productprice
+        WHERE product_id = $1`, [product_id]);
+        current_price = current_price.rows[0].current_price;
+        if(delivery === 1){
+            delivery = 1.1;// 10% delivery
+        }
+        else{
+            delivery = 1;
+        }
+        let subTotal = current_price * quantity * delivery * 1.11; //1.11 for taxes
+        total += subTotal;
+      }
+      return total;
     } catch (error) {
       console.error("Error getting all warehouse info:", error);
     }

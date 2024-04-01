@@ -489,11 +489,8 @@ const generateAccessToken = async () => {
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
  */
-const createOrder = async (user_email, acquisitionMethod) => {
-  // TODO: using user_email, get the user's shopping cart, total it up, add fees (depending on delivery or pickup, and address of delivery), and pass the total to the paypal API
-  // user_email: user's email
-  // acquisitionMethod: either "delivery" or "pickup", used to determine whether to add shipping fees or not to the user's order, magnitude of shipping fee address saved on the user's account
-
+const createOrder = async (user_email) => {
+  const total = await helpers.getOrderTotal(user_email);
   const accessToken = await generateAccessToken();
   const url = `${paypal_base}/v2/checkout/orders`;
   const payload = {
@@ -502,7 +499,7 @@ const createOrder = async (user_email, acquisitionMethod) => {
       {
         amount: {
           currency_code: "CAD",
-          value: "123.45"
+          value: total.toString
         }
       }
     ]
@@ -563,7 +560,11 @@ app.post("/api/orders", async (req, res) => {
 app.post("/api/orders/:orderID/capture", async (req, res) => {
   try {
     const {orderID} = req.params;
+    const { user_email } = req.body;
     const {jsonResponse, httpStatusCode} = await captureOrder(orderID);
+    if(httpStatusCode === 201){
+        await helpers.clearUserCart(user_email);
+    }
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
     console.error("Failed to create order:", error);
