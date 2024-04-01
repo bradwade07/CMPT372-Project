@@ -42,7 +42,7 @@ app.delete("/deleteAllTables", async (req, res) => {
 
 // Products related endpoints
 app.get("/getProduct/:product_id", async (req, res) => {
-  if (!req.params.product_id){
+  if (!req.params.product_id) {
     return res.status(400).send({error: "Invalid product id!"});
   }
   let product_id = parseInt(req.params.product_id);
@@ -192,31 +192,22 @@ app.post("/postUser", async (req, res) => {
     user_email,
     user_type
   } = req.body;
-  if (!user_email) 
+  let addressGiven = 1;
+  if (!user_email) {
     return res.status(400).send({error: "Invalid user email!"});
-  user_email = user_email.trim();
-
-  if (!street_name) 
-    return res.status(400).send({error: "Invalid street name!"});
-  street_name = street_name.trim();
-
-  if (!city) 
-    return res.status(400).send({error: "Invalid city!"});
-  city = city.trim();
-
-  if (!province) 
-    return res.status(400).send({error: "Invalid province!"});
-  province = province.trim();
-
-  if (!post_code) 
-    return res.status(400).send({error: "Invalid post code!"});
-  post_code = post_code.trim();
-
-  if (!country) 
-    return res.status(400).send({error: "Invalid country!"});
-  country = country.trim();
-
-  if (!user_type) 
+    user_email = user_email.trim();
+  }
+  if(!street_name || !city || !province || !post_code || !country){
+    addressGiven = 0;
+  }
+  else{
+    street_name = street_name.trim();
+    city = city.trim();
+    province = province.trim();
+    post_code = post_code.trim();
+    country = country.trim();
+  }
+  if (user_type) 
     return res.status(400).send({error: "Invalid type!"});
   user_type = user_type.trim().toLowerCase();
 
@@ -229,7 +220,7 @@ app.post("/postUser", async (req, res) => {
     : 2;
 
   try {
-    await helpers.postUser(street_name, city, province, post_code, country, user_email, type_id);
+    await helpers.postUser(street_name, city, province, post_code, country, user_email, type_id, addressGiven);
     return res.status(201).json({success: "Product added successfully!"});
   } catch (error) {
     console.error("Error:", error);
@@ -258,12 +249,14 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
 // also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let {user_email, type: user_type} = req.body;
-  if (!user_email){
-    return res.status(400).send({error: "Invalid user email!"});}
+  if (!user_email) {
+    return res.status(400).send({error: "Invalid user email!"});
+  }
   user_email = user_email.trim();
 
-  if (!user_type){
-    return res.status(400).send({error: "Invalid type!"});}
+  if (!user_type) {
+    return res.status(400).send({error: "Invalid type!"});
+  }
   user_type = user_type.trim().toLowerCase();
 
   if (user_type !== "customer" && user_type !== "vendor") {
@@ -580,29 +573,23 @@ app.post("/api/orders/:orderID/capture", async (req, res) => {
 
 app.post("/createProductListing", async (req, res) => {
   try {
-    const {
-      product_name,
-      product_description,
-      base_price,
-      current_price,
-      user_email,
-    } = req.body;
+    const {product_name, product_description, base_price, current_price, user_email} = req.body;
     let product_images = [];
     let warehouse_ids = [];
     let quantities = [];
     let product_tags = [];
     req.files["product_images[]"].forEach(obj => {
-        product_images.push(obj.data);
+      product_images.push(obj.data);
     });
-    req.body["warehouse_ids[]"].forEach(id =>{
-        warehouse_ids.push(parseInt(id));
-    })
-    req.body["quantities[]"].forEach(quantity =>{
-        quantities.push(parseInt(quantity));
-    })
-    req.body["product_tags[]"].forEach(tag =>{
-        product_tags.push(tag);
-    })
+    req.body["warehouse_ids[]"].forEach(id => {
+      warehouse_ids.push(parseInt(id));
+    });
+    req.body["quantities[]"].forEach(quantity => {
+      quantities.push(parseInt(quantity));
+    });
+    req.body["product_tags[]"].forEach(tag => {
+      product_tags.push(tag);
+    });
     product_images.pop();
     warehouse_ids.pop();
     quantities.pop();
@@ -616,53 +603,81 @@ app.post("/createProductListing", async (req, res) => {
   }
 });
 app.post("/postReviewsByUserEmail", async (req, res) => {
-    try {
-      const {
-        product_id,
-        user_email,
-        comment
-      } = req.body;
-      await helpers.postReviewsByUserEmail(product_id, user_email, comment);
-      console.log("Review Posted Successfully!");
-      res.status(200);
-    } catch (error) {
-      console.error("Failed to create review:", error);
-      res.status(500).json({error: "Failed to create review."});
-    }
-  });
-  
-  app.post("/postVendorRequestsByUserEmail", async (req, res) => {
-    try {
-      const {user_email} = req.body;
-      await helpers.postVendorRequestsByUserEmail(user_email);
-      console.log("Review Posted Successfully!");
-      res.status(200);
-    } catch (error) {
-        console.error("Failed to post vendor request:", error);
-        res.status(500).json({error: "Failed to post vendor request."});
-    }
-  });
+  try {
+    const {product_id, user_email, comment} = req.body;
+    await helpers.postReviewsByUserEmail(product_id, user_email, comment);
+    console.log("Review Posted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to create review:", error);
+    res.status(500).json({error: "Failed to create review."});
+  }
+});
 
-  app.get("/getAllVendorRequests", async (req, res) => {
-    try {
-      const response = await helpers.getAllVendorRequests();
-      res.status(200).json(response);
-    } catch (error) {
-      console.error("Failed to get all vendor request:", error);
-      res.status(500).json({error: "Failed to get all vendor request."});
-    }
-  });
+app.post("/postVendorRequestsByUserEmail", async (req, res) => {
+  try {
+    const {user_email} = req.body;
+    await helpers.postVendorRequestsByUserEmail(user_email);
+    console.log("Review Posted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to post vendor request:", error);
+    res.status(500).json({error: "Failed to post vendor request."});
+  }
+});
 
-  app.delete("/deleteVendorRequest", async (req, res) => {
-    try {
-    const { user_email } = req.body;
+app.get("/getAllVendorRequests", async (req, res) => {
+  try {
+    const response = await helpers.getAllVendorRequests();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get all vendor request:", error);
+    res.status(500).json({error: "Failed to get all vendor request."});
+  }
+});
+
+app.delete("/deleteVendorRequestByUserEmail", async (req, res) => {
+  try {
+    const {user_email} = req.body;
     await helpers.deleteVendorRequestByUserEmail(user_email);
-      console.log("Review Deleted Successfully!");
-      res.status(200);
-    } catch (error) {
-        console.error("Failed to delete vendor request:", error);
-        res.status(500).json({error: "Failed to delete vendor request."});
-    }
+    console.log("Review Deleted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to delete vendor request:", error);
+    res.status(500).json({error: "Failed to delete vendor request."});
+  }
+});
+
+app.get("/getInStockWarehouses/:product_id/:quantity", async (req, res) => {
+  try {
+    const {product_id, quantity} = req.params;
+    const response = await helpers.getInStockWarehouses(product_id, quantity);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse stock:", error);
+    res.status(500).json({error: "Failed to get warehouse stock."});
+  }
+});
+
+app.get("/getWarehouseInfo/:warehouse_id", async (req, res) => {
+  try {
+    const {warehouse_id} = req.params;
+    const response = await helpers.getWarehouseInfo(warehouse_id);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse info:", error);
+    res.status(500).json({error: "Failed to get warehouse info."});
+  }
+});
+
+app.get("/getAllWarehouseInfo", async (req, res) => {
+  try {
+    const response = await helpers.getAllWarehouseInfo();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get All warehouse info:", error);
+    res.status(500).json({error: "Failed to All get warehouse info."});
+  }
 });
 
 // Server initialization
