@@ -98,8 +98,7 @@ export async function updateUserAddress(
 // user with user_email applies to become a vendor account, application stored in database and will be approved/denied by an admin
 export async function applyToBecomeVendor(user_email: string): Promise<void> {
   try {
-    await axios.post("/???", {
-      //FIXME: backend url
+    await axios.post("/postVendorRequestsByUserEmail", {
       user_email: user_email,
     });
   } catch (error) {
@@ -116,13 +115,9 @@ export async function getBecomeVendorRequests(): Promise<
   BecomeVendorRequest[]
 > {
   try {
-    const thing: BecomeVendorRequest[] = [];
-    for (let i = 0; i < 30; i++) {
-      thing.push({ user_email: `user${i}@gmail.com` });
-    }
-    return thing;
-
-    let response = await axios.get("/???"); //FIXME: backend url
+    let response = await axios.get<BecomeVendorRequest[]>(
+      "/getAllVendorRequests",
+    );
 
     return response.data;
   } catch (error) {
@@ -140,8 +135,7 @@ export async function getBecomeVendorRequests(): Promise<
 // removes the application for the user with user_email to become a vendor
 export async function removeVendorRequest(user_email: string): Promise<void> {
   try {
-    await axios.delete("/???", {
-      //FIXME: backend url
+    await axios.delete("/deleteVendorRequest", {
       data: {
         user_email: user_email,
       },

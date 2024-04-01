@@ -59,6 +59,8 @@ export async function getInStockWarehouses(
   quantity: number,
 ): Promise<Warehouse[]> {
   try {
+    return warehouses;
+
     let response = await axios.get<Warehouse[]>("???"); // FIXME: backend url
 
     return response.data;
