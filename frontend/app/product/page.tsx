@@ -4,7 +4,7 @@ import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
 import ImageSelector from "@/components/ImageSelector/ImageSelector"
 import { TopNavbar } from "@/components/navbar";
-import { Button } from "@nextui-org/react";
+import { Button , Checkbox, CheckboxGroup } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +13,12 @@ type SearchParams = {
   product_id: number;
 };
 
+
+
 function page({ searchParams }: { searchParams: SearchParams }) {
+  const [isInvalid, setIsInvalid] = useState(false);
+
+
   const router = useRouter();
   const [selectedQuantity, setSelectedQuantity] = useState(1); 
 
@@ -79,8 +84,22 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           <div className="flex flex-col justify-center items-center text-center md:w-3/5">
             <p className="font-bold text-xl">{data?.product_name}</p>
             <p className="text-lg">${data?.base_price}</p>
-            <p className="mb-8">{data?.product_description}</p>
-            <div className="flex flex-col gap-4 mb-8">
+            <div className = 'flex gap-4'>
+              <CheckboxGroup
+                label="Pick up or Deliver?"
+                defaultValue={["true"]}
+                orientation="horizontal"
+                isInvalid={isInvalid}
+                onValueChange={(value) => {
+                  setIsInvalid(value.length != 1);
+                }}
+                
+              >
+                <Checkbox value="true" defaultChecked>Delivery</Checkbox>
+                <Checkbox value="false">Pick Up</Checkbox>
+              </CheckboxGroup>
+            </div>
+            <div className="flex flex-col gap-4 mb-8 py-5">
               <Button className="bg-blue-500 hover:bg-blue-700 text-white" onClick={addItemToShoppingCart}>
                 ADD TO CART
               </Button>
@@ -92,7 +111,8 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                 <input  className="rounded-md max-w-10 bg-slate-100 ring-2 ring-blue-500" type="number" min="0" step="1" value={selectedQuantity} onChange={handleQuantityChange} />
               </div>
             </div>
-            <p className="mb-8">SPECIFICATIONS</p>
+            <p className="mb-8">Description</p>
+            <p className="mb-8">{data?.product_description}</p>
           </div>
         </div>
         <div className="flex justify-center items-center text-center mt-8">

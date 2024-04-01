@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const userType = await getSessionUserType();
 
-  if(false){
+
   // checking the user type on user specific URLs
   if (request.nextUrl.pathname.startsWith("/become-vendor")) {
     if (!(userType == UserTypes.Customer)) {
@@ -32,8 +32,6 @@ export async function middleware(request: NextRequest) {
       console.log("Cannot go to checkout without being logged in");
       return NextResponse.redirect(new URL("/signin", request.url));
     }
-  }
-
   }
 }
 
