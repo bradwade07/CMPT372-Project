@@ -8,6 +8,7 @@ import { Button, Checkbox, CheckboxGroup } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getSession } from "../auth";
 
 type SearchParams = {
   product_id: number;
@@ -26,9 +27,9 @@ function page({ searchParams }: { searchParams: SearchParams }) {
 
   const queryClient = useQueryClient();
 
-  // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
-    try {
+    const session = await getSession();
+    if (session) {
       // TODO: provide actual "delivery" and "warehouse_id" values
       await addToShoppingCart(
         searchParams.product_id,
@@ -37,20 +38,18 @@ function page({ searchParams }: { searchParams: SearchParams }) {
         1,
       );
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
-    } catch (error) {
+    } else {
       router.push("/signin");
-      console.error("Could not add item to shopping cart");
     }
   }
 
-  // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
-    try {
+    const session = await getSession();
+    if (session) {
       await addToWishlist(searchParams.product_id, selectedQuantity);
       queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
-    } catch (error) {
+    } else {
       router.push("/signin");
-      console.error("Could not add item to shopping cart");
     }
   }
 

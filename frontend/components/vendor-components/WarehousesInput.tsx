@@ -111,7 +111,6 @@ export function WarehousesInput({
         </div>
       </div>
       {renderWarehouseQuantityInput()}
-      {/* TODO: implement warehouse map */}
     </>
   );
 }

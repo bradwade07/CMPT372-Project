@@ -16,8 +16,8 @@ export function BecomeVendorButton() {
     const user_email = await getSessionUserEmail();
 
     if (user_email) {
-      setPressState("success");
       await applyToBecomeVendor(user_email);
+      setPressState("success");
     } else {
       router.push("/signin");
     }
@@ -28,7 +28,7 @@ export function BecomeVendorButton() {
       <Button
         className="w-fit mt-8 self-center"
         color="success"
-        onPress={apply}
+        onClick={apply}
       >
         Become a Vendor
       </Button>

@@ -46,6 +46,7 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
           <p>${product.base_price}</p>
         )}
         <p>{product.product_description}</p>
+        <p>Rating: {product.product_avg_rating}</p>
       </CardBody>
     </Card>
   );

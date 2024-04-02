@@ -13,14 +13,14 @@ type VendorRequestCardProps = {
 export function VendorRequestCard({ request }: VendorRequestCardProps) {
   const queryClient = useQueryClient();
 
-  function approveRequest() {
-    updateUserType(request.user_email, UserTypes.Vendor);
-    removeVendorRequest(request.user_email);
+  async function approveRequest() {
+    await updateUserType(request.user_email, UserTypes.Vendor);
+    await removeVendorRequest(request.user_email);
     queryClient.invalidateQueries({ queryKey: ["Vendor Requests"] });
   }
 
-  function denyRequest() {
-    removeVendorRequest(request.user_email);
+  async function denyRequest() {
+    await removeVendorRequest(request.user_email);
     queryClient.invalidateQueries({ queryKey: ["Vendor Requests"] });
   }
 
