@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const { helpers } = require("./models/db");
 
-const app = express();
+
 const port = 8080;
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 const paypal_base = "https://api-m.sandbox.paypal.com";
