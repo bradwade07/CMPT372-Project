@@ -33,7 +33,7 @@ export function ItemGrid({ filters }: ItemGridProps) {
   const endIndex = startIndex + itemsPerPage;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full h-fit">
       <div className="flex flex-wrap gap-y-8 flex-1 justify-items-center items-center">
         {!(isLoading || error) && data
           ? data.slice(startIndex, endIndex).map((item) => (

@@ -22,7 +22,8 @@ export function TagsFilter({ selectedTags, onChange }: TagsFilterProps) {
     <div className="flex flex-col gap-1 w-full mb-4">
       <CheckboxGroup
         className="gap-1"
-        label="Select Product Tags"
+        classNames={{ label: "text-black mb-2" }}
+        label="Select Product Tags:"
         orientation="horizontal"
         name="product_tags"
         value={selectedTags}

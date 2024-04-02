@@ -20,7 +20,7 @@ export function Filters({ onFiltersSave }: FiltersProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
-    <Card className="w-80 h-fit">
+    <Card className="w-80 md:w-[26rem] h-fit">
       <CardBody className="flex flex-col align-middle text-center">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         <PriceFilter
