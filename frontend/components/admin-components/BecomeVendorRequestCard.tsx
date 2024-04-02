@@ -3,25 +3,23 @@
 import { removeVendorRequest, updateUserType } from "@/api/user";
 import { UserTypes, BecomeVendorRequest } from "@/api/user.types";
 import { Button, Card, CardBody } from "@nextui-org/react";
-import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 
 type VendorRequestCardProps = {
   request: BecomeVendorRequest;
+  refetch: () => void;
 };
 
-export function VendorRequestCard({ request }: VendorRequestCardProps) {
-  const queryClient = useQueryClient();
-
+export function VendorRequestCard({ request, refetch }: VendorRequestCardProps) {
   async function approveRequest() {
     await updateUserType(request.user_email, UserTypes.Vendor);
     await removeVendorRequest(request.user_email);
-    queryClient.invalidateQueries({ queryKey: ["Vendor Requests"] });
+    refetch()
   }
 
   async function denyRequest() {
     await removeVendorRequest(request.user_email);
-    queryClient.invalidateQueries({ queryKey: ["Vendor Requests"] });
+    refetch()
   }
 
   return (
