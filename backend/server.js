@@ -106,15 +106,15 @@ app.get("/getProductsByFilters", async (req, res) => {
     response = await helpers.getProductIdByPrice(current_price_min, current_price_max);
     tempRows = response.map(row => row.product_id);
     responseIds = responseIds.filter(id => tempRows.includes(id));
-
+    
     response = await helpers.getProductIdByDateAdded(product_date_added_after, product_date_added_before);
     tempRows = response.map(row => row.product_id);
     responseIds = responseIds.filter(id => tempRows.includes(id));
-
+    
     response = await helpers.getProductIdByUserEmail(user_email);
     tempRows = response.map(row => row.product_id);
     responseIds = responseIds.filter(id => tempRows.includes(id));
-
+    
     if (tags.length > 0) {
       response = await helpers.getProductIdByTags(tags);
       tempRows = response.map(row => row.product_id);
@@ -422,11 +422,7 @@ app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
 
   try {
     const products = await helpers.getUserCartByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).json({ error: "User cart not found!" });
-    }
+    res.json(products);
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get user cart!" });
   }
@@ -633,7 +629,7 @@ app.post("/createProductListing", async (req, res) => {
       quantities.push(parseInt(quantity));
     });
     req.body["product_tags[]"].forEach((tag) => {
-      product_tags.push(tag);
+      product_tags.push(tag.toLowerCase());
     });
     product_images.pop();
     warehouse_ids.pop();

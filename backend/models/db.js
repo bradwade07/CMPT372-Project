@@ -729,8 +729,9 @@ const helpers = {
         result.rows.forEach((row) => {
           row.product_main_img = row.product_main_img.toString("base64");
         });
-        return result.rows;
-      } else return { message: "No products found in the user's wishlist" };
+        
+      } 
+      return result.rows;
     } catch (error) {
       console.error("Error retrieving user cart by email:", error);
     }
