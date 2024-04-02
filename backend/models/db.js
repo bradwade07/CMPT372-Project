@@ -490,7 +490,7 @@ const helpers = {
   getProductsOnSaleByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE pp.current_price < pp.base_price
@@ -518,7 +518,7 @@ const helpers = {
   getNewestProductsByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         ORDER BY p.product_date_added DESC
