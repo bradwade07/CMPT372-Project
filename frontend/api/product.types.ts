@@ -1,6 +1,3 @@
-type Base64<imageType extends string> =
-  `data:image/${imageType};base64, ${string}`;
-
 export type Product = {
   product_id: number;
   product_name: string;

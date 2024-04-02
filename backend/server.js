@@ -13,7 +13,7 @@ const paypal_base = "https://api-m.sandbox.paypal.com";
 app.use(upload());
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 // Testing related endpoints
 app.post("/insertTestData", async (req, res) => {
@@ -67,58 +67,77 @@ app.get("/getProductsByFilters", async (req, res) => {
   const product_name = req.query.product_name
     ? req.query.product_name.trim()
     : "";
-  const product_avg_rating_min = req.query.product_avg_rating_min !== undefined && req.query.product_avg_rating_min !== ""
-    ? parseInt(req.query.product_avg_rating_min)
-    : 0.0;
-  const product_avg_rating_max = req.query.product_avg_rating_max !== undefined && req.query.product_avg_rating_max !== ""
-    ? parseInt(req.query.product_avg_rating_max)
-    : 5.0;
-  const current_price_min = req.query.current_price_min !== undefined && req.query.current_price_min !== ""
-    ? parseInt(req.query.current_price_min)
-    : 0.0;
-  const current_price_max = req.query.current_price_max !== undefined && req.query.current_price_max !== ""
-    ? parseInt(req.query.current_price_max)
-    : 2147483647; // SQL MAX INT
-  const product_date_added_before = req.query.product_date_added_before !== undefined && req.query.product_date_added_before !== ""
-    ? parseInt(req.query.product_date_added_before)
-    : new Date().getTime();
-  const product_date_added_after = req.query.product_date_added_after !== undefined && req.query.product_date_added_after !== ""
-    ? parseInt(req.query.product_date_added_after)
-    : 0;
+  const product_avg_rating_min =
+    req.query.product_avg_rating_min !== undefined &&
+    req.query.product_avg_rating_min !== ""
+      ? parseInt(req.query.product_avg_rating_min)
+      : 0.0;
+  const product_avg_rating_max =
+    req.query.product_avg_rating_max !== undefined &&
+    req.query.product_avg_rating_max !== ""
+      ? parseInt(req.query.product_avg_rating_max)
+      : 5.0;
+  const current_price_min =
+    req.query.current_price_min !== undefined &&
+    req.query.current_price_min !== ""
+      ? parseInt(req.query.current_price_min)
+      : 0.0;
+  const current_price_max =
+    req.query.current_price_max !== undefined &&
+    req.query.current_price_max !== ""
+      ? parseInt(req.query.current_price_max)
+      : 2147483647; // SQL MAX INT
+  const product_date_added_before =
+    req.query.product_date_added_before !== undefined &&
+    req.query.product_date_added_before !== ""
+      ? parseInt(req.query.product_date_added_before)
+      : new Date().getTime();
+  const product_date_added_after =
+    req.query.product_date_added_after !== undefined &&
+    req.query.product_date_added_after !== ""
+      ? parseInt(req.query.product_date_added_after)
+      : 0;
   const tags = req.query.tags
     ? req.query.tags.trim().toLowerCase().split(",")
     : [];
-  const user_email = req.query.user_email
-    ? req.query.user_email.trim()
-    : "";
+  const user_email = req.query.user_email ? req.query.user_email.trim() : "";
 
   let responseIds = [];
   try {
     let response = await helpers.getProductIdByName(product_name);
-    response.forEach(row => {
+    response.forEach((row) => {
       responseIds.push(row.product_id);
     });
 
-    response = await helpers.getProductIdByRating(product_avg_rating_min, product_avg_rating_max);
-    let tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
+    response = await helpers.getProductIdByRating(
+      product_avg_rating_min,
+      product_avg_rating_max,
+    );
+    let tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
 
-    response = await helpers.getProductIdByPrice(current_price_min, current_price_max);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
-    response = await helpers.getProductIdByDateAdded(product_date_added_after, product_date_added_before);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
+    response = await helpers.getProductIdByPrice(
+      current_price_min,
+      current_price_max,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    response = await helpers.getProductIdByDateAdded(
+      product_date_added_after,
+      product_date_added_before,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
     response = await helpers.getProductIdByUserEmail(user_email);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
     if (tags.length > 0) {
       response = await helpers.getProductIdByTags(tags);
-      tempRows = response.map(row => row.product_id);
-      responseIds = responseIds.filter(id => tempRows.includes(id));
+      tempRows = response.map((row) => row.product_id);
+      responseIds = responseIds.filter((id) => tempRows.includes(id));
     }
 
     let reply = [];
@@ -146,9 +165,7 @@ app.get("/getProductsByFilters", async (req, res) => {
 });
 
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit
-    ? parseInt(req.params.limit)
-    : -1; //-1 is unlimited
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getProductsOnSaleByLimit(limit);
     if (products.length > 0) {
@@ -163,9 +180,7 @@ app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
 });
 
 app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit
-    ? parseInt(req.params.limit)
-    : -1; //-1 is unlimited
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getNewestProductsByLimit(limit);
     if (products.length > 0) {
@@ -422,7 +437,11 @@ app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
 
   try {
     const products = await helpers.getUserCartByUserEmail(user_email);
-    res.json(products);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).json({ error: "User cart not found!" });
+    }
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get user cart!" });
   }
@@ -629,7 +648,7 @@ app.post("/createProductListing", async (req, res) => {
       quantities.push(parseInt(quantity));
     });
     req.body["product_tags[]"].forEach((tag) => {
-      product_tags.push(tag.toLowerCase());
+      product_tags.push(tag);
     });
     product_images.pop();
     warehouse_ids.pop();
