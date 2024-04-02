@@ -1,328 +1,414 @@
-const path = require("path");
 const express = require("express");
+const app = express();
+const cors = require("cors");
+const { helpers } = require("./models/db");
 
 const app = express();
-const cors = require('cors');
-const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
-const { helpers } = require('./models/db')
-
 const port = 8080;
+const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+const paypal_base = "https://api-m.sandbox.paypal.com";
 
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
-app.get('/', (req, res) => {
-    res.send('Welcome to my server!');
-  });
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
- 
-  
-  
-
-app.get("/landingBackend", async (req, res) =>{
-    helpers.init(req, res);
-    helpers.landingBackendFn(req, res);
-
-	let responseIds = [];
+app.post("/insertTestData", async (req, res) => {
+	//testing
 	try {
-		let response = await helpers.getProductIdByName(product_name);
-		response.forEach((row) => {
-			responseIds.push(row.product_id);
-		});
-
-		response = await helpers.getProductIdByRating(
-			product_avg_rating_min,
-			product_avg_rating_max
-		);
-		let tempRows = response.map((row) => row.product_id);
-		responseIds = responseIds.filter((id) => tempRows.includes(id));
-
-		response = await helpers.getProductIdByPrice(
-			current_price_min,
-			current_price_max
-		);
-		tempRows = response.map((row) => row.product_id);
-		responseIds = responseIds.filter((id) => tempRows.includes(id));
-
-		response = await helpers.getProductIdByDateAdded(
-			product_date_added_after,
-			product_date_added_before
-		);
-		tempRows = response.map((row) => row.product_id);
-		responseIds = responseIds.filter((id) => tempRows.includes(id));
-
-		response = await helpers.getProductIdByUserEmail(user_email);
-		tempRows = response.map((row) => row.product_id);
-		responseIds = responseIds.filter((id) => tempRows.includes(id));
-
-		if (tags.length > 0) {
-			response = await helpers.getProductIdByTags(tags);
-			tempRows = response.map((row) => row.product_id);
-			responseIds = responseIds.filter((id) => tempRows.includes(id));
-		}
-
-		let reply = [];
-		for (id of responseIds) {
-			response = await helpers.getProductInfoByPid(id);
-			response.forEach((row) => {
-				reply.push({
-					product_id: row.product_id,
-					product_name: row.product_name,
-					product_imgsrc: row.product_imgsrc,
-					product_description: row.product_description,
-					product_date_added: row.product_date_added,
-					product_avg_rating: row.product_avg_rating,
-					user_email: row.user_email,
-					base_price: row.base_price,
-					current_price: row.current_price,
-				});
-			});
-		}
-
-		res.status(200).send(reply);
+		helpers.insertTestData();
+		console.log("Success: Data inserted succesfully!");
+		res.status(201).send("Success: Data inserted succesfully!");
 	} catch (error) {
-		res.status(500).send({ error: "Server failed to get products!" });
+		console.error("Error: Data Not Inserted.", error);
+		res.status(500).send("Error: Data Not Inserted.");
 	}
 });
-app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
-	let user_email = req.params.user_email;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
+app.post("/deleteTestData", async (req, res) => {
+	//testing
 	try {
-		const users = await helpers.getUserTypeByUserEmail(user_email);
-		if (users.length > 0) {
-			res.status(200).json({ type: users[0].type });
+		helpers.deleteTestData();
+		console.log("Success: Data deleted succesfully!");
+		res.status(201).send("Success: Data deleted succesfully!");
+	} catch (error) {
+		console.error("Error: Data Not deleted.", error);
+		res.status(500).send("Error: Data Not deleted.");
+	}
+});
+app.post("/deleteAllTables", async (req, res) => {
+	//testing
+	try {
+		helpers.deleteAllTables();
+		console.log("Success: Tables deleted succesfully!");
+		res.status(201).send("Success: Tables deleted succesfully!");
+	} catch (error) {
+		console.error("Error: Tables Not deleted.", error);
+		res.status(500).send("Error: Tables Not deleted.");
+	}
+});
+app.get("/getProduct/:product_id", async (req, res) => {
+	let product_id = req.params.product_id
+		? parseInt(req.params.product_id)
+		: res.status(400).send({ error: "Invalid product id!" });
+	let reply = [];
+	try {
+		// Check for non-positive product_id
+		if (product_id <= 0) {
+			res.status(400).send({ error: "Invalid Product ID!" });
+		}
+		const response = await helpers.getProductInfoByPid(product_id);
+		if (response.length === 0) {
+			res.status(404).send({ error: "Product not found!" });
 		} else {
-			res.status(404).send({ error: "User not found!" });
+			res.status(200).json(response);
 		}
 	} catch (error) {
-		res.status(500).send({ error: "Server failed to get user!" });
+		res.status(500).send({ error: "Server failed to get product!" });
 	}
 });
-app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
-	let user_email = req.params.user_email;
-	user_email = user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	try {
-		const products = await helpers.getUserCartByUserEmail(user_email);
-		if (products.length > 0) {
-			res.json(products);
-		} else {
-			res.status(404).json({ error: "User cart not found!" });
-		}
-	} catch (error) {
-		res.status(500).send({ error: "Server failed to get user cart!" });
-	}
+app.get("/getProductsByFilters", async (req, res) => {
+	const product_name = req.query.product_name
+		? req.query.product_name.trim()
+		: "";
+	const product_avg_rating_min =
+		req.query.product_avg_rating_min !== undefined &&
+		req.query.product_avg_rating_min !== ""
+			? parseInt(req.query.product_avg_rating_min)
+			: 0.0;
+	const product_avg_rating_max =
+		req.query.product_avg_rating_max !== undefined &&
+		req.query.product_avg_rating_max !== ""
+			? parseInt(req.query.product_avg_rating_max)
+			: 5.0;
+	const current_price_min =
+		req.query.current_price_min !== undefined &&
+		req.query.current_price_min !== ""
+			? parseInt(req.query.current_price_min)
+			: 0.0;
+	const current_price_max =
+		req.query.current_price_max !== undefined &&
+		req.query.current_price_max !== ""
+			? parseInt(req.query.current_price_max)
+			: 2147483647; // SQL MAX INT
+	const product_date_added_before =
+		req.query.product_date_added_before !== undefined &&
+		req.query.product_date_added_before !== ""
+			? parseInt(req.query.product_date_added_before)
+			: new Date().getTime();
+	const product_date_added_after =
+		req.query.product_date_added_after !== undefined &&
+		req.query.product_date_added_after !== ""
+			? parseInt(req.query.product_date_added_after)
+			: 0;
+	const tags = req.query.tags
+		? req.query.tags.trim().toLowerCase().split(",")
+		: [];
+	const user_email = req.query.user_email ? req.query.user_email.trim() : "";
+
+  let responseIds = [];
+  try {
+    let response = await helpers.getProductIdByName(product_name);
+    response.forEach((row) => {
+      responseIds.push(row.product_id);
+    });
+
+    response = await helpers.getProductIdByRating(
+      product_avg_rating_min,
+      product_avg_rating_max,
+    );
+    let tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    response = await helpers.getProductIdByPrice(
+      current_price_min,
+      current_price_max,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    response = await helpers.getProductIdByDateAdded(
+      product_date_added_after,
+      product_date_added_before,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    response = await helpers.getProductIdByUserEmail(user_email);
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    if (tags.length > 0) {
+      response = await helpers.getProductIdByTags(tags);
+      tempRows = response.map((row) => row.product_id);
+      responseIds = responseIds.filter((id) => tempRows.includes(id));
+    }
+
+    let reply = [];
+    for (id of responseIds) {
+      response = await helpers.getProductInfoByPid(id);
+      reply.push({
+        product_id: response.product_id,
+        product_name: response.product_name,
+        product_main_img: response.product_main_img.toString("base64"),
+        product_description: response.product_description,
+        product_date_added: response.product_date_added,
+        product_avg_rating: response.product_avg_rating,
+        user_email: response.user_email,
+        base_price: response.base_price,
+        current_price: response.current_price,
+        tags: response.tags,
+        additional_img: response.additional_img,
+      });
+    }
+
+    return res.status(200).send(reply);
+  } catch (error) {
+    return res.status(500).send({ error: "Server failed to get products!" });
+  }
 });
-app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
-	let user_email = req.params.user_email;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	try {
-		const products = await helpers.getUserWishlistByUserEmail(user_email);
-		if (products.length > 0) {
-			res.json(products);
-		} else {
-			res.status(404).send({ error: "User wishlist not found!" });
-		}
-	} catch (error) {
-		res.status(500).send({ error: "Server failed to get user wishlist!" });
-	}
-});
+
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
-	const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
-	try {
-		const products = await helpers.getProductsOnSaleByLimit(limit);
-		if (products.length > 0) {
-			res.json(products);
-		} else {
-			res.status(404).json({ error: "Products not found!" });
-		}
-	} catch (error) {
-		console.error(error);
-		res.status(500).send({ error: "Server failed to get products!" });
-	}
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
+  try {
+    const products = await helpers.getProductsOnSaleByLimit(limit);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).json({ error: "Products not found!" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: "Server failed to get products!" });
+  }
 });
+
 app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
-	const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
-	try {
-		const products = await helpers.getNewestProductsByLimit(limit);
-		if (products.length > 0) {
-			res.json(products);
-		} else {
-			res.status(404).json({ error: "Products not found!" });
-		}
-	} catch (error) {
-		console.error(error);
-		res.status(500).send({ error: "Server failed to get products!" });
-	}
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
+  try {
+    const products = await helpers.getNewestProductsByLimit(limit);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).json({ error: "Products not found!" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: "Server failed to get products!" });
+  }
 });
-app.get('/image/:productId', async (req, res) => {
-    const { productId } = req.params;
-  
-    try {
-      const result = await pool.query('SELECT image FROM product WHERE product_id = $1', [productId]);
-      if (result.rows.length > 0) {
-        const image = result.rows[0].image;
-        res.type('jpg'); // Set this according to your image's MIME type
-        res.send(image);
-      } else {
-        res.status(404).send('Image not found');
-      }
-    } catch (error) {
-      console.error('Failed to retrieve image from database', error);
-      res.status(500).send('Failed to retrieve image');
-    }
-  });
-  
-app.post('/upload', upload.single('image'), async (req, res) => {
-    const imageBuffer = req.file.buffer; 
-    const productId = req.body.productId;
-  
-    try {
-      await pool.query('UPDATE product SET image = $1 WHERE product_id = $2', [imageBuffer, productId]);
-      res.send('Image uploaded successfully!');
-    } catch (error) {
-      console.error('Failed to store image in database', error);
-      res.status(500).send('Failed to upload image');
-    }
-  });
 app.post("/postUser", async (req, res) => {
-	let { street_name, city, province, post_code, country, user_email, type } =
-		req.body;
-	street_name = street_name
-		? street_name.trim()
-		: res.status(400).send({ error: "Street name required!" });
-	city = city ? city.trim() : res.status(400).send({ error: "City required!" });
-	province = province
-		? province.trim()
-		: res.status(400).send({ error: "Province required!" });
-	post_code = post_code
-		? post_code.trim()
-		: res.status(400).send({ error: "Post code required!" });
-	country = country
-		? country.trim()
-		: res.status(400).send({ error: "Country required!" });
-	user_email = user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	type = type
-		? type.toLowerCase().trim()
-		: res.status(400).send({ error: "Invalid type1!" });
-	if (type !== "customer" && type !== "vendor") {
-		res.status(400).send({ error: "Invalid type2!" });
-	}
-	let type_id = type === "vendor" ? 1 : 2;
-	try {
-		await helpers.postUser(
-			street_name,
-			city,
-			province,
-			post_code,
-			country,
-			user_email,
-			type_id
-		);
-		res.status(201).json({ success: "Product added successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Server failed to add user!" });
-	}
+  let {
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+    user_email,
+    user_type,
+  } = req.body;
+  let addressGiven = 1;
+  if (!user_email) {
+    return res.status(400).send({ error: "Invalid user email!" });
+    user_email = user_email.trim();
+  }
+  if (!street_name || !city || !province || !post_code || !country) {
+    addressGiven = 0;
+  } else {
+    street_name = street_name.trim();
+    city = city.trim();
+    province = province.trim();
+    post_code = post_code.trim();
+    country = country.trim();
+  }
+  if (!user_type) return res.status(400).send({ error: "Invalid type!" });
+  user_type = user_type.trim().toLowerCase();
+
+  if (user_type !== "customer" && user_type !== "vendor") {
+    return res.status(400).send({ error: "Invalid type2!" });
+  }
+
+  let type_id = user_type === "vendor" ? 1 : 2;
+
+  try {
+    await helpers.postUser(
+      street_name,
+      city,
+      province,
+      post_code,
+      country,
+      user_email,
+      type_id,
+      addressGiven,
+    );
+    return res.status(201).json({ success: "Product added successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ error: "Server failed to add user!" });
+  }
 });
+
+app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
+  try {
+    const users = await helpers.getUserTypeByUserEmail(user_email);
+    if (users.length > 0) {
+      return res.status(200).json({ type: users[0].type });
+    } else {
+      return res.status(404).send({ error: "User not found!" });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: "Server failed to get user!" });
+  }
+});
+
+// FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
+// also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
-	let { user_email, type } = req.body;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	type ? type.trim() : res.status(400).send({ error: "Invalid type!" });
-	if (type !== "customer" && type !== "vendor") {
-		res.status(400).send({ error: "Invalid type2!" });
-	}
-	let type_id = type === "vendor" ? 1 : 2;
-	try {
-		await helpers.patchUserType(user_email, type_id);
-		res.status(200).json({ success: "User type modified successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Server failed to modify user type!" });
-	}
+  let { user_email, user_type } = req.body;
+  if (!user_email) {
+    return res.status(400).send({ error: "Invalid user email!" });
+  }
+  user_email = user_email.trim();
+
+  if (!user_type) {
+    return res.status(400).send({ error: "Invalid type!" });
+  }
+  user_type = user_type.trim().toLowerCase();
+
+  if (user_type !== "customer" && user_type !== "vendor") {
+    return res.status(400).send({ error: "Invalid type2!" });
+  }
+
+  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+
+  try {
+    await helpers.patchUserType(user_email, type_id);
+    return res
+      .status(200)
+      .json({ success: "User type modified successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .json({ error: "Server failed to modify user type!" });
+  }
 });
+
 app.patch("/patchUserAddress", async (req, res) => {
-	let { user_email, street_name, city, province, post_code, country } =
-		req.body;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	street_name
-		? street_name.trim()
-		: res.status(400).send({ error: "Invalid street name!" });
-	city ? city.trim() : res.status(400).send({ error: "Invalid city!" });
-	province
-		? province.trim()
-		: res.status(400).send({ error: "Invalid province!" });
-	post_code
-		? post_code.trim()
-		: res.status(400).send({ error: "Invalid post code!" });
-	country
-		? country.trim()
-		: res.status(400).send({ error: "Invalid country!" });
-	try {
-		await helpers.patchUserAddress(
-			user_email,
-			street_name,
-			city,
-			province,
-			post_code,
-			country
-		);
-		res.status(200).send({ success: "User address modified successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).send({ error: "Server failed to modify user address!" });
-	}
+  let { user_email, street_name, city, province, post_code, country } =
+    req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  if (!street_name)
+    return res.status(400).send({ error: "Invalid street name!" });
+  street_name = street_name.trim();
+
+  if (!city) return res.status(400).send({ error: "Invalid city!" });
+  city = city.trim();
+
+  if (!province) return res.status(400).send({ error: "Invalid province!" });
+  province = province.trim();
+
+  if (!post_code) return res.status(400).send({ error: "Invalid post code!" });
+  post_code = post_code.trim();
+
+  if (!country) return res.status(400).send({ error: "Invalid country!" });
+  country = country.trim();
+
+  try {
+    await helpers.patchUserAddress(
+      user_email,
+      street_name,
+      city,
+      province,
+      post_code,
+      country,
+    );
+    return res
+      .status(200)
+      .send({ success: "User address modified successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to modify user address!" });
+  }
 });
-app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
-	let { user_email, product_id } = req.body;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	product_id = parseInt(product_id);
-	try {
-		await helpers.deleteUserCartByPidUserEmail(user_email, product_id);
-		res
-			.status(200)
-			.send({ success: "Item removed from user cart successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res
-			.status(500)
-			.send({ error: "Server failed to delete prodcut from user cart!" });
-	}
+
+// User wishlist related endpoints
+app.post("/postProductToUserWishlist", async (req, res) => {
+  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
+  let { user_email, product_id, quantity } = req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  product_id = parseInt(product_id);
+  quantity = parseInt(quantity);
+
+  try {
+    await helpers.postProductToUserWishlist(user_email, product_id, quantity);
+    return res
+      .status(200)
+      .send({ success: "Item added to user wishlist successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to add product to the user wishlist!" });
+  }
 });
+
+app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
+  if (!req.params.user_email.trim())
+    return res.status(400).send({ error: "Invalid user email!" });
+  let user_email = req.params.user_email.trim();
+
+  try {
+    const products = await helpers.getUserWishlistByUserEmail(user_email);
+    if (products.length > 0) {
+      res.json(products);
+    } else {
+      return res.status(404).send({ error: "User wishlist not found!" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ error: "Server failed to get user wishlist!" });
+  }
+});
+
 app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
-	let { user_email, product_id } = req.body;
-	user_email
-		? user_email.trim()
-		: res.status(400).send({ error: "Invalid user email!" });
-	product_id = parseInt(product_id);
-	try {
-		await helpers.deleteUserWishlistByPidUserEmail(user_email, product_id);
-		res
-			.status(200)
-			.send({ success: "Item removed from user wishlist successfully!" });
-	} catch (error) {
-		console.error("Error:", error);
-		res
-			.status(500)
-			.send({ error: "Server failed to delete product from user wishlist!" });
-	}
+  let { user_email, product_id } = req.body;
+
+  if (!user_email)
+    return res.status(400).send({ error: "Invalid user email!" });
+  user_email = user_email.trim();
+
+  product_id = parseInt(product_id);
+
+  try {
+    await helpers.deleteUserWishlistByPidUserEmail(user_email, product_id);
+    return res
+      .status(200)
+      .send({ success: "Item removed from user wishlist successfully!" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res
+      .status(500)
+      .send({ error: "Server failed to delete product from user wishlist!" });
+  }
 });
+
+// User shopping cart related endpoints
 app.post("/postProductToUserCart", async (req, res) => {
-	//fixed
+	//TODO: missing the fucntionality where if a product already exists in a cart, then just add up the quantity
 	let { user_email, product_id, quantity } = req.body;
 	user_email
 		? user_email.trim()
@@ -340,7 +426,7 @@ app.post("/postProductToUserCart", async (req, res) => {
 	}
 });
 app.post("/postProductToUserWishlist", async (req, res) => {
-	//fixed
+	//TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
 	let { user_email, product_id, quantity } = req.body;
 	user_email
 		? user_email.trim()
@@ -359,8 +445,10 @@ app.post("/postProductToUserWishlist", async (req, res) => {
 			.send({ error: "Server failed to add product to the user wishlist!" });
 	}
 });
+
+// Warehouse related endpoints
 app.patch("/patchWarehouseStock", async (req, res) => {
-	//Fixed by ashraf
+	//TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
 	let { warehouse_id, product_id, quantity } = req.body;
 	warehouse_id = warehouse_id
 		? parseInt(warehouse_id)
@@ -393,12 +481,256 @@ app.patch("/patchWarehouseStock", async (req, res) => {
 	}
 });
 
+// Paypal functions and endpoints
+/**
+ * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
+ * @see https://developer.paypal.com/api/rest/authentication/
+ */
+const generateAccessToken = async () => {
+  try {
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
+    const auth = Buffer.from(
+      PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
+    ).toString("base64");
+    const response = await fetch(`${paypal_base}/v1/oauth2/token`, {
+      method: "POST",
+      body: "grant_type=client_credentials",
+      headers: {
+        Authorization: `Basic ${auth}`,
+      },
+    });
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error("Failed to generate Access Token:", error);
+  }
+};
+
+/**
+ * Create an order to start the transaction.
+ * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
+ */
+const createOrder = async (user_email) => {
+  const total = await helpers.getOrderTotal(user_email);
+  const accessToken = await generateAccessToken();
+  const url = `${paypal_base}/v2/checkout/orders`;
+  const payload = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount: {
+          currency_code: "CAD",
+          value: total.toFixed(2).toString(),
+        },
+      },
+    ],
+  };
+
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      // Uncomment one of these to force an error for negative testing (in sandbox mode only). Documentation:
+      // https://developer.paypal.com/tools/sandbox/negative-testing/request-headers/
+      // "PayPal-Mock-Response": '{"mock_application_codes": "MISSING_REQUIRED_PARAMETER"}'
+      // "PayPal-Mock-Response": '{"mock_application_codes": "PERMISSION_DENIED"}'
+      // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
+    },
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  return helpers.handleResponse(response);
+};
+
+/**
+ * Capture payment for the created order to complete the transaction.
+ * @see https://developer.paypal.com/docs/api/orders/v2/#orders_capture
+ */
+const captureOrder = async (orderID) => {
+  const accessToken = await generateAccessToken();
+  const url = `${paypal_base}/v2/checkout/orders/${orderID}/capture`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      // Uncomment one of these to force an error for negative testing (in sandbox mode only). Documentation:
+      // https://developer.paypal.com/tools/sandbox/negative-testing/request-headers/
+      // "PayPal-Mock-Response": '{"mock_application_codes": "INSTRUMENT_DECLINED"}'
+      // "PayPal-Mock-Response": '{"mock_application_codes": "TRANSACTION_REFUSED"}'
+      // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
+    },
+  });
+
+  return helpers.handleResponse(response);
+};
+
+app.post("/api/orders", async (req, res) => {
+  try {
+    const { user_email, acquisitionMethod } = req.body;
+    const { jsonResponse, httpStatusCode } = await createOrder(
+      user_email,
+      acquisitionMethod,
+    );
+    res.status(httpStatusCode).json(jsonResponse);
+  } catch (error) {
+    console.error("Failed to create order:", error);
+    res.status(500).json({ error: "Failed to create order." });
+  }
+});
+
+app.post("/api/orders/:orderID/capture", async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    const { user_email } = req.body;
+    const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
+    if (httpStatusCode === 201) {
+      await helpers.clearUserCart(user_email);
+    }
+    res.status(httpStatusCode).json(jsonResponse);
+  } catch (error) {
+    console.error("Failed to create order:", error);
+    res.status(500).json({ error: "Failed to capture order." });
+  }
+});
+
+app.post("/createProductListing", async (req, res) => {
+  try {
+    const {
+      product_name,
+      product_description,
+      base_price,
+      current_price,
+      user_email,
+    } = req.body;
+    let product_images = [];
+    let warehouse_ids = [];
+    let quantities = [];
+    let product_tags = [];
+    req.files["product_images[]"].forEach((obj) => {
+      product_images.push(obj.data);
+    });
+    req.body["warehouse_ids[]"].forEach((id) => {
+      warehouse_ids.push(parseInt(id));
+    });
+    req.body["quantities[]"].forEach((quantity) => {
+      quantities.push(parseInt(quantity));
+    });
+    req.body["product_tags[]"].forEach((tag) => {
+      product_tags.push(tag);
+    });
+    product_images.pop();
+    warehouse_ids.pop();
+    quantities.pop();
+    product_tags.pop();
+    await helpers.createProductListing(
+      product_name,
+      product_description,
+      base_price,
+      current_price,
+      user_email,
+      warehouse_ids,
+      quantities,
+      product_images,
+      product_tags,
+    );
+    console.log("Product Created Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to create product:", error);
+    res.status(500).json({ error: "Failed to create product." });
+  }
+});
+app.post("/postReviewsByUserEmail", async (req, res) => {
+  try {
+    const { product_id, user_email, comment } = req.body;
+    await helpers.postReviewsByUserEmail(product_id, user_email, comment);
+    console.log("Review Posted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to create review:", error);
+    res.status(500).json({ error: "Failed to create review." });
+  }
+});
+
+app.post("/postVendorRequestsByUserEmail", async (req, res) => {
+  try {
+    const { user_email } = req.body;
+    await helpers.postVendorRequestsByUserEmail(user_email);
+    console.log("Vendor Request Posted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to post vendor request:", error);
+    res.status(500).json({ error: "Failed to post vendor request." });
+  }
+});
+
+app.get("/getAllVendorRequests", async (req, res) => {
+  try {
+    const response = await helpers.getAllVendorRequests();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get all vendor request:", error);
+    res.status(500).json({ error: "Failed to get all vendor request." });
+  }
+});
+
+app.delete("/deleteVendorRequestByUserEmail", async (req, res) => {
+  try {
+    const { user_email } = req.body;
+    await helpers.deleteVendorRequestByUserEmail(user_email);
+    console.log("Vendor Request Deleted Successfully!");
+    res.status(200);
+  } catch (error) {
+    console.error("Failed to delete vendor request:", error);
+    res.status(500).json({ error: "Failed to delete vendor request." });
+  }
+});
+
+app.get("/getInStockWarehouses/:product_id/:quantity", async (req, res) => {
+  try {
+    const { product_id, quantity } = req.params;
+    const response = await helpers.getInStockWarehouses(product_id, quantity);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse stock:", error);
+    res.status(500).json({ error: "Failed to get warehouse stock." });
+  }
+});
+
+app.get("/getWarehouseInfo/:warehouse_id", async (req, res) => {
+  try {
+    const { warehouse_id } = req.params;
+    const response = await helpers.getWarehouseInfo(warehouse_id);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get warehouse info:", error);
+    res.status(500).json({ error: "Failed to get warehouse info." });
+  }
+});
+
+app.get("/getAllWarehouseInfo", async (req, res) => {
+  try {
+    const response = await helpers.getAllWarehouseInfo();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Failed to get All warehouse info:", error);
+    res.status(500).json({ error: "Failed to All get warehouse info." });
+  }
+});
+
+// Server initialization
 try {
-	helpers.init().then(() => {
-		console.log("Success: Tables created succesfully!");
-		app.listen(port, "0.0.0.0");
-		console.log(`Running on http://0.0.0.0:${port}`);
-	});
+  helpers.init().then(() => {
+    console.log("Success: Tables created succesfully!");
+    app.listen(port, "0.0.0.0");
+    console.log(`Running on http://0.0.0.0:${port}`);
+  });
 } catch (error) {
-	console.error("Error: Failed to create tables.", error);
+  console.error("Error: Failed to create tables.", error);
 }

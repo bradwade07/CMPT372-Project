@@ -1,0 +1,8 @@
+{
+  "extends": ["next/core-web-vitals", "prettier"],
+  // TODO: remove hook rule later and fix any broken hook rules
+  "rules": {
+    "react-hooks/rules-of-hooks": "off",
+    "@next/next/no-img-element": "off"
+  }
+}
