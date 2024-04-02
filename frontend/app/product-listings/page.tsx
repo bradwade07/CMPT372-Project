@@ -59,8 +59,8 @@ function page() {
               </CardBody>
               <CardFooter className="text-small justify-between">
                 <b>{item.product_name}</b>
-                <p className="text-default-500">{item.current_price}</p>
-                <p className="text-default-200">{item.base_price}</p>
+                <p className="text-default-500">${item.current_price.toFixed(2)}</p>
+                <p className="text-default-200">${item.base_price.toFixed(2)}</p>
               </CardFooter>
             </Card>
           ))}

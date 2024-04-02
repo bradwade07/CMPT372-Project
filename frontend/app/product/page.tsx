@@ -1,30 +1,30 @@
-"use client";
-import { getProduct } from "@/api/product";
-import addToShoppingCart from "@/api/shoppingCart";
-import { addToWishlist } from "@/api/wishlist";
-import ImageSelector from "@/components/ImageSelector/ImageSelector";
-import { TopNavbar } from "@/components/navbar";
-import { Button, Checkbox, CheckboxGroup } from "@nextui-org/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+"use client"
+import { getProduct } from "@/api/product"
+import addToShoppingCart from "@/api/shoppingCart"
+import { addToWishlist } from "@/api/wishlist"
+import ImageSelector from "@/components/ImageSelector/ImageSelector"
+import { TopNavbar } from "@/components/navbar"
+import { Button, RadioGroup, Radio } from "@nextui-org/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { getInStockWarehouses } from "@/api/warehouse"
 
 type SearchParams = {
-  product_id: number;
-};
+  product_id: number
+}
 
 function page({ searchParams }: { searchParams: SearchParams }) {
-  const [isInvalid, setIsInvalid] = useState(false);
 
-  const router = useRouter();
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const router = useRouter()
+  const [selectedQuantity, setSelectedQuantity] = useState(1)
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["Product", searchParams.product_id],
     queryFn: () => getProduct(searchParams.product_id),
-  });
+  })
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
@@ -35,32 +35,47 @@ function page({ searchParams }: { searchParams: SearchParams }) {
         selectedQuantity,
         false,
         1,
-      );
-      queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
+      )
+      queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] })
     } catch (error) {
-      router.push("/signin");
-      console.error("Could not add item to shopping cart");
+      router.push("/signin")
+      console.error("Could not add item to shopping cart")
     }
   }
 
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
     try {
-      await addToWishlist(searchParams.product_id, selectedQuantity);
-      queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
+      await addToWishlist(searchParams.product_id, selectedQuantity)
+      queryClient.invalidateQueries({ queryKey: ["Wishlist"] })
     } catch (error) {
-      router.push("/signin");
-      console.error("Could not add item to shopping cart");
+      router.push("/signin")
+      console.error("Could not add item to shopping cart")
     }
   }
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+    const value = event.target.value
     if (/^\d*$/.test(value)) {
-      setSelectedQuantity(parseInt(value));
+      setSelectedQuantity(parseInt(value))
     }
-  };
+  }
 
+  const [selectedDilvery, setSelectedDilvery] = useState('true')
+
+  const handleSelectedDilvery = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDilvery(event.target.value)
+  }
+
+  const [warehouses, setWarehouses] = useState([]);
+//   useEffect(() => {
+//     const fetchWarehouses = async () => {
+//       const warehouses = await getInStockWarehouses(data?.);
+//       setWarehouses(warehouses);
+//     };
+
+//     fetchWarehouses();
+//  }, []);
   return (
     <>
       <TopNavbar />
@@ -80,23 +95,32 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           </div>
           <div className="flex flex-col justify-center items-center text-center md:w-3/5">
             <p className="font-bold text-xl">{data?.product_name}</p>
-            <p className="text-lg">${data?.base_price}</p>
+            <p className="text-lg">${data?.base_price.toFixed(2)}</p>
             <div className="flex gap-4">
-              <CheckboxGroup
-                label="Pick up or Deliver?"
-                defaultValue={["true"]}
+              <RadioGroup
+                defaultValue="true"
                 orientation="horizontal"
-                isInvalid={isInvalid}
-                onValueChange={(value) => {
-                  setIsInvalid(value.length != 1);
-                }}
+                onChangeCapture={handleSelectedDilvery}
               >
-                <Checkbox value="true" defaultChecked>
+                <Radio value="true" defaultChecked>
                   Delivery
-                </Checkbox>
-                <Checkbox value="false">Pick Up</Checkbox>
-              </CheckboxGroup>
+                </Radio>
+                <Radio value="false">Pick Up</Radio>
+              </RadioGroup>
             </div>
+            {selectedDilvery === 'false' && (
+              <div className="flex gap-4">
+                <RadioGroup
+                  defaultValue="option1"
+                  orientation="vertical"
+                >
+                  <Radio value="option1" defaultChecked>
+                    Option 1
+                  </Radio>
+                  <Radio value="option2">Option 2</Radio>
+                </RadioGroup>
+              </div>
+            )}
             <div className="flex flex-col gap-4 mb-8 py-5">
               <Button
                 className="bg-blue-500 hover:bg-blue-700 text-white"
@@ -132,7 +156,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
         </div>
       </main>
     </>
-  );
+  )
 }
 
-export default page;
+export default page

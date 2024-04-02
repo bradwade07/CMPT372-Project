@@ -8,32 +8,40 @@ import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation"
 
 const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
   loading: () => null,
   ssr: false,
 });
 
+const defaultProduct = {
+  product_name: "",
+  product_description: "",
+  base_price: 0,
+  current_price: 0,
+  product_tags: [],
+  main_product_img_file: null,
+  additional_product_img_files: [],
+  warehouse_ids: [],
+  quantities: [],
+}
+
 export function CreateListingForm() {
-  const [formData, setFormData] = useState<ProductListingCreation>({
-    product_name: "",
-    product_description: "",
-    base_price: 0,
-    current_price: 0,
-    product_tags: [],
-    main_product_img_file: null,
-    additional_product_img_files: [],
-    warehouse_ids: [],
-    quantities: [],
-  });
+  const [formData, setFormData] = useState<ProductListingCreation>(defaultProduct);
 
   // error checks, then submits the form
   // TODO: error check base_price >= current_price
+
+  const router = useRouter();
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     // console.log(formData);
 
-    createProductListing(formData);
+    createProductListing(formData).then(() =>{
+      router.push("/product-listings");
+      }
+    );
   };
 
   // updates a specific attribute in the user's address whenever they change an input
