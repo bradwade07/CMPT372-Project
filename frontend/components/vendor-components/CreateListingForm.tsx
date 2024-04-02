@@ -8,6 +8,7 @@ import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
 import dynamic from "next/dynamic";
+
 const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
   loading: () => null,
   ssr: false,
