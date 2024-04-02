@@ -16,8 +16,8 @@ export function BecomeVendorButton() {
     const user_email = await getSessionUserEmail();
 
     if (user_email) {
-      await applyToBecomeVendor(user_email);
       setPressState("success");
+      await applyToBecomeVendor(user_email);
     } else {
       router.push("/signin");
     }

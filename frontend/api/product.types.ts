@@ -5,15 +5,15 @@ export type Product = {
   product_id: number;
   product_name: string;
   product_description: string;
-  product_imgsrc: string;
   base_price: number;
   current_price: number;
   product_date_added: number;
-  main_product_img: Base64<"jpeg">;
+  product_main_img: string;
 };
 
 export type ProductFull = {
-  additional_product_img: Blob[];
+  tags: [];
+  additional_img: [];
   // TODO: reviews?
 } & Product;
 

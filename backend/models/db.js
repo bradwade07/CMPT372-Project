@@ -1,6 +1,6 @@
-const {error} = require("console");
+const { error } = require("console");
 const { resolve } = require("path");
-const {Pool} = require("pg");
+const { Pool } = require("pg");
 
 var pool;
 
@@ -168,20 +168,28 @@ const helpers = {
     //Placeholder Address
     response = await pool.query(`SELECT * FROM address;`);
     if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ('This is a placeholder for when the customer does not give address', 'placeholder', 'placeholder', 'placeholder', 'placeholder');`); //Cameron
-
+      await pool.query(
+        `INSERT INTO address (street_name, city, province, post_code, country) VALUES ('This is a placeholder for when the customer does not give address', 'placeholder', 'placeholder', 'placeholder', 'placeholder');`,
+      ); //Cameron
     }
-        
+
     //Admins
     response = await pool.query(`SELECT * FROM userinfo;`);
     let response1 = await pool.query(`SELECT * FROM users;`);
     if (response.rows.length === 0 && response1.rows.length === 0) {
-        await pool.query(`INSERT INTO userinfo (user_email, address_id) VALUES ('catchet101@gmail.com', 1);`); //Cameron
-        await pool.query(`INSERT INTO userinfo (user_email, address_id) VALUES ('bradwade7@gmail.com', 1);`); //Tawheed
-        await pool.query(`INSERT INTO users (user_email, type_id) VALUES ('catchet101@gmail.com', 3);`); //Cameron
-        await pool.query(`INSERT INTO users (user_email, type_id) VALUES ('bradwade7@gmail.com', 3);`); //Tawheed
+      await pool.query(
+        `INSERT INTO userinfo (user_email, address_id) VALUES ('catchet101@gmail.com', 1);`,
+      ); //Cameron
+      await pool.query(
+        `INSERT INTO userinfo (user_email, address_id) VALUES ('bradwade7@gmail.com', 1);`,
+      ); //Tawheed
+      await pool.query(
+        `INSERT INTO users (user_email, type_id) VALUES ('catchet101@gmail.com', 3);`,
+      ); //Cameron
+      await pool.query(
+        `INSERT INTO users (user_email, type_id) VALUES ('bradwade7@gmail.com', 3);`,
+      ); //Tawheed
     }
-    
     await pool.query(`COMMIT`);
   },
 
@@ -193,45 +201,99 @@ const helpers = {
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('New Arrival');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Best Seller');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Eco-Friendly');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Tech Innovations');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Tech Innovations');`,
+      );
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Smart Home');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Outdoor Gear');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Gaming');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Limited Edition');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Fitness & Health');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Limited Edition');`,
+      );
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Fitness & Health');`,
+      );
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Fashion Trends');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Pet Care');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Educational');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Organic & Natural');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Travel Essentials');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Organic & Natural');`,
+      );
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Travel Essentials');`,
+      );
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Vintage');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('DIY & Crafts');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Professional Tools');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Professional Tools');`,
+      );
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Music & Audio');`);
-      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Automotive Accessories');`);
+      await pool.query(
+        `INSERT INTO tag (tag_name) VALUES ('Automotive Accessories');`,
+      );
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Home Decor');`);
 
       //warehouse Table
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (34.0522, -118.2437);`); // Los Angeles
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (40.7128, -74.0060);`); // New York
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (37.7749, -122.4194);`); // San Francisco
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (51.5074, -0.1278);`); // London
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (35.6895, 139.6917);`); // Tokyo
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (-33.8688, 151.2093);`); // Sydney
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (48.8566, 2.3522);`); // Paris
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (52.5200, 13.4050);`); // Berlin
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (55.7558, 37.6173);`); // Moscow
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (-23.5505, -46.6333);`); // Sao Paulo
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (19.4326, -99.1332);`); // Mexico City
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (22.3193, 114.1694);`); // Hong Kong
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (39.9042, 116.4074);`); // Beijing
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (28.6139, 77.2090);`); // New Delhi
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (-34.6037, -58.3816);`); // Buenos Aires
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (41.8781, -87.6298);`); // Chicago
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (34.6937, 135.5023);`); // Osaka
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (30.0444, 31.2357);`); // Cairo
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (31.2304, 121.4737);`); // Shanghai
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (47.6062, -122.3321);`); // Seattle
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (34.0522, -118.2437);`,
+      ); // Los Angeles
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (40.7128, -74.0060);`,
+      ); // New York
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (37.7749, -122.4194);`,
+      ); // San Francisco
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (51.5074, -0.1278);`,
+      ); // London
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (35.6895, 139.6917);`,
+      ); // Tokyo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-33.8688, 151.2093);`,
+      ); // Sydney
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (48.8566, 2.3522);`,
+      ); // Paris
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (52.5200, 13.4050);`,
+      ); // Berlin
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (55.7558, 37.6173);`,
+      ); // Moscow
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-23.5505, -46.6333);`,
+      ); // Sao Paulo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (19.4326, -99.1332);`,
+      ); // Mexico City
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (22.3193, 114.1694);`,
+      ); // Hong Kong
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (39.9042, 116.4074);`,
+      ); // Beijing
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (28.6139, 77.2090);`,
+      ); // New Delhi
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (-34.6037, -58.3816);`,
+      ); // Buenos Aires
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (41.8781, -87.6298);`,
+      ); // Chicago
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (34.6937, 135.5023);`,
+      ); // Osaka
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (30.0444, 31.2357);`,
+      ); // Cairo
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (31.2304, 121.4737);`,
+      ); // Shanghai
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (47.6062, -122.3321);`,
+      ); // Seattle
 
       await pool.query(`COMMIT`);
     } catch (error) {
@@ -269,12 +331,15 @@ const helpers = {
 
   getProductInfoByPid: async function (id) {
     try {
-      let productResponse = await pool.query(`
+      let productResponse = await pool.query(
+        `
         SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE p.product_id = $1;
-      `, [id]);
+      `,
+        [id],
+      );
       let reply = {};
       if (productResponse.rows.length > 0) {
         let product = productResponse.rows[0];
@@ -289,21 +354,32 @@ const helpers = {
           base_price: product.base_price,
           current_price: product.current_price,
           tags: [],
-          additional_img: []
+          additional_img: [],
         };
-        let tagsResponse = await pool.query(`
+        let tagsResponse = await pool.query(
+          `
           SELECT pt.tag_id, t.tag_name 
           FROM producttags pt
           JOIN tag t ON pt.tag_id = t.tag_id
           WHERE pt.product_id = $1;
-        `, [id]);
-        reply.tags = tagsResponse.rows.map(tag => ({id: tag.tag_id, tag: tag.tag_name}));
-        let imagesResponse = await pool.query(`
+        `,
+          [id],
+        );
+        reply.tags = tagsResponse.rows.map((tag) => ({
+          id: tag.tag_id,
+          tag: tag.tag_name,
+        }));
+        let imagesResponse = await pool.query(
+          `
           SELECT image 
           FROM image
           WHERE product_id = $1;
-        `, [id]);
-        reply.additional_img = imagesResponse.rows.map(imgRow => imgRow.image.toString("base64"));
+        `,
+          [id],
+        );
+        reply.additional_img = imagesResponse.rows.map((imgRow) =>
+          imgRow.image.toString("base64"),
+        );
       }
 
       return reply;
@@ -327,7 +403,10 @@ const helpers = {
     }
   },
 
-  getProductIdByRating: async function (product_rating_min, product_rating_max) {
+  getProductIdByRating: async function (
+    product_rating_min,
+    product_rating_max,
+  ) {
     try {
       const response = await pool.query(`
           SELECT product_id 
@@ -353,7 +432,10 @@ const helpers = {
     }
   },
 
-  getProductIdByDateAdded: async function (product_date_added_after, product_date_added_before) {
+  getProductIdByDateAdded: async function (
+    product_date_added_after,
+    product_date_added_before,
+  ) {
     try {
       const response = await pool.query(`
         SELECT product_id 
@@ -417,15 +499,15 @@ const helpers = {
       if (limit >= 0) {
         query += ` LIMIT $1;`;
         const result = await pool.query(query, [limit]);
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       } else {
         const result = await pool.query(query);
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       }
     } catch (error) {
@@ -444,15 +526,15 @@ const helpers = {
       if (limit >= 0) {
         query += ` LIMIT $1;`;
         const result = await pool.query(query, [limit]);
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       } else {
         const result = await pool.query(query);
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
       }
     } catch (error) {
@@ -460,20 +542,47 @@ const helpers = {
     }
   },
 
-  postUser: async function (street_name, city, province, post_code, country, user_email, type_id, addressGiven) {
+  postUser: async function (
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+    user_email,
+    type_id,
+    addressGiven,
+  ) {
     try {
-        let address_id = 1;
-        if(addressGiven === 1){ 
-            address_id = await helpers.postAddress(street_name, city, province, post_code, country);
-        }
-      await pool.query(`INSERT INTO userinfo (user_email, address_id) VALUES ($1, $2);`, [user_email, address_id]);
-      await pool.query(`INSERT INTO users (user_email, type_id) VALUES ($1, $2);`, [user_email, type_id]);
+      let address_id = 1;
+      if (addressGiven === 1) {
+        address_id = await helpers.postAddress(
+          street_name,
+          city,
+          province,
+          post_code,
+          country,
+        );
+      }
+      await pool.query(
+        `INSERT INTO userinfo (user_email, address_id) VALUES ($1, $2);`,
+        [user_email, address_id],
+      );
+      await pool.query(
+        `INSERT INTO users (user_email, type_id) VALUES ($1, $2);`,
+        [user_email, type_id],
+      );
     } catch (error) {
       console.error("Error adding user:", error);
     }
   },
 
-  postAddress: async function (street_name, city, province, post_code, country) {
+  postAddress: async function (
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+  ) {
     try {
       const response = await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`, [street_name, city, province, post_code, country]);
       return response.rows[0].address_id;
@@ -485,9 +594,12 @@ const helpers = {
   getUserTypeByUserEmail: async function (email) {
     try {
       await pool.query(`BEGIN`);
-      const result = await pool.query(`SELECT users.type_id, usertypes.type FROM users 
+      const result = await pool.query(
+        `SELECT users.type_id, usertypes.type FROM users 
         JOIN usertypes ON users.type_id = usertypes.type_id 
-        WHERE user_email = $1;`, [email]);
+        WHERE user_email = $1;`,
+        [email],
+      );
       await pool.query(`COMMIT`);
       return result.rows;
     } catch (error) {
@@ -498,7 +610,10 @@ const helpers = {
 
   patchUserType: async function (user_email, type) {
     try {
-      await pool.query(`UPDATE users SET type_id = $1 WHERE user_email = $2`, [type, user_email]);
+      await pool.query(`UPDATE users SET type_id = $1 WHERE user_email = $2`, [
+        type,
+        user_email,
+      ]);
     } catch (error) {
       console.error("Error updating user type:", error);
     }
@@ -506,11 +621,14 @@ const helpers = {
 
   patchUserAddress: async function (user_email, street_name, city, province, post_code, country) {
     try {
-      const response = await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`, [street_name, city, province, post_code, country]);
-      await pool.query(`UPDATE userInfo SET address_id = $1 WHERE user_email = $2;`, [
-        response.rows[0].address_id,
-        user_email
-      ]);
+      const response = await pool.query(
+        `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
+        [street_name, city, province, post_code, country],
+      );
+      await pool.query(
+        `UPDATE userInfo SET address_id = $1 WHERE user_email = $2;`,
+        [response.rows[0].address_id, user_email],
+      );
     } catch (error) {
       console.error("Error updating user address:", error);
     }
@@ -518,7 +636,10 @@ const helpers = {
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(`INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`, [user_email, product_id, quantity]);
+      await pool.query(
+        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+        [user_email, product_id, quantity],
+      );
     } catch (error) {
       console.error("Error adding item to wish list:", error);
     }
@@ -542,13 +663,12 @@ const helpers = {
         `;
       const values = [email];
       const result = await pool.query(query, values);
-      if(result.rows.length > 0){
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+      if (result.rows.length > 0) {
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
-      }
-      else return {message: "No products found in the user's wishlist"};
+      } else return { message: "No products found in the user's wishlist" };
     } catch (error) {
       console.error("Error retrieving wish list products by email:", error);
     }
@@ -565,15 +685,21 @@ const helpers = {
   postProductToUserCart: async function (user_email, product_id, quantity) {
     try {
       await pool.query(`BEGIN`);
-      const response = await pool.query(`SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`, [user_email, product_id]);
+      const response = await pool.query(
+        `SELECT * FROM usercart WHERE user_email = $1 AND product_id = $2;`,
+        [user_email, product_id],
+      );
       if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`, [user_email, product_id, quantity]);
+        await pool.query(
+          `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
       } else {
-        await pool.query(`UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`, [
-          response.rows[0].quantity + quantity,
-          user_email,
-          product_id
-        ], [user_email, product_id, quantity]);
+        await pool.query(
+          `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+          [user_email, product_id, quantity],
+        );
       }
       await pool.query(`COMMIT`);
     } catch (error) {
@@ -599,13 +725,12 @@ const helpers = {
         `;
       const values = [email];
       const result = await pool.query(query, values);
-      if(result.rows.length > 0){
-        result.rows.forEach(row =>{
-            row.product_main_img = row.product_main_img.toString("base64");
-        })
+      if (result.rows.length > 0) {
+        result.rows.forEach((row) => {
+          row.product_main_img = row.product_main_img.toString("base64");
+        });
         return result.rows;
-      }
-      else return {message: "No products found in the user's wishlist"};
+      } else return { message: "No products found in the user's wishlist" };
     } catch (error) {
       console.error("Error retrieving user cart by email:", error);
     }
@@ -613,7 +738,10 @@ const helpers = {
 
   deleteUserCartByPidUserEmail: async function (user_email, product_id) {
     try {
-      await pool.query(`DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `, [user_email, product_id]);
+      await pool.query(
+        `DELETE FROM usercart WHERE user_email = $1 AND product_id = $2 `,
+        [user_email, product_id],
+      );
     } catch (error) {
       console.error("Error removing item from cart:", error);
     }
@@ -631,55 +759,85 @@ const helpers = {
       console.error("Error adjusting warehouse stock:", error);
     }
   },
-  createProductListing: async function (product_name, product_description, base_price, current_price, user_email, warehouse_ids, quantities, product_images, product_tags) {
+  createProductListing: async function (
+    product_name,
+    product_description,
+    base_price,
+    current_price,
+    user_email,
+    warehouse_ids,
+    quantities,
+    product_images,
+    product_tags,
+  ) {
     try {
       const product_date_added = Math.floor(new Date().getTime() / 1000);
       await pool.query(`BEGIN`);
-      let response = await pool.query(`INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
-            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`, [
-        product_name,
-        product_images[0],
-        product_description,
-        new Date().getTime(),
-        user_email,
-        0.0
-      ]);
+      let response = await pool.query(
+        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
+            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
+        [
+          product_name,
+          product_images[0],
+          product_description,
+          new Date().getTime(),
+          user_email,
+          0.0,
+        ],
+      );
       const product_id = response.rows[0].product_id;
-      await pool.query(`INSERT INTO productprice (product_id, base_price, current_price)
-            VALUES ($1, $2, $3);`, [product_id, base_price, current_price]);
+      await pool.query(
+        `INSERT INTO productprice (product_id, base_price, current_price)
+            VALUES ($1, $2, $3);`,
+        [product_id, base_price, current_price],
+      );
       if (product_images.length > 1) {
         for (let i = 1; i < product_images.length; i++) {
-          await pool.query(`INSERT INTO image (product_id, image)
-                    VALUES ($1, $2);`, [
-            product_id, product_images[i]
-          ]);
+          await pool.query(
+            `INSERT INTO image (product_id, image)
+                    VALUES ($1, $2);`,
+            [product_id, product_images[i]],
+          );
         }
       }
       for (let i = 0; i < warehouse_ids.length; i++) {
-        let response = await pool.query(`SELECT warehouse_id FROM warehouse WHERE warehouse_id = $1;`, [warehouse_ids[i]]);
+        let response = await pool.query(
+          `SELECT warehouse_id FROM warehouse WHERE warehouse_id = $1;`,
+          [warehouse_ids[i]],
+        );
         if (response.rows.length === 0) {
           throw new Error("Warehouse id not found");
         }
-        await pool.query(`INSERT INTO warehousestock (warehouse_id, product_id, quantity)
-                VALUES ($1, $2, $3);`, [
-          warehouse_ids[i], product_id, quantities[i]
-        ]);
+        await pool.query(
+          `INSERT INTO warehousestock (warehouse_id, product_id, quantity)
+                VALUES ($1, $2, $3);`,
+          [warehouse_ids[i], product_id, quantities[i]],
+        );
       }
       let tag_id;
       for (let i = 0; i < product_tags.length; i++) {
-        response = await pool.query(`SELECT * 
+        response = await pool.query(
+          `SELECT * 
             FROM tag
-            WHERE tag_name = $1;`, [product_tags[i]]);
+            WHERE tag_name = $1;`,
+          [product_tags[i]],
+        );
         if (response.rows.length === 0) {
-          resp = await pool.query(`INSERT INTO tag(tag_name)
+          resp = await pool.query(
+            `INSERT INTO tag(tag_name)
                 VALUES ($1)
-                RETURNING tag_id;`, [product_tags[i]]);
+                RETURNING tag_id;`,
+            [product_tags[i]],
+          );
           tag_id = resp.rows[0].tag_id;
         } else {
           tag_id = response.rows[0].tag_id;
         }
-        await pool.query(`INSERT INTO producttags(product_id, tag_id)
-                VALUES ($1, $2);`, [product_id, tag_id]);
+        await pool.query(
+          `INSERT INTO producttags(product_id, tag_id)
+                VALUES ($1, $2);`,
+          [product_id, tag_id],
+        );
       }
       await pool.query(`COMMIT`);
     } catch (error) {
@@ -688,8 +846,11 @@ const helpers = {
   },
   clearUserCart: async function (user_email) {
     try {
-      await pool.query(`DELETE FROM usercart
-            WHERE user_email = $1;`, [user_email]);
+      await pool.query(
+        `DELETE FROM usercart
+            WHERE user_email = $1;`,
+        [user_email],
+      );
     } catch (error) {
       console.error("Error adjusting warehouse stock:", error);
     }
@@ -697,7 +858,7 @@ const helpers = {
   handleResponse: async function (response) {
     try {
       const jsonResponse = await response.json();
-      return {jsonResponse, httpStatusCode: response.status};
+      return { jsonResponse, httpStatusCode: response.status };
     } catch (err) {
       const errorMessage = await response.text();
       throw new Error(errorMessage);
@@ -705,12 +866,18 @@ const helpers = {
   },
   postReviewsByUserEmail: async function (product_id, user_email, comment) {
     try {
-      const response = await pool.query(`SELECT * 
+      const response = await pool.query(
+        `SELECT * 
             FROM product
-            WHERE user_email = $1;`, [user_email]);
+            WHERE user_email = $1;`,
+        [user_email],
+      );
       if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO review(product_id, user_email, comment, rating)
-                VALUES ($1, $2, $3);`, [product_id, user_email, comment]);
+        await pool.query(
+          `INSERT INTO review(product_id, user_email, comment, rating)
+                VALUES ($1, $2, $3);`,
+          [product_id, user_email, comment],
+        );
       }
     } catch (error) {
       console.error("Error creating review:", error);
@@ -718,12 +885,18 @@ const helpers = {
   },
   postVendorRequestsByUserEmail: async function (user_email) {
     try {
-      const response = await pool.query(`SELECT *
+      const response = await pool.query(
+        `SELECT *
             FROM vendorrequest
-            WHERE user_email = $1;`, [user_email]);
+            WHERE user_email = $1;`,
+        [user_email],
+      );
       if (response.rows.length === 0) {
-        await pool.query(`INSERT INTO vendorrequest(user_email)
-                VALUES ($1);`, [user_email]);
+        await pool.query(
+          `INSERT INTO vendorrequest(user_email)
+                VALUES ($1);`,
+          [user_email],
+        );
       }
     } catch (error) {
       console.error("Error creating vendor request:", error);
@@ -740,8 +913,11 @@ const helpers = {
   },
   deleteVendorRequestByUserEmail: async function (user_email) {
     try {
-      const response = await pool.query(`DELETE FROM vendorrequest
-      WHERE user_email = $1;`, [user_email]);
+      const response = await pool.query(
+        `DELETE FROM vendorrequest
+      WHERE user_email = $1;`,
+        [user_email],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error deleting vendor request:", error);
@@ -750,9 +926,11 @@ const helpers = {
   getInStockWarehouses: async function (product_id, quantity) {
     try {
       const response = await pool.query(
-      `SELECT * 
+        `SELECT * 
       FROM WarehouseStock
-      WHERE product_id = $1 AND quantity = $2;`, [product_id, quantity]);
+      WHERE product_id = $1 AND quantity = $2;`,
+        [product_id, quantity],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error getting warehouse stock:", error);
@@ -761,9 +939,11 @@ const helpers = {
   getWarehouseInfo: async function (warehouse_id) {
     try {
       const response = await pool.query(
-      `SELECT * 
+        `SELECT * 
       FROM warehouse
-      WHERE warehouse_id = $1;`, [warehouse_id]);
+      WHERE warehouse_id = $1;`,
+        [warehouse_id],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error getting warehouse info:", error);
@@ -772,8 +952,9 @@ const helpers = {
   getAllWarehouseInfo: async function () {
     try {
       const response = await pool.query(
-      `SELECT * 
-      FROM warehouse;`);
+        `SELECT * 
+      FROM warehouse;`,
+      );
       return response.rows;
     } catch (error) {
       console.error("Error getting all warehouse info:", error);
@@ -782,22 +963,25 @@ const helpers = {
   getOrderTotal: async function (user_email) {
     try {
       const response = await pool.query(
-      `SELECT * 
+        `SELECT * 
       FROM usercart
-      WHERE user_email = $1;`, [user_email]);
+      WHERE user_email = $1;`,
+        [user_email],
+      );
       let total = 0;
-      for(let i = 0; i < response.rows.length; i++){
-        let {product_id, quantity, delivery} = response.rows[i];
+      for (let i = 0; i < response.rows.length; i++) {
+        let { product_id, quantity, delivery } = response.rows[i];
         let current_price = await pool.query(
-        `SELECT current_price
+          `SELECT current_price
         FROM productprice
-        WHERE product_id = $1`, [product_id]);
+        WHERE product_id = $1`,
+          [product_id],
+        );
         current_price = current_price.rows[0].current_price;
-        if(delivery === 1){
-            delivery = 1.1;// 10% delivery
-        }
-        else{
-            delivery = 1;
+        if (delivery === 1) {
+          delivery = 1.1; // 10% delivery
+        } else {
+          delivery = 1;
         }
         let subTotal = current_price * quantity * delivery * 1.11; //1.11 for taxes
         total += subTotal;
@@ -806,9 +990,8 @@ const helpers = {
     } catch (error) {
       console.error("Error getting all warehouse info:", error);
     }
-  }
+  },
 };
-
 
 module.exports = {
   helpers

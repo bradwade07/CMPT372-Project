@@ -4,7 +4,7 @@ import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
 import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import { TopNavbar } from "@/components/navbar";
-import { Button } from "@nextui-org/react";
+import { Button, Checkbox, CheckboxGroup } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +14,8 @@ type SearchParams = {
 };
 
 function page({ searchParams }: { searchParams: SearchParams }) {
+  const [isInvalid, setIsInvalid] = useState(false);
+
   const router = useRouter();
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
@@ -67,7 +69,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
             <div className="relative w-full h-96">
               <img
-                src={"/images/grey.jpg"} // TODO: properly display image
+                src={`data:image/jpeg;base64, ${data?.product_main_img}`}
                 alt="Product Image"
                 className="object-contain w-full h-full"
               />
@@ -79,8 +81,23 @@ function page({ searchParams }: { searchParams: SearchParams }) {
           <div className="flex flex-col justify-center items-center text-center md:w-3/5">
             <p className="font-bold text-xl">{data?.product_name}</p>
             <p className="text-lg">${data?.base_price}</p>
-            <p className="mb-8">{data?.product_description}</p>
-            <div className="flex flex-col gap-4 mb-8">
+            <div className="flex gap-4">
+              <CheckboxGroup
+                label="Pick up or Deliver?"
+                defaultValue={["true"]}
+                orientation="horizontal"
+                isInvalid={isInvalid}
+                onValueChange={(value) => {
+                  setIsInvalid(value.length != 1);
+                }}
+              >
+                <Checkbox value="true" defaultChecked>
+                  Delivery
+                </Checkbox>
+                <Checkbox value="false">Pick Up</Checkbox>
+              </CheckboxGroup>
+            </div>
+            <div className="flex flex-col gap-4 mb-8 py-5">
               <Button
                 className="bg-blue-500 hover:bg-blue-700 text-white"
                 onClick={addItemToShoppingCart}
@@ -100,7 +117,8 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                 />
               </div>
             </div>
-            <p className="mb-8">SPECIFICATIONS</p>
+            <p className="mb-8">Description</p>
+            <p className="mb-8">{data?.product_description}</p>
           </div>
         </div>
         <div className="flex justify-center items-center text-center mt-8">

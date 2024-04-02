@@ -16,11 +16,6 @@ export async function createNewUser(
     await axios.post("/postUser", {
       user_email: user_email,
       user_type: user_type,
-      street_name: "1234 Smith Street",
-      city: "Burnaby",
-      province: "BC",
-      post_code: "1A2 B3C",
-      country: "Canada",
     });
   } catch (error) {
     if (isAxiosError(error)) {
@@ -65,7 +60,7 @@ export async function updateUserType(
   try {
     await axios.patch("/patchUserType", {
       user_email: user_email,
-      type: user_type,
+      user_type: user_type,
     });
   } catch (error) {
     if (isAxiosError(error)) {
@@ -98,10 +93,10 @@ export async function updateUserAddress(
 // user with user_email applies to become a vendor account, application stored in database and will be approved/denied by an admin
 export async function applyToBecomeVendor(user_email: string): Promise<void> {
   try {
-    await axios.post("/???", {
-      //FIXME: backend url
+    await axios.post("/postVendorRequestsByUserEmail", {
       user_email: user_email,
     });
+    console.log("test3");
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
@@ -116,13 +111,9 @@ export async function getBecomeVendorRequests(): Promise<
   BecomeVendorRequest[]
 > {
   try {
-    const thing: BecomeVendorRequest[] = [];
-    for (let i = 0; i < 30; i++) {
-      thing.push({ user_email: `user${i}@gmail.com` });
-    }
-    return thing;
-
-    let response = await axios.get("/???"); //FIXME: backend url
+    let response = await axios.get<BecomeVendorRequest[]>(
+      "/getAllVendorRequests",
+    );
 
     return response.data;
   } catch (error) {
@@ -140,8 +131,7 @@ export async function getBecomeVendorRequests(): Promise<
 // removes the application for the user with user_email to become a vendor
 export async function removeVendorRequest(user_email: string): Promise<void> {
   try {
-    await axios.delete("/???", {
-      //FIXME: backend url
+    await axios.delete("/deleteVendorRequestByUserEmail", {
       data: {
         user_email: user_email,
       },

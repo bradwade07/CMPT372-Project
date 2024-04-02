@@ -7,6 +7,11 @@ import React, { useState } from "react";
 import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
+import dynamic from "next/dynamic";
+const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
+  loading: () => null,
+  ssr: false,
+});
 
 export function CreateListingForm() {
   const [formData, setFormData] = useState<ProductListingCreation>({
@@ -25,7 +30,7 @@ export function CreateListingForm() {
   // TODO: error check base_price >= current_price
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(formData);
+    // console.log(formData);
 
     createProductListing(formData);
   };
@@ -167,7 +172,7 @@ export function CreateListingForm() {
           }}
         />
       </div>
-      <div className="flex flex-col mb-4">
+      <div className="flex flex-col mb-4 w-fit md:w-1/2 lg:w-5/12 xl:w-1/3">
         <label
           className="text-sm pb-[6px] hover:cursor-pointer"
           htmlFor="main_product_img_file"
@@ -201,6 +206,9 @@ export function CreateListingForm() {
         />
       </div>
       <div className="flex flex-col mt-2 mb-4">
+        <div className="h-96 mb-16">
+          <WarehouseMap />
+        </div>
         <WarehousesInput
           handleInputChange={handleInputChange}
           onAmountDecrease={(curAmount) => {

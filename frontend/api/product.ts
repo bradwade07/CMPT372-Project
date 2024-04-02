@@ -1,15 +1,19 @@
-import { Product, ProductListingCreation } from "./product.types";
+import { Product, ProductFull, ProductListingCreation } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
 import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
-export async function getProduct(product_id: number): Promise<Product | null> {
+export async function getProduct(
+  product_id: number,
+): Promise<ProductFull | null> {
   try {
-    let response = await axios.get<Product[]>(`/getProduct/${product_id}`);
+    let response = await axios.get<ProductFull>(`/getProduct/${product_id}`);
 
-    return response.data[0];
+    console.log(response.data);
+
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
@@ -27,6 +31,8 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
     let response = await axios.get<Product[]>(
       `/getNewestProductsByLimit/${limit}`,
     );
+
+    console.log(response.data);
 
     return response.data;
   } catch (error) {
