@@ -10,16 +10,19 @@ type VendorRequestCardProps = {
   refetch: () => void;
 };
 
-export function VendorRequestCard({ request, refetch }: VendorRequestCardProps) {
+export function VendorRequestCard({
+  request,
+  refetch,
+}: VendorRequestCardProps) {
   async function approveRequest() {
     await updateUserType(request.user_email, UserTypes.Vendor);
     await removeVendorRequest(request.user_email);
-    refetch()
+    refetch();
   }
 
   async function denyRequest() {
     await removeVendorRequest(request.user_email);
-    refetch()
+    refetch();
   }
 
   return (

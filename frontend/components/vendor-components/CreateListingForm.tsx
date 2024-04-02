@@ -31,6 +31,7 @@ export function CreateListingForm() {
 
   // error checks, then submits the form
   // TODO: error check base_price < current_price, and other error checks
+  // TODO: error check that there is at least 1 product tag
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const localFormData = formData;

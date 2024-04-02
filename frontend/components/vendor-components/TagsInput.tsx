@@ -1,12 +1,19 @@
 import { CheckboxGroup } from "@nextui-org/react";
 import React from "react";
-import { CustomCheckbox } from "./CustomCheckbox";
+import { CustomCheckbox } from "@/components/general";
+import { useQuery } from "@tanstack/react-query";
+import { getProductTags } from "@/api/product";
 
 type TagsInputProps = {
   handleInputChange(value: string[]): void;
 };
 
 export default function TagsInput({ handleInputChange }: TagsInputProps) {
+  const { data } = useQuery({
+    queryKey: ["Product Tags"],
+    queryFn: getProductTags,
+  });
+
   const [groupSelected, setGroupSelected] = React.useState<string[]>([]);
 
   return (
@@ -22,12 +29,11 @@ export default function TagsInput({ handleInputChange }: TagsInputProps) {
           handleInputChange(value as string[]);
         }}
       >
-        <CustomCheckbox value="Electronics">Electronics</CustomCheckbox>
-        <CustomCheckbox value="Fashion">Fashion</CustomCheckbox>
-        <CustomCheckbox value="Kitchen">Kitchen</CustomCheckbox>
-        <CustomCheckbox value="Home">Home</CustomCheckbox>
-        <CustomCheckbox value="Garden">Garden</CustomCheckbox>
-        <CustomCheckbox value="Toys">Toys</CustomCheckbox>
+        {data?.map((tag) => (
+          <span key={tag}>
+            <CustomCheckbox value={tag}>{tag}</CustomCheckbox>
+          </span>
+        ))}
       </CheckboxGroup>
     </div>
   );

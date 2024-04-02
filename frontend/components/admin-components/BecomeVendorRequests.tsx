@@ -11,8 +11,7 @@ const itemsPerPage = 10;
 export function VendorRequests() {
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["Vendor Requests"],
-    queryFn: getBecomeVendorRequests,      
-    
+    queryFn: getBecomeVendorRequests,
   });
 
   const [currentPage, setCurrentPage] = useState(1);

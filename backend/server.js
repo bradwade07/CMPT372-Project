@@ -97,9 +97,7 @@ app.get("/getProductsByFilters", async (req, res) => {
     req.query.product_date_added_after !== ""
       ? parseInt(req.query.product_date_added_after)
       : 0;
-  const tags = req.query.tags
-    ? req.query.tags.trim().toLowerCase().split(",")
-    : [];
+  const tags = req.query.tags ? req.query.tags.trim().split(",") : [];
   const user_email = req.query.user_email ? req.query.user_email.trim() : "";
 
   let responseIds = [];
@@ -243,6 +241,16 @@ app.post("/postUser", async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ error: "Server failed to add user!" });
+  }
+});
+
+app.get("/getAllProductTags", async (req, res) => {
+  try {
+    const tags = await helpers.getAllProductTags();
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({ error: "Failed to fetch product tags" });
   }
 });
 
@@ -640,7 +648,7 @@ app.post("/createProductListing", async (req, res) => {
       quantities.push(parseInt(quantity));
     });
     req.body["product_tags[]"].forEach((tag) => {
-      product_tags.push(tag.toLowerCase());
+      product_tags.push(tag);
     });
     product_images.pop();
     warehouse_ids.pop();
