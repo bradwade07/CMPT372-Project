@@ -248,8 +248,6 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
   }
 });
 
-// FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
-// also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let { user_email, user_type } = req.body;
   if (!user_email) {
@@ -266,7 +264,7 @@ app.patch("/patchUserType", async (req, res) => {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2;
 
   try {
     await helpers.patchUserType(user_email, type_id);
@@ -451,7 +449,6 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
 
 // Warehouse related endpoints
 app.patch("/patchWarehouseStock", async (req, res) => {
-  //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
 
   if (!warehouse_id)
@@ -466,11 +463,7 @@ app.patch("/patchWarehouseStock", async (req, res) => {
   quantity = parseInt(quantity);
 
   try {
-    const response = await helpers.patchWarehouseStock(
-      warehouse_id,
-      product_id,
-      quantity,
-    );
+    const response = await helpers.patchWarehouseStock(warehouse_id,product_id,quantity,);
     if (response === 1) {
       return res
         .status(200)

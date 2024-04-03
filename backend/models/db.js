@@ -19,6 +19,7 @@ pool = new Pool({
 });
 
 const helpers = {
+
   init: async function () {
     await pool.query(`BEGIN`);
 
