@@ -327,7 +327,6 @@ app.patch("/patchUserAddress", async (req, res) => {
 
 // User wishlist related endpoints
 app.post("/postProductToUserWishlist", async (req, res) => {
-  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
 
   if (!user_email)
@@ -730,6 +729,15 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
     res.status(500).json({ error: "Failed to All get warehouse info." });
   }
 });
+app.get("/getAllProductTags", async (req, res) => {
+    try {
+      const tags = await helpers.getAllProductTags(); 
+      res.status(200).json(tags); 
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send({ error: "Failed to fetch product tags" });
+    }
+  });
 
 // Server initialization
 try {
