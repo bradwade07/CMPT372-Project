@@ -4,14 +4,7 @@ const { Pool } = require("pg");
 
 var pool;
 
-// pool = new Pool({
-//   TODO: connection string
-//   user: "postgres",
-//   host: "db",
-//   password: "root"
-// });
 pool = new Pool({
-  //TODO: connection string
   user: "postgres",
   host: "localhost",
   password: "root",
@@ -570,16 +563,6 @@ const helpers = {
     }
   },
 
-  getAllProductTags: async function () {
-    try {
-      const result = await pool.query("SELECT tag_name FROM tag;");
-      return result.rows.map((row) => row.tag_name);
-    } catch (error) {
-      console.error("Error fetching product tags:", error);
-      throw error;
-    }
-  },
-
   postUser: async function (
     street_name,
     city,
@@ -684,10 +667,26 @@ const helpers = {
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
+      const response = await pool.query(
+        `
+      SELECT *
+      FROM userwishlist
+      WHERE user_email = $1 AND product_id = $2 RETURNING quantity;`,
+        [user_email, product_id],
       );
+      if (response.rows.length > 0) {
+        await pool.query(
+          `UPDATE userwishlist 
+            SET quantity = $1
+            WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+        );
+      } else {
+        await pool.query(
+          `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
+      }
     } catch (error) {
       console.error("Error adding item to wish list:", error);
     }
@@ -1046,6 +1045,14 @@ const helpers = {
       return total;
     } catch (error) {
       console.error("Error getting all warehouse info:", error);
+    }
+  },
+  getAllProductTags: async function () {
+    try {
+      const result = await pool.query("SELECT tag_name FROM tag;");
+      return result.rows.map((row) => row.tag_name);
+    } catch (error) {
+      console.error("Error fetching product tags:", error);
     }
   },
 };

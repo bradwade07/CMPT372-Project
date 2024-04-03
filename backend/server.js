@@ -244,16 +244,6 @@ app.post("/postUser", async (req, res) => {
   }
 });
 
-app.get("/getAllProductTags", async (req, res) => {
-  try {
-    const tags = await helpers.getAllProductTags();
-    res.status(200).json(tags);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send({ error: "Failed to fetch product tags" });
-  }
-});
-
 app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
   if (!req.params.user_email.trim())
     return res.status(400).send({ error: "Invalid user email!" });
@@ -271,8 +261,6 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
   }
 });
 
-// FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
-// also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let { user_email, user_type } = req.body;
   if (!user_email) {
@@ -289,7 +277,7 @@ app.patch("/patchUserType", async (req, res) => {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2;
 
   try {
     await helpers.patchUserType(user_email, type_id);
@@ -350,7 +338,6 @@ app.patch("/patchUserAddress", async (req, res) => {
 
 // User wishlist related endpoints
 app.post("/postProductToUserWishlist", async (req, res) => {
-  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
 
   if (!user_email)
@@ -379,7 +366,7 @@ app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
   let user_email = req.params.user_email.trim();
 
   try {
-    const products = await helpers.getUserCartByUserEmail(user_email);
+    const products = await helpers.getUserWishlistByUserEmail(user_email);
     res.json(products);
   } catch (error) {
     return res
@@ -471,7 +458,6 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
 
 // Warehouse related endpoints
 app.patch("/patchWarehouseStock", async (req, res) => {
-  //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
 
   if (!warehouse_id)
@@ -747,6 +733,15 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
   } catch (error) {
     console.error("Failed to get All warehouse info:", error);
     res.status(500).json({ error: "Failed to All get warehouse info." });
+  }
+});
+app.get("/getAllProductTags", async (req, res) => {
+  try {
+    const tags = await helpers.getAllProductTags();
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({ error: "Failed to fetch product tags" });
   }
 });
 
