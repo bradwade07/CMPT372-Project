@@ -9,16 +9,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { getInStockWarehouses } from "@/api/warehouse"
+import { WarehouseWithStock } from "@/api/warehouse.types"
 
 type SearchParams = {
   product_id: number
 }
-export type Warehouse = {
-  warehouse_id: number;
-  lat: number;
-  long: number;
-};
-
 
 function page({ searchParams }: { searchParams: SearchParams }) {
 
@@ -35,12 +30,12 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
     try {
-      // TODO: provide actual "delivery" and "warehouse_id" values
+      // TODO: provide actual "delivery" and "warehouse_id" values teg-should work.
       await addToShoppingCart(
         searchParams.product_id,
         selectedQuantity,
-        false,
-        1,
+        selectedDilvery,
+        selectedWarehouse,
       )
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] })
     } catch (error) {
@@ -67,37 +62,42 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     }
   }
 
-  const [selectedDilvery, setSelectedDilvery] = useState('true')
+  const [selectedDilvery, setSelectedDilvery] = useState(true)
   const [hasFetched, setHasFetched] = useState(true)
 
   const handleSelectedDilvery = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDilvery(event.target.value)
+    if(event.target.value === 'false'){
+      setSelectedDilvery(false);
+    }else{
+      setSelectedDilvery(true);
+    }
     setHasFetched(false);
     
   }
 
    
   
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [selectedWarehouse, setSelectedWarehouse] = useState();
+  const [warehouses, setWarehouses] = useState<WarehouseWithStock[]>([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(1);
 
 
     useEffect(()=>{
       (async () =>{
-        if( selectedDilvery === 'false' && data && !hasFetched){
+        if( !selectedDilvery && data && !hasFetched){
           const fetchedWarehouses = await getInStockWarehouses(data?.product_id, selectedQuantity); 
           if(fetchedWarehouses){
             setWarehouses(fetchedWarehouses);
           }
           console.log(warehouses);
-          console.log("product id: " +data.product_id, "quantity: " + selectedQuantity);
+          console.log("product id: " + data.product_id, "quantity: " + selectedQuantity);
           setHasFetched(true);
         } 
       })();
     });
   
     const handleWarehouseChange = (event: any) => {
-      setSelectedWarehouse(event.target.value);
+      let num =+ event.target.value;
+      setSelectedWarehouse(num)
     }
   
   
@@ -134,21 +134,25 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                 <Radio value="false">Pick Up</Radio>
               </RadioGroup>
             </div>
-            {selectedDilvery === 'false' && (
-              <div>
-              {warehouses.map((warehouse) => (
+            {selectedDilvery === false && (
+              <div className="my-2">
+                <RadioGroup
+                label= "select delivery location"
+                defaultValue={warehouses[0]?.warehouse_id?.toString()}
+                >
+                {warehouses.map((warehouse) => (
                 <div key={warehouse.warehouse_id}>
-                  <input
-                    type="radio"
+                  <Radio
                     id={`warehouse-${warehouse.warehouse_id}`}
                     name="warehouse"
-                    value={warehouse.warehouse_id}
+                    value={warehouse.warehouse_id.toString()}
                     checked={selectedWarehouse === warehouse.warehouse_id}
                     onChange={handleWarehouseChange}
-                  />
-                  <label htmlFor={`warehouse-${warehouse.warehouse_id}`}>{warehouse.warehouse_id}</label>
+                  > Location : {warehouse.warehouse_id} has {warehouse.quantity} in stock.</Radio>
                 </div>
               ))}
+                </RadioGroup>
+
             </div>
             )}
             <div className="flex flex-col gap-4 mb-8 py-5">

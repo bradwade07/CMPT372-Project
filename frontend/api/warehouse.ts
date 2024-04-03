@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { axios } from "./axios";
-import { Warehouse } from "./warehouse.types";
+import { Warehouse, WarehouseWithStock } from "./warehouse.types";
 
 export async function getAllWarehouses(): Promise<Warehouse[]> {
   try {
@@ -43,9 +43,9 @@ export async function getWarehouse(
 export async function getInStockWarehouses(
   product_id: number,
   quantity: number,
-): Promise<Warehouse[]> {
+): Promise<WarehouseWithStock[]> {
   try {
-    let response = await axios.get<Warehouse[]>(
+    let response = await axios.get<WarehouseWithStock[]>(
       `/getInStockWarehouses/${product_id}/${quantity}`,
     );
 

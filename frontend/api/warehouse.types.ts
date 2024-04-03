@@ -3,3 +3,9 @@ export type Warehouse = {
   lat: number;
   long: number;
 };
+
+
+export type WarehouseWithStock = {
+  product_id: number;
+  quantity: number;
+} & Warehouse

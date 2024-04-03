@@ -968,8 +968,10 @@ const helpers = {
     try {
       const response = await pool.query(
         `SELECT * 
-      FROM WarehouseStock
-      WHERE product_id = $1 AND quantity = $2;`,
+        FROM warehousestock whs
+        JOIN warehouse wh
+        ON whs.warehouse_id = wh.warehouse_id
+        WHERE product_id = $1 AND quantity >= $2;`,
         [product_id, quantity],
       );
       return response.rows;
