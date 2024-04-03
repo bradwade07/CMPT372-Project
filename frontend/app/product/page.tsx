@@ -13,6 +13,12 @@ import { getInStockWarehouses } from "@/api/warehouse"
 type SearchParams = {
   product_id: number
 }
+export type Warehouse = {
+  warehouse_id: number;
+  lat: number;
+  long: number;
+};
+
 
 function page({ searchParams }: { searchParams: SearchParams }) {
 
@@ -62,20 +68,40 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   }
 
   const [selectedDilvery, setSelectedDilvery] = useState('true')
+  const [hasFetched, setHasFetched] = useState(true)
 
   const handleSelectedDilvery = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDilvery(event.target.value)
+    setHasFetched(false);
+    
   }
 
-  const [warehouses, setWarehouses] = useState([]);
-//   useEffect(() => {
-//     const fetchWarehouses = async () => {
-//       const warehouses = await getInStockWarehouses(data?.);
-//       setWarehouses(warehouses);
-//     };
+   
+  
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState();
 
-//     fetchWarehouses();
-//  }, []);
+
+    useEffect(()=>{
+      (async () =>{
+        if( selectedDilvery === 'false' && data && !hasFetched){
+          const fetchedWarehouses = await getInStockWarehouses(data?.product_id, selectedQuantity); 
+          if(fetchedWarehouses){
+            setWarehouses(fetchedWarehouses);
+          }
+          console.log(warehouses);
+          console.log("product id: " +data.product_id, "quantity: " + selectedQuantity);
+          setHasFetched(true);
+        } 
+      })();
+    });
+  
+    const handleWarehouseChange = (event: any) => {
+      setSelectedWarehouse(event.target.value);
+    }
+  
+  
+
   return (
     <>
       <TopNavbar />
@@ -109,17 +135,21 @@ function page({ searchParams }: { searchParams: SearchParams }) {
               </RadioGroup>
             </div>
             {selectedDilvery === 'false' && (
-              <div className="flex gap-4">
-                <RadioGroup
-                  defaultValue="option1"
-                  orientation="vertical"
-                >
-                  <Radio value="option1" defaultChecked>
-                    Option 1
-                  </Radio>
-                  <Radio value="option2">Option 2</Radio>
-                </RadioGroup>
-              </div>
+              <div>
+              {warehouses.map((warehouse) => (
+                <div key={warehouse.warehouse_id}>
+                  <input
+                    type="radio"
+                    id={`warehouse-${warehouse.warehouse_id}`}
+                    name="warehouse"
+                    value={warehouse.warehouse_id}
+                    checked={selectedWarehouse === warehouse.warehouse_id}
+                    onChange={handleWarehouseChange}
+                  />
+                  <label htmlFor={`warehouse-${warehouse.warehouse_id}`}>{warehouse.warehouse_id}</label>
+                </div>
+              ))}
+            </div>
             )}
             <div className="flex flex-col gap-4 mb-8 py-5">
               <Button
