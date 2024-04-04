@@ -24,7 +24,7 @@ export default function WarehouseMap({ data }: WarehouseMapProps) {
 
   return (
     <MapContainer
-      className="w-full h-full select-none"
+      className="w-full h-full select-none z-0"
       center={[51.100492, -98.018919]}
       zoom={4}
       minZoom={4}
