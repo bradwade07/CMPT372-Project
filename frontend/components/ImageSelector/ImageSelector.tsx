@@ -1,7 +1,6 @@
 import { MouseEventHandler, useState } from "react";
 import { Image, Button } from "@nextui-org/react";
 import { ProductFull } from "@/api/product.types"
-import { IoReload } from "react-icons/io5"
 
 export default function ImageSelector(imageData: ProductFull) {
   const [selectedImage, setSelectedImage] = useState("");
@@ -21,12 +20,11 @@ if(firstTimeRender)
   setSelectedImage(pictures[0]);
 }
 
-const handleSelected = (index: number): MouseEventHandler<HTMLImageElement> => {
+const handleSelected = (index: any): MouseEventHandler<HTMLImageElement> => {
   return (event:any) => {
-    setSelectedImage(pictures[index]);
+    setSelectedImage(index);
   };
 };
-
   return (<>
     <div className="relative w-full h-96">
               <Image
@@ -50,7 +48,7 @@ const handleSelected = (index: number): MouseEventHandler<HTMLImageElement> => {
             height={100}
             src={`data:image/jpeg;base64, ${index}`}
             alt={`grey.jpg`}
-            className={`cursor-pointer ${selectedImage === `${index}` ? "border-2 border-blue-500" : ""}`} ////images/image${index}.jpg
+            className={`cursor-pointer `} ////images/image${index}.jpg
           />
         ))}
       </div>
