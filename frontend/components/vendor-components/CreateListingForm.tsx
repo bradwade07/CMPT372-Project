@@ -7,12 +7,8 @@ import React, { useState } from "react";
 import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
-  loading: () => null,
-  ssr: false,
-});
+import AllWarehouseMap from "./AllWarehouseMap";
 
 export function CreateListingForm() {
   const router = useRouter();
@@ -216,7 +212,7 @@ export function CreateListingForm() {
       </div>
       <div className="flex flex-col mt-2 mb-4">
         <div className="h-96 mb-16">
-          <WarehouseMap />
+          <AllWarehouseMap />
         </div>
         <WarehousesInput
           handleInputChange={handleInputChange}
