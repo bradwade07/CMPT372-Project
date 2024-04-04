@@ -11,9 +11,9 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
   const deliveryPercentage = 0.1;
 
-  const [pickupSubtotal, setPickupSubtotal] = useState(-1);
-  const [deliverySubtotal, setDeliverySubtotal] = useState(-1);
-  const [totalPrice, setTotalPrice] = useState(-1);
+  const [pickupSubtotal, setPickupSubtotal] = useState(0);
+  const [deliverySubtotal, setDeliverySubtotal] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [totalPriceVisible, setTotalPriceVisible] = useState(false);
 
   // whenever props change, calculates the subtotal of delivered items, subtotal of picked up items, taxes and fees, total price,
@@ -23,8 +23,7 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
       let pickupSubtotal = 0;
       let deliverySubtotal = 0;
       for (let item of data) {
-        if (item.delivery == true || true) {
-          // FIXME: remove "|| true" later
+        if (item.delivery) {
           deliverySubtotal += item.quantity * item.current_price;
         } else {
           pickupSubtotal += item.quantity * item.current_price;
@@ -77,11 +76,11 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
       <div className="mt-4">
         <p>
           Tax (%{taxPercentage * 100}): $
-          {(pickupSubtotal + deliverySubtotal * taxPercentage).toFixed(2)}
+          {((pickupSubtotal + deliverySubtotal) * taxPercentage).toFixed(2)}
         </p>
         <p>
-          Delivery fees (%{deliveryPercentage * 100} for delivered items): $
-          {(deliverySubtotal * deliveryPercentage).toFixed(2)}
+          Delivery fees (%{deliveryPercentage * 100} on delivered items' price):
+          ${(deliverySubtotal * deliveryPercentage).toFixed(2)}
         </p>
         <p>Total after tax and fees: ${totalPrice.toFixed(2)}</p>
       </div>
