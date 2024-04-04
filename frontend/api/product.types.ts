@@ -10,8 +10,8 @@ export type Product = {
 };
 
 export type ProductFull = {
-  tags: [];
-  additional_img: [];
+  tags: string[];
+  additional_img: string[];
 } & Product;
 
 export type ShoppingCartEntry = {
