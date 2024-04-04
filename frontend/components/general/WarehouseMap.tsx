@@ -24,11 +24,15 @@ export default function WarehouseMap({ data }: WarehouseMapProps) {
 
   return (
     <MapContainer
-      className="w-full h-full z-0"
+      className="w-full h-full select-none"
       center={[51.100492, -98.018919]}
-      zoom={3}
-      minZoom={3}
+      zoom={4}
+      minZoom={4}
       scrollWheelZoom={true}
+      maxBounds={[
+        [36, -170], // SW bound
+        [80, -20], // NE bound
+      ]}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
