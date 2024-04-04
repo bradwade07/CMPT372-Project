@@ -4,7 +4,6 @@ import { getSessionUserEmail } from "@/app/auth";
 import { isAxiosError } from "axios";
 
 // Creates a new paypal order
-// TODO: fix the acquisitionmethod removal in backend
 export async function createOrder() {
   const user_email = await getSessionUserEmail();
 

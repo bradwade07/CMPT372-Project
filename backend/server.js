@@ -67,30 +67,38 @@ app.get("/getProductsByFilters", async (req, res) => {
   const product_name = req.query.product_name
     ? req.query.product_name.trim()
     : "";
-  const product_avg_rating_min = req.query.product_avg_rating_min !== undefined && req.query.product_avg_rating_min !== ""
-    ? parseInt(req.query.product_avg_rating_min)
-    : 0.0;
-  const product_avg_rating_max = req.query.product_avg_rating_max !== undefined && req.query.product_avg_rating_max !== ""
-    ? parseInt(req.query.product_avg_rating_max)
-    : 5.0;
-  const current_price_min = req.query.current_price_min !== undefined && req.query.current_price_min !== ""
-    ? parseInt(req.query.current_price_min)
-    : 0.0;
-  const current_price_max = req.query.current_price_max !== undefined && req.query.current_price_max !== ""
-    ? parseInt(req.query.current_price_max)
-    : 2147483647; // SQL MAX INT
-  const product_date_added_before = req.query.product_date_added_before !== undefined && req.query.product_date_added_before !== ""
-    ? parseInt(req.query.product_date_added_before)
-    : new Date().getTime();
-  const product_date_added_after = req.query.product_date_added_after !== undefined && req.query.product_date_added_after !== ""
-    ? parseInt(req.query.product_date_added_after)
-    : 0;
-  const tags = req.query.tags
-    ? req.query.tags.trim().toLowerCase().split(",")
-    : [];
-  const user_email = req.query.user_email
-    ? req.query.user_email.trim()
-    : "";
+  const product_avg_rating_min =
+    req.query.product_avg_rating_min !== undefined &&
+    req.query.product_avg_rating_min !== ""
+      ? parseInt(req.query.product_avg_rating_min)
+      : 0.0;
+  const product_avg_rating_max =
+    req.query.product_avg_rating_max !== undefined &&
+    req.query.product_avg_rating_max !== ""
+      ? parseInt(req.query.product_avg_rating_max)
+      : 5.0;
+  const current_price_min =
+    req.query.current_price_min !== undefined &&
+    req.query.current_price_min !== ""
+      ? parseInt(req.query.current_price_min)
+      : 0.0;
+  const current_price_max =
+    req.query.current_price_max !== undefined &&
+    req.query.current_price_max !== ""
+      ? parseInt(req.query.current_price_max)
+      : 2147483647; // SQL MAX INT
+  const product_date_added_before =
+    req.query.product_date_added_before !== undefined &&
+    req.query.product_date_added_before !== ""
+      ? parseInt(req.query.product_date_added_before)
+      : new Date().getTime();
+  const product_date_added_after =
+    req.query.product_date_added_after !== undefined &&
+    req.query.product_date_added_after !== ""
+      ? parseInt(req.query.product_date_added_after)
+      : 0;
+  const tags = req.query.tags ? req.query.tags.trim().split(",") : [];
+  const user_email = req.query.user_email ? req.query.user_email.trim() : "";
 
   let responseIds = [];
   try {
@@ -354,11 +362,7 @@ app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
 
   try {
     const products = await helpers.getUserWishlistByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).send({ error: "User wishlist not found!" });
-    }
+    res.json(products);
   } catch (error) {
     return res
       .status(500)
@@ -723,14 +727,14 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
   }
 });
 app.get("/getAllProductTags", async (req, res) => {
-    try {
-      const tags = await helpers.getAllProductTags(); 
-      res.status(200).json(tags); 
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).send({ error: "Failed to fetch product tags" });
-    }
-  });
+  try {
+    const tags = await helpers.getAllProductTags();
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({ error: "Failed to fetch product tags" });
+  }
+});
 
 // Server initialization
 try {

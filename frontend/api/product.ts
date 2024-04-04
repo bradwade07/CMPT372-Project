@@ -1,7 +1,7 @@
 import { Product, ProductFull, ProductListingCreation } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
-import { FiltersType, filtersToQueryString } from "./filters.types";
+import { Categories, FiltersType, filtersToQueryString } from "./filters.types";
 import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
@@ -10,8 +10,6 @@ export async function getProduct(
 ): Promise<ProductFull | null> {
   try {
     let response = await axios.get<ProductFull>(`/getProduct/${product_id}`);
-
-    console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -31,8 +29,6 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
     let response = await axios.get<Product[]>(
       `/getNewestProductsByLimit/${limit}`,
     );
-
-    console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -125,7 +121,7 @@ export async function createProductListing(formData: ProductListingCreation) {
     // });
 
     try {
-      await axios.post(
+      axios.post(
         `/createProductListing`,
         {
           ...rest,
@@ -163,5 +159,21 @@ export async function createProductListing(formData: ProductListingCreation) {
     }
   } else {
     console.error("Could not create product listing");
+  }
+}
+
+export async function getProductTags() {
+  try {
+    let response = await axios.get<string[]>("getAllProductTags");
+
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+
+    return [];
   }
 }

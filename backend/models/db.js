@@ -4,14 +4,7 @@ const { Pool } = require("pg");
 
 var pool;
 
-// pool = new Pool({
-//   TODO: connection string
-//   user: "postgres",
-//   host: "db",
-//   password: "root"
-// });
 pool = new Pool({
-  //TODO: connection string
   user: "postgres",
   host: "localhost",
   password: "root",
@@ -199,6 +192,12 @@ const helpers = {
     try {
       await pool.query(`BEGIN`);
       //Tag Table
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Electronics');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Fashion');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Kitchen');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Home');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Garden');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Toys');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('New Arrival');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Best Seller');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Eco-Friendly');`);
@@ -637,21 +636,25 @@ const helpers = {
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      const response = await pool.query(`
+      const response = await pool.query(
+        `
       SELECT *
       FROM userwishlist
-      WHERE user_email = $1 AND product_id = $2 RETURNING quantity;`, [user_email, product_id]);
-      if(response.rows.length > 0){
+      WHERE user_email = $1 AND product_id = $2 RETURNING quantity;`,
+        [user_email, product_id],
+      );
+      if (response.rows.length > 0) {
         await pool.query(
-            `UPDATE userwishlist 
+          `UPDATE userwishlist 
             SET quantity = $1
-            WHERE user_email = $2 AND product_id = $3;`,[response.rows[0].quantity + quantity, user_email, product_id]);
-      }
-      else{
+            WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+        );
+      } else {
         await pool.query(
-            `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-            [user_email, product_id, quantity],
-          );
+          `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
       }
     } catch (error) {
       console.error("Error adding item to wish list:", error);
@@ -742,8 +745,7 @@ const helpers = {
         result.rows.forEach((row) => {
           row.product_main_img = row.product_main_img.toString("base64");
         });
-        
-      } 
+      }
       return result.rows;
     } catch (error) {
       console.error("Error retrieving user cart by email:", error);
@@ -941,8 +943,10 @@ const helpers = {
     try {
       const response = await pool.query(
         `SELECT * 
-      FROM WarehouseStock
-      WHERE product_id = $1 AND quantity = $2;`,
+      FROM warehousestock whs
+      JOIN warehouse wh
+      ON whs.warehouse_id = wh.warehouse_id
+      WHERE product_id = $1 AND quantity >= $2;`,
         [product_id, quantity],
       );
       return response.rows;
@@ -1005,14 +1009,14 @@ const helpers = {
       console.error("Error getting all warehouse info:", error);
     }
   },
-  getAllProductTags: async function() {
+  getAllProductTags: async function () {
     try {
-      const result = await pool.query('SELECT tag_name FROM tag;');
-      return result.rows.map(row => row.tag_name); 
+      const result = await pool.query("SELECT tag_name FROM tag;");
+      return result.rows.map((row) => row.tag_name);
     } catch (error) {
       console.error("Error fetching product tags:", error);
     }
-  }
+  },
 };
 
 module.exports = {

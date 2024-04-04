@@ -65,9 +65,6 @@ export default function PickupMap({ data }: PickupMapProps) {
             <Popup>Warehouse ID: {warehouse.warehouse_id}</Popup>
           </Marker>
         ))}
-        <Marker position={[49.283353, -123.122444]} icon={icon}>
-          <Popup>Stock warehouse pin</Popup>
-        </Marker>
       </MapContainer>
     </div>
   );
