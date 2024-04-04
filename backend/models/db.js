@@ -8,11 +8,10 @@ pool = new Pool({
   user: "postgres",
   host: "localhost",
   password: "root",
-  port: "5432"
+  port: "5432",
 });
 
 const helpers = {
-
   init: async function () {
     await pool.query(`BEGIN`);
 
@@ -393,7 +392,9 @@ const helpers = {
       let response;
       let queryStr = `SELECT product_id FROM product `;
       if (product_name !== "") {
-        response = await pool.query((queryStr += `WHERE product_name = $1;`), [product_name]);
+        response = await pool.query((queryStr += `WHERE product_name = $1;`), [
+          product_name,
+        ]);
       } else {
         response = await pool.query((queryStr += `;`));
       }
@@ -408,11 +409,14 @@ const helpers = {
     product_rating_max,
   ) {
     try {
-      const response = await pool.query(`
+      const response = await pool.query(
+        `
           SELECT product_id 
           FROM product 
           WHERE product_avg_rating >= $1 AND product_avg_rating <= $2;
-        `, [product_rating_min, product_rating_max]);
+        `,
+        [product_rating_min, product_rating_max],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByRating:", error);
@@ -421,11 +425,14 @@ const helpers = {
 
   getProductIdByPrice: async function (product_price_min, product_price_max) {
     try {
-      const response = await pool.query(`
+      const response = await pool.query(
+        `
         SELECT product_id 
         FROM productprice 
         WHERE current_price >= $1 AND current_price <= $2;
-      `, [product_price_min, product_price_max]);
+      `,
+        [product_price_min, product_price_max],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByPrice:", error);
@@ -437,11 +444,14 @@ const helpers = {
     product_date_added_before,
   ) {
     try {
-      const response = await pool.query(`
+      const response = await pool.query(
+        `
         SELECT product_id 
         FROM product 
         WHERE product_date_added >= $1 AND product_date_added <= $2;
-      `, [product_date_added_after, product_date_added_before]);
+      `,
+        [product_date_added_after, product_date_added_before],
+      );
       return response.rows;
     } catch (error) {
       console.error("Error in getProductIdByDateAdded:", error);
@@ -453,7 +463,9 @@ const helpers = {
       let response;
       let queryStr = `SELECT product_id FROM product `;
       if (user_email !== "") {
-        response = await pool.query((queryStr += `WHERE user_email = $1;`), [user_email]);
+        response = await pool.query((queryStr += `WHERE user_email = $1;`), [
+          user_email,
+        ]);
       } else {
         response = await pool.query((queryStr += `;`));
       }
@@ -465,19 +477,28 @@ const helpers = {
 
   getProductIdByTags: async function (tags) {
     try {
-      const tagResponse = await pool.query("SELECT tag_id FROM tag WHERE tag_name = ANY($1);", [tags]);
-      const tagIds = tagResponse.rows.map(row => row.tag_id);
+      const tagResponse = await pool.query(
+        "SELECT tag_id FROM tag WHERE tag_name = ANY($1);",
+        [tags],
+      );
+      const tagIds = tagResponse.rows.map((row) => row.tag_id);
       let productIds = [];
       for (const tagId of tagIds) {
-        const response = await pool.query(`SELECT product_id FROM producttags WHERE tag_id = $1;`, [tagId]);
-        response.rows.forEach(row => {
+        const response = await pool.query(
+          `SELECT product_id FROM producttags WHERE tag_id = $1;`,
+          [tagId],
+        );
+        response.rows.forEach((row) => {
           if (!productIds.includes(row.product_id)) {
             productIds.push(row.product_id);
           }
         });
       }
       if (productIds.length > 0) {
-        const response = await pool.query(`SELECT * FROM product WHERE product_id = ANY($1);`, [productIds]);
+        const response = await pool.query(
+          `SELECT * FROM product WHERE product_id = ANY($1);`,
+          [productIds],
+        );
         return response.rows;
       } else {
         return [];
@@ -584,7 +605,10 @@ const helpers = {
     country,
   ) {
     try {
-      const response = await pool.query(`INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`, [street_name, city, province, post_code, country]);
+      const response = await pool.query(
+        `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
+        [street_name, city, province, post_code, country],
+      );
       return response.rows[0].address_id;
     } catch (error) {
       console.error("Error adding address:", error);
@@ -619,7 +643,14 @@ const helpers = {
     }
   },
 
-  patchUserAddress: async function (user_email, street_name, city, province, post_code, country) {
+  patchUserAddress: async function (
+    user_email,
+    street_name,
+    city,
+    province,
+    post_code,
+    country,
+  ) {
     try {
       const response = await pool.query(
         `INSERT INTO address (street_name, city, province, post_code, country) VALUES ($1, $2, $3, $4, $5) RETURNING address_id;`,
@@ -692,7 +723,10 @@ const helpers = {
 
   deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
     try {
-      await pool.query("DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2", [user_email, product_id]);
+      await pool.query(
+        "DELETE FROM userwishlist WHERE user_email = $1 AND product_id = $2",
+        [user_email, product_id],
+      );
     } catch (error) {
       console.error("Error removing item from wish list:", error);
     }
@@ -765,9 +799,15 @@ const helpers = {
 
   patchWarehouseStock: async function (warehouse_id, product_id, quantity) {
     try {
-      let response = await pool.query(`SELECT quantity FROM warehousestock WHERE warehouse_id = $1 AND product_id = $2;`, [warehouse_id, product_id]);
+      let response = await pool.query(
+        `SELECT quantity FROM warehousestock WHERE warehouse_id = $1 AND product_id = $2;`,
+        [warehouse_id, product_id],
+      );
       if (response.rows[0].quantity >= quantity) {
-        await pool.query(`UPDATE warehousestock SET quantity = quantity - $3 WHERE warehouse_id = $1 AND product_id = $2;`, [warehouse_id, product_id, quantity]);
+        await pool.query(
+          `UPDATE warehousestock SET quantity = quantity - $3 WHERE warehouse_id = $1 AND product_id = $2;`,
+          [warehouse_id, product_id, quantity],
+        );
         return 1;
       }
       return 0;
@@ -1020,5 +1060,5 @@ const helpers = {
 };
 
 module.exports = {
-  helpers
+  helpers,
 };

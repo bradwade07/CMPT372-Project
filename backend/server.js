@@ -13,7 +13,7 @@ const paypal_base = "https://api-m.sandbox.paypal.com";
 app.use(upload());
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 // Testing related endpoints
 app.post("/insertTestData", async (req, res) => {
@@ -103,30 +103,39 @@ app.get("/getProductsByFilters", async (req, res) => {
   let responseIds = [];
   try {
     let response = await helpers.getProductIdByName(product_name);
-    response.forEach(row => {
+    response.forEach((row) => {
       responseIds.push(row.product_id);
     });
 
-    response = await helpers.getProductIdByRating(product_avg_rating_min, product_avg_rating_max);
-    let tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
+    response = await helpers.getProductIdByRating(
+      product_avg_rating_min,
+      product_avg_rating_max,
+    );
+    let tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
 
-    response = await helpers.getProductIdByPrice(current_price_min, current_price_max);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
-    response = await helpers.getProductIdByDateAdded(product_date_added_after, product_date_added_before);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
+    response = await helpers.getProductIdByPrice(
+      current_price_min,
+      current_price_max,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
+    response = await helpers.getProductIdByDateAdded(
+      product_date_added_after,
+      product_date_added_before,
+    );
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
     response = await helpers.getProductIdByUserEmail(user_email);
-    tempRows = response.map(row => row.product_id);
-    responseIds = responseIds.filter(id => tempRows.includes(id));
-    
+    tempRows = response.map((row) => row.product_id);
+    responseIds = responseIds.filter((id) => tempRows.includes(id));
+
     if (tags.length > 0) {
       response = await helpers.getProductIdByTags(tags);
-      tempRows = response.map(row => row.product_id);
-      responseIds = responseIds.filter(id => tempRows.includes(id));
+      tempRows = response.map((row) => row.product_id);
+      responseIds = responseIds.filter((id) => tempRows.includes(id));
     }
 
     let reply = [];
@@ -154,9 +163,7 @@ app.get("/getProductsByFilters", async (req, res) => {
 });
 
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit
-    ? parseInt(req.params.limit)
-    : -1; //-1 is unlimited
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getProductsOnSaleByLimit(limit);
     if (products.length > 0) {
@@ -171,9 +178,7 @@ app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
 });
 
 app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
-  const limit = req.params.limit
-    ? parseInt(req.params.limit)
-    : -1; //-1 is unlimited
+  const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
     const products = await helpers.getNewestProductsByLimit(limit);
     if (products.length > 0) {
@@ -467,7 +472,11 @@ app.patch("/patchWarehouseStock", async (req, res) => {
   quantity = parseInt(quantity);
 
   try {
-    const response = await helpers.patchWarehouseStock(warehouse_id,product_id,quantity,);
+    const response = await helpers.patchWarehouseStock(
+      warehouse_id,
+      product_id,
+      quantity,
+    );
     if (response === 1) {
       return res
         .status(200)
@@ -625,7 +634,7 @@ app.post("/createProductListing", async (req, res) => {
       quantities.push(parseInt(quantity));
     });
     req.body["product_tags[]"].forEach((tag) => {
-      product_tags.push(tag.toLowerCase());
+      product_tags.push(tag);
     });
     product_images.pop();
     warehouse_ids.pop();
