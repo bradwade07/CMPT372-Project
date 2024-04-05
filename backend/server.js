@@ -399,7 +399,7 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
 
 // User shopping cart related endpoints
 app.post("/postProductToUserCart", async (req, res) => {
-  let { user_email, product_id, quantity } = req.body;
+  let { user_email, product_id, quantity, delivery, warehouse_id } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -409,7 +409,7 @@ app.post("/postProductToUserCart", async (req, res) => {
   quantity = parseInt(quantity);
 
   try {
-    await helpers.postProductToUserCart(user_email, product_id, quantity);
+    await helpers.postProductToUserCart(user_email, product_id, quantity, delivery, warehouse_id);
     return res
       .status(200)
       .send({ success: "Item added to user cart successfully!" });
