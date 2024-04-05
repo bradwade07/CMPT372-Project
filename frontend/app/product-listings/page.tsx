@@ -2,7 +2,7 @@
 import { TopNavbar } from "@/components/navbar";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, Image } from "@nextui-org/react";
 import { getSessionUserEmail } from "@/app/auth";
 import { getFilteredProducts } from "@/api/product";
 import { Product } from "@/api/product.types";
@@ -31,12 +31,14 @@ function page() {
       <main className="flex flex-col items-center mb-16">
         <h3 className="mt-8 mx-4 text-2xl">My Product Listings</h3>
         <div className="flex flex-col flex-1 text-center w-full mb-10 mt-8">
-          <p>My Product Listings</p>
           <Link
             href={"/product-listings/create-listing"}
             className="text-blue-500"
           >
-            CREATE NEW LISTING
+            <Button className="bg-blue-500 hover:bg-blue-700 text-white">
+              {" "}
+              CREATE NEW LISTING{" "}
+            </Button>
           </Link>
         </div>
         <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
@@ -51,7 +53,7 @@ function page() {
                 <Image
                   shadow="sm"
                   radius="lg"
-                  width="100%"
+                  width={192}
                   alt={item.product_name}
                   className="w-full object-cover h-[140px]"
                   src={`data:image/jpeg;base64, ${item?.product_main_img}`}
@@ -59,7 +61,12 @@ function page() {
               </CardBody>
               <CardFooter className="text-small justify-between">
                 <b>{item.product_name}</b>
-                <p className="text-default-500">{item.current_price}</p>
+                <p className="text-default-500">
+                  ${item.current_price.toFixed(2)}
+                </p>
+                <p className="text-default-200">
+                  ${item.base_price.toFixed(2)}
+                </p>
               </CardFooter>
             </Card>
           ))}

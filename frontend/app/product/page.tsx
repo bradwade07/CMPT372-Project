@@ -4,19 +4,20 @@ import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
 import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import { TopNavbar } from "@/components/navbar";
-import { Button, Checkbox, CheckboxGroup } from "@nextui-org/react";
+import { Button, RadioGroup, Radio } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getInStockWarehouses } from "@/api/warehouse";
+import { WarehouseWithStock } from "@/api/warehouse.types";
 import { getSession } from "../auth";
+import { InStockWarehouseMap } from "@/components/ImageSelector";
 
 type SearchParams = {
   product_id: number;
 };
 
 function page({ searchParams }: { searchParams: SearchParams }) {
-  const [isInvalid, setIsInvalid] = useState(false);
-
   const router = useRouter();
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
@@ -30,12 +31,11 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   async function addItemToShoppingCart() {
     const session = await getSession();
     if (session) {
-      // TODO: provide actual "delivery" and "warehouse_id" values
       await addToShoppingCart(
         searchParams.product_id,
         selectedQuantity,
-        false,
-        1,
+        selectedDilvery,
+        selectedWarehouse,
       );
       queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
     } else {
@@ -60,46 +60,107 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     }
   };
 
+  const [selectedDilvery, setSelectedDilvery] = useState(true);
+  const [hasFetched, setHasFetched] = useState(true);
+
+  const handleSelectedDilvery = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (event.target.value === "false") {
+      setSelectedDilvery(false);
+    } else {
+      setSelectedDilvery(true);
+      setSelectedWarehouse(-1);
+    }
+    setHasFetched(false);
+  };
+
+  const [warehouses, setWarehouses] = useState<WarehouseWithStock[]>([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(-1);
+
+  useEffect(() => {
+    (async () => {
+      if (!selectedDilvery && data && !hasFetched) {
+        const fetchedWarehouses = await getInStockWarehouses(
+          data?.product_id,
+          selectedQuantity,
+        );
+        if (fetchedWarehouses) {
+          setWarehouses(fetchedWarehouses);
+        }
+        console.log(warehouses);
+        console.log(
+          "product id: " + data.product_id,
+          "quantity: " + selectedQuantity,
+        );
+        setHasFetched(true);
+      }
+    })();
+  });
+
+  const handleWarehouseChange = (event: any) => {
+    let num = +event.target.value;
+    setSelectedWarehouse(num);
+  };
+
   return (
     <>
       <TopNavbar />
       <main className="flex flex-col min-h-screen py-20">
         <div className="container mx-auto flex flex-col md:flex-row">
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
-            <div className="relative w-full h-96">
-              <img
-                src={`data:image/jpeg;base64, ${data?.product_main_img}`}
-                alt="Product Image"
-                className="object-contain w-full h-full"
-              />
-            </div>
             <div className="w-full mt-4">
-              <ImageSelector />
+              {data ? (
+                <ImageSelector
+                  product_main_img={data.product_main_img}
+                  additional_img={data.additional_img}
+                />
+              ) : (
+                <div></div>
+              )}
             </div>
           </div>
           <div className="flex flex-col justify-center items-center text-center md:w-3/5">
             <p className="font-bold text-xl">{data?.product_name}</p>
-            <p className="text-lg">${data?.base_price}</p>
+            <p className="text-lg">${data?.base_price.toFixed(2)}</p>
             <div className="flex gap-4">
-              <CheckboxGroup
-                label="Pick up or Deliver?"
-                defaultValue={["true"]}
+              <RadioGroup
+                defaultValue="true"
                 orientation="horizontal"
-                isInvalid={isInvalid}
-                onValueChange={(value) => {
-                  setIsInvalid(value.length != 1);
-                }}
+                onChangeCapture={handleSelectedDilvery}
               >
-                <Checkbox value="true" defaultChecked>
+                <Radio value="true" defaultChecked>
                   Delivery
-                </Checkbox>
-                <Checkbox value="false">Pick Up</Checkbox>
-              </CheckboxGroup>
+                </Radio>
+                <Radio value="false">Pick Up</Radio>
+              </RadioGroup>
             </div>
+            {selectedDilvery === false && (
+              <div className="my-2">
+                <RadioGroup label="select delivery location">
+                  {warehouses.map((warehouse) => (
+                    <div key={warehouse.warehouse_id}>
+                      <Radio
+                        id={`warehouse-${warehouse.warehouse_id}`}
+                        name="warehouse"
+                        value={warehouse.warehouse_id.toString()}
+                        checked={selectedWarehouse === warehouse.warehouse_id}
+                        onChange={handleWarehouseChange}
+                      >
+                        {" "}
+                        Location : {warehouse.warehouse_id} has{" "}
+                        {warehouse.quantity} in stock.
+                      </Radio>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            )}
             <div className="flex flex-col gap-4 mb-8 py-5">
               <Button
                 className="bg-blue-500 hover:bg-blue-700 text-white"
                 onClick={addItemToShoppingCart}
+                disabled={!selectedDilvery && selectedWarehouse == -1}
               >
                 ADD TO CART
               </Button>
@@ -120,11 +181,11 @@ function page({ searchParams }: { searchParams: SearchParams }) {
             <p className="mb-8">{data?.product_description}</p>
           </div>
         </div>
-        <div className="flex justify-center items-center text-center mt-8">
-          REVIEWS
+        <div className="mx-auto mt-20 w-1/2 lg:w-2/3 h-96">
+          <InStockWarehouseMap data={warehouses} />
         </div>
         <div className="flex justify-center items-center text-center mt-8">
-          WAREHOUSE MAP
+          REVIEWS
         </div>
         <div className="flex justify-center items-center text-center mt-8">
           ALSO LIKE THIS PRODUCT
