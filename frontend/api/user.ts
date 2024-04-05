@@ -41,7 +41,6 @@ export async function getUserType(
       return null;
     }
   } catch (error) {
-    console.log(error);
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
     } else {
@@ -116,7 +115,6 @@ export async function getBecomeVendorRequests(): Promise<
 
     return response.data;
   } catch (error) {
-    console.log(error);
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
     } else {
