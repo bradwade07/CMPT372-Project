@@ -981,6 +981,7 @@ const helpers = {
         `SELECT * 
       FROM warehouse;`,
       );
+      response.rows = response.rows.filter(row => row.warehouse_id !== -1);
       return response.rows;
     } catch (error) {
       console.error("Error getting all warehouse info:", error);
