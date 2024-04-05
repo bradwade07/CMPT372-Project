@@ -79,8 +79,8 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
           {((pickupSubtotal + deliverySubtotal) * taxPercentage).toFixed(2)}
         </p>
         <p>
-          Delivery fees (%{deliveryPercentage * 100} on delivered items' price):
-          ${(deliverySubtotal * deliveryPercentage).toFixed(2)}
+          Delivery fees (%{deliveryPercentage * 100} on delivered items&apos;
+          price): ${(deliverySubtotal * deliveryPercentage).toFixed(2)}
         </p>
         <p>Total after tax and fees: ${totalPrice.toFixed(2)}</p>
       </div>
