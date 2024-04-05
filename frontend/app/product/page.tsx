@@ -11,7 +11,6 @@ import { useState, useEffect } from "react";
 import { getInStockWarehouses } from "@/api/warehouse";
 import { WarehouseWithStock } from "@/api/warehouse.types";
 import { getSession } from "../auth";
-import AllWarehouseMap from "@/components/vendor-components/AllWarehouseMap";
 import { InStockWarehouseMap } from "@/components/ImageSelector";
 
 type SearchParams = {
@@ -71,12 +70,13 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       setSelectedDilvery(false);
     } else {
       setSelectedDilvery(true);
+      setSelectedWarehouse(-1);
     }
     setHasFetched(false);
   };
 
   const [warehouses, setWarehouses] = useState<WarehouseWithStock[]>([]);
-  const [selectedWarehouse, setSelectedWarehouse] = useState(1);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(-1);
 
   useEffect(() => {
     (async () => {
@@ -137,10 +137,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
             </div>
             {selectedDilvery === false && (
               <div className="my-2">
-                <RadioGroup
-                  label="select delivery location"
-                  defaultValue={warehouses[0]?.warehouse_id?.toString()}
-                >
+                <RadioGroup label="select delivery location">
                   {warehouses.map((warehouse) => (
                     <div key={warehouse.warehouse_id}>
                       <Radio
@@ -163,6 +160,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
               <Button
                 className="bg-blue-500 hover:bg-blue-700 text-white"
                 onClick={addItemToShoppingCart}
+                disabled={!selectedDilvery && selectedWarehouse == -1}
               >
                 ADD TO CART
               </Button>
