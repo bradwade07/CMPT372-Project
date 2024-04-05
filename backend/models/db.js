@@ -167,7 +167,10 @@ const helpers = {
     }
 
     //Placeholder Warehouse
-    response = await pool.query(`SELECT * FROM warehouse WHERE warehouse_id = $1;`, [-1]); //placeholder warehouse_id
+    response = await pool.query(
+      `SELECT * FROM warehouse WHERE warehouse_id = $1;`,
+      [-1],
+    ); //placeholder warehouse_id
     if (response.rows.length === 0) {
       await pool.query(
         `INSERT INTO warehouse (warehouse_id, lat, long) VALUES (-1, 0.0, 0.0);`,
@@ -240,26 +243,66 @@ const helpers = {
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Home Decor');`);
 
       //warehouse Table
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (43.6532, -79.3832);`); // Toronto
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (49.2827, -123.1207);`); // Vancouver
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (45.5017, -73.5673);`); // Montreal
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (51.0447, -114.0719);`); // Calgary
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (45.4215, -75.6972);`); // Ottawa
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (53.5461, -113.4938);`); // Edmonton
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (49.8951, -97.1384);`); // Winnipeg
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (46.8139, -71.2080);`); // Quebec City
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (52.9399, -106.4509);`); // Saskatoon
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (50.4452, -104.6189);`); // Regina
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (44.6488, -63.5752);`); // Halifax
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (47.5605, -52.7126);`); // St. John's
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (46.2330, -63.1311);`); // Charlottetown
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (45.9636, -66.6431);`); // Fredericton
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (60.7212, -135.0568);`); // Whitehorse
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (62.4540, -114.3718);`); // Yellowknife
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (63.7467, -68.5170);`); // Iqaluit
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (53.1355, -57.6604);`); // Labrador City
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (49.2673, -123.1456);`); // Burnaby
-      await pool.query(`INSERT INTO warehouse (lat, long) VALUES (43.8561, -79.3370);`); // Markham      
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (43.6532, -79.3832);`,
+      ); // Toronto
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (49.2827, -123.1207);`,
+      ); // Vancouver
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (45.5017, -73.5673);`,
+      ); // Montreal
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (51.0447, -114.0719);`,
+      ); // Calgary
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (45.4215, -75.6972);`,
+      ); // Ottawa
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (53.5461, -113.4938);`,
+      ); // Edmonton
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (49.8951, -97.1384);`,
+      ); // Winnipeg
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (46.8139, -71.2080);`,
+      ); // Quebec City
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (52.9399, -106.4509);`,
+      ); // Saskatoon
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (50.4452, -104.6189);`,
+      ); // Regina
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (44.6488, -63.5752);`,
+      ); // Halifax
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (47.5605, -52.7126);`,
+      ); // St. John's
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (46.2330, -63.1311);`,
+      ); // Charlottetown
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (45.9636, -66.6431);`,
+      ); // Fredericton
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (60.7212, -135.0568);`,
+      ); // Whitehorse
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (62.4540, -114.3718);`,
+      ); // Yellowknife
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (63.7467, -68.5170);`,
+      ); // Iqaluit
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (53.1355, -57.6604);`,
+      ); // Labrador City
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (49.2673, -123.1456);`,
+      ); // Burnaby
+      await pool.query(
+        `INSERT INTO warehouse (lat, long) VALUES (43.8561, -79.3370);`,
+      ); // Markham
 
       await pool.query(`COMMIT`);
     } catch (error) {
@@ -699,7 +742,13 @@ const helpers = {
     }
   },
 
-  postProductToUserCart: async function (user_email, product_id, quantity, delivery, warehouse_id) {
+  postProductToUserCart: async function (
+    user_email,
+    product_id,
+    quantity,
+    delivery,
+    warehouse_id,
+  ) {
     try {
       await pool.query(`BEGIN`);
       const response = await pool.query(
@@ -714,7 +763,7 @@ const helpers = {
       } else {
         await pool.query(
           `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
-          [response.rows[0].quantity + quantity, user_email, product_id]
+          [response.rows[0].quantity + quantity, user_email, product_id],
         );
       }
       await pool.query(`COMMIT`);
@@ -981,7 +1030,7 @@ const helpers = {
         `SELECT * 
       FROM warehouse;`,
       );
-      response.rows = response.rows.filter(row => row.warehouse_id !== -1);
+      response.rows = response.rows.filter((row) => row.warehouse_id !== -1);
       return response.rows;
     } catch (error) {
       console.error("Error getting all warehouse info:", error);

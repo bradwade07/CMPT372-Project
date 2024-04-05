@@ -409,7 +409,13 @@ app.post("/postProductToUserCart", async (req, res) => {
   quantity = parseInt(quantity);
 
   try {
-    await helpers.postProductToUserCart(user_email, product_id, quantity, delivery, warehouse_id);
+    await helpers.postProductToUserCart(
+      user_email,
+      product_id,
+      quantity,
+      delivery,
+      warehouse_id,
+    );
     return res
       .status(200)
       .send({ success: "Item added to user cart successfully!" });
