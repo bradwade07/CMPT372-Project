@@ -18,7 +18,11 @@ type InStockWarehouseMap = {
 
 export function InStockWarehouseMap({ data }: InStockWarehouseMap) {
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col text-center gap-y-2 w-full h-full">
+      <h3 className="text-xl">
+        Map of warehouse locations that has this product in stock
+      </h3>
+      <p>Please click on a pin to see the warehouse ID</p>
       <WarehouseMap data={data} />
     </div>
   );

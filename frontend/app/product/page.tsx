@@ -181,7 +181,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
             <p className="mb-8">{data?.product_description}</p>
           </div>
         </div>
-        <div className="mx-auto mt-8 w-1/2 lg:w-2/3 h-96">
+        <div className="mx-auto mt-20 w-1/2 lg:w-2/3 h-96">
           <InStockWarehouseMap data={warehouses} />
         </div>
         <div className="flex justify-center items-center text-center mt-8">
