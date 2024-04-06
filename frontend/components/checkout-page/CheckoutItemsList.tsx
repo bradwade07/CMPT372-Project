@@ -40,6 +40,9 @@ export function CheckoutItemsList({ data }: CheckoutItemsListProps) {
                     <p>
                       Delivery Method: {item.delivery ? "Delivery" : "Pickup"}
                     </p>
+                    {!item.delivery && (
+                      <p>Pickup Warehouse ID: {item.warehouse_id}</p>
+                    )}
                   </div>
                 </div>
               </CardBody>
