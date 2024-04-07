@@ -108,7 +108,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       <main className="flex flex-col min-h-screen py-20">
         <div className="container mx-auto flex flex-col md:flex-row">
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
-            <div className="w-full mt-4">
+            <div className="w-full mt-[1rem]">
             {data ? (
                 <ImageSelector tags={data.tags} additional_img={data.additional_img} product_id={data.product_date_added} product_name={data.product_name} product_description={data.product_description} base_price={data.base_price} current_price={data.current_price} product_date_added={data.product_date_added} product_main_img={data.product_main_img} />
               ) : (<div></div>
