@@ -6,9 +6,15 @@ import { getProductTags } from "@/api/product";
 
 type TagsInputProps = {
   handleInputChange(value: string[]): void;
+  isInvalid?: boolean;
+  errorMessage?: React.ReactNode;
 };
 
-export default function TagsInput({ handleInputChange }: TagsInputProps) {
+export default function TagsInput({
+  handleInputChange,
+  isInvalid,
+  errorMessage,
+}: TagsInputProps) {
   const { data } = useQuery({
     queryKey: ["Product Tags"],
     queryFn: getProductTags,
@@ -20,14 +26,20 @@ export default function TagsInput({ handleInputChange }: TagsInputProps) {
     <div className="flex flex-col gap-1 w-full">
       <CheckboxGroup
         className="gap-1"
-        label="Select Product Tags"
+        label="Select Product Tags (Min. 1)"
+        classNames={{
+          label: isInvalid && "text-[#F31260]",
+        }}
         orientation="horizontal"
         name="product_tags"
         value={groupSelected}
+        isRequired
         onChange={(value) => {
           setGroupSelected(value as string[]);
           handleInputChange(value as string[]);
         }}
+        isInvalid={isInvalid}
+        errorMessage={errorMessage}
       >
         {data?.map((tag) => (
           <span key={tag}>

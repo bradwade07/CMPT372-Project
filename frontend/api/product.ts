@@ -102,24 +102,6 @@ export async function createProductListing(formData: ProductListingCreation) {
       ...rest
     } = formData;
 
-    // console.log({
-    //   ...rest,
-    //   user_email: user_email,
-    //   // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
-    //   // forces this array to be posted as an array.
-    //   // when there's only 1 item in the array it gets posted as an object instead of a single element array
-    //   product_tags: [...product_tags, "placeholdertag"],
-    //   warehouse_ids: [...warehouse_ids, -1],
-    //   quantities: [...quantities, -1],
-    //   product_images: [
-    //     main_product_img_file,
-    //     ...additional_product_img_files,
-    //     new File([new Blob([], { type: "image/jpeg" })], "placeholder.jpg", {
-    //       type: "image/jpeg",
-    //     }),
-    //   ],
-    // });
-
     try {
       axios.post(
         `/createProductListing`,

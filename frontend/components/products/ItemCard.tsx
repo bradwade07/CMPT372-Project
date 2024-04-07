@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardBody } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/api/product.types";
 
@@ -26,9 +26,9 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         <h4 className="font-bold text-xl">{product.product_name}</h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2">
-        <img
+        <Image
           alt="Product Image"
-          className="object-cover rounded-xl pb-2"
+          className="object-cover rounded-xl pb-2 h-[240px]"
           src={`data:image/jpeg;base64, ${product.product_main_img}`}
           width={270}
         />
@@ -45,7 +45,9 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         ) : (
           <p>${product.base_price}</p>
         )}
-        <p>{product.product_description}</p>
+        <p className="truncate overflow-hidden">
+          {product.product_description}
+        </p>
         <p>Rating: {product.product_avg_rating}</p>
       </CardBody>
     </Card>
