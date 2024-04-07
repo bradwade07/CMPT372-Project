@@ -173,28 +173,6 @@ export async function createProductListing(
   }
 }
 
-// gets all the information on a product listing for given product ID
-// TODO: double check the type of object that is returned from the backend
-export async function getProductListing(
-  product_id: number,
-): Promise<ProductListing | null> {
-  try {
-    let response = await axios.get<ProductListing[]>(
-      `/getProductListingByProductId/${product_id}`,
-    );
-
-    return response.data[0];
-  } catch (error) {
-    if (isAxiosError(error)) {
-      console.error(error.response?.data || error.response || error);
-    } else {
-      console.error(error);
-    }
-
-    return null;
-  }
-}
-
 // changes the current price of a product to a new price
 export async function updateProductPrice(
   product_id: number,
