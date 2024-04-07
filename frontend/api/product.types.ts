@@ -35,3 +35,15 @@ export type ProductListingCreation = {
   warehouse_ids: number[];
   quantities: number[];
 };
+
+export type ProductListing = {
+  product_name: string;
+  product_description: string;
+  base_price: number;
+  current_price: number;
+  product_tags: string[];
+  main_product_img_file: string;
+  additional_product_img_files: string[];
+  warehouse_ids: number[];
+  quantities: number[];
+};

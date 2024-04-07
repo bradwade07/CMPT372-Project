@@ -1,4 +1,9 @@
-import { Product, ProductFull, ProductListingCreation } from "./product.types";
+import {
+  Product,
+  ProductFull,
+  ProductListing,
+  ProductListingCreation,
+} from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
@@ -94,7 +99,9 @@ export async function getFilteredProducts(
 }
 
 // Creates a new product listing using the submitted form data
-export async function createProductListing(formData: ProductListingCreation) {
+export async function createProductListing(
+  formData: ProductListingCreation,
+): Promise<void> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     const {
@@ -163,5 +170,63 @@ export async function createProductListing(formData: ProductListingCreation) {
     }
   } else {
     console.error("Could not create product listing");
+  }
+}
+
+// gets all the information on a product listing for given product ID
+// TODO: double check the type of object that is returned from the backend
+export async function getProductListing(
+  product_id: number,
+): Promise<ProductListing | null> {
+  try {
+    let response = await axios.get<ProductListing[]>(
+      `/getProductListingByProductId/${product_id}`,
+    );
+
+    return response.data[0];
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+
+    return null;
+  }
+}
+
+// changes the current price of a product to a new price
+export async function updateProductPrice(
+  product_id: number,
+  new_price: number,
+): Promise<void> {
+  try {
+    await axios.patch("/updateProductPriceByProductId", {
+      product_id: product_id,
+      new_price: new_price,
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+// deletes the product listing for the product ID
+export async function deleteProductListing(product_id: number): Promise<void> {
+  try {
+    await axios.delete("/deleteProductListingByProductId", {
+      data: {
+        product_id: product_id,
+      },
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
   }
 }
