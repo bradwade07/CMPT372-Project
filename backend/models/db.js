@@ -1111,7 +1111,18 @@ const helpers = {
       } catch (error) {
         console.error("Error adding items to order info table:", error);
       }
+  },
+  updateProductPriceByProductId: async function (product_id, new_price) {
+    try {
+        const response = await pool.query(`
+        UPDATE productprice
+        SET current_price = $1
+        WHERE product_id = $2`,[new_price, product_id]);
+      } catch (error) {
+        console.error("Error updating product price in productprice table:", error);
+      }
   }
+
 };
 
 

@@ -764,6 +764,16 @@ app.delete("/deleteProductListingByProductId", async (req, res) => {
         res.status(500).send({ error: "Failed to get order History" });
       }
   });
+  app.patch("/updateProductPriceByProductId", async (req, res) => {
+    try {
+        const { product_id, new_price } = req.body;
+        await helpers.updateProductPriceByProductId(product_id, new_price);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed updating product price in productprice table" });
+      }
+  });
 
 // Server initialization
 try {
