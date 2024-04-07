@@ -40,6 +40,7 @@ const helpers = {
         product_date_added bigINT,
         user_email VARCHAR(255),
         product_avg_rating FLOAT,
+        active BOOLEAN,
         FOREIGN KEY (user_email) REFERENCES userInfo(user_email)
         );`);
     await pool.query(`
@@ -119,17 +120,6 @@ const helpers = {
         FOREIGN KEY (product_id) REFERENCES product(product_id)
         );`);
     await pool.query(`
-        CREATE TABLE IF NOT EXISTS review (
-        review_id SERIAL,
-        product_id INTEGER,
-        user_email VARCHAR(255),
-        comment VARCHAR(255),
-        rating FLOAT,
-        PRIMARY KEY (review_id),
-        FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
-        FOREIGN KEY (product_id) REFERENCES product(product_id)
-        );`);
-    await pool.query(`
         CREATE TABLE IF NOT EXISTS vendorrequest (
         request_id SERIAL PRIMARY KEY,
         user_email VARCHAR(255),
@@ -137,7 +127,7 @@ const helpers = {
         );`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS orderinfo (
-        order_id SERIAL,
+        order_id INTEGER,
         user_email VARCHAR(255),
         product_id INTEGER,
         quantity INTEGER,
@@ -327,7 +317,6 @@ const helpers = {
       await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS image CASCADE;`);
-      await pool.query(`DROP TABLE IF EXISTS review CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS vendorrequest CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS orderinfo CASCADE;`);
       await pool.query(`COMMIT`);
@@ -342,7 +331,7 @@ const helpers = {
     try {
       let productResponse = await pool.query(
         `
-        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, p.active, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE p.product_id = $1;
@@ -524,7 +513,7 @@ const helpers = {
         SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
-        WHERE pp.current_price < pp.base_price
+        WHERE pp.current_price < pp.base_price AND p.active = true
         ORDER BY pp.current_price DESC
       `;
       if (limit >= 0) {
@@ -552,6 +541,7 @@ const helpers = {
         SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
+        WHERE p.active = true
         ORDER BY p.product_date_added DESC
       `;
       if (limit >= 0) {
@@ -937,25 +927,6 @@ const helpers = {
       throw new Error(errorMessage);
     }
   },
-  postReviewsByUserEmail: async function (product_id, user_email, comment) {
-    try {
-      const response = await pool.query(
-        `SELECT * 
-            FROM product
-            WHERE user_email = $1;`,
-        [user_email],
-      );
-      if (response.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO review(product_id, user_email, comment, rating)
-                VALUES ($1, $2, $3);`,
-          [product_id, user_email, comment],
-        );
-      }
-    } catch (error) {
-      console.error("Error creating review:", error);
-    }
-  },
   postVendorRequestsByUserEmail: async function (user_email) {
     try {
       const response = await pool.query(
@@ -1069,13 +1040,80 @@ const helpers = {
   },
   getAllProductTags: async function () {
     try {
-      const result = await pool.query("SELECT tag_name FROM tag;");
+      const result = await pool.query(`SELECT tag_name FROM tag;`);
       return result.rows.map((row) => row.tag_name);
     } catch (error) {
       console.error("Error fetching product tags:", error);
     }
   },
+  deleteProductListingByProductId: async function (product_id) {
+    try {
+      await pool.query(`
+      UPDATE product
+      SET active = false
+      WHERE product_id = $1;`, [product_id]);
+    } catch (error) {
+      console.error("Error deleting product listing:", error);
+    }
+  },
+  getOrderHistoryByEmail: async function (user_email) {
+    try {
+      let reply = [];
+      const response = await pool.query(`
+      SELECT o.order_id, o.product_id, o.quantity, o.delivery, o.warehouse_id, o.order_date, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.product_avg_rating, p.active, pp.base_price, pp.current_price
+      FROM orderinfo o
+      JOIN product p ON o.product_id = p.product_id
+      JOIN productprice pp ON o.product_id = pp.product_id
+      WHERE o.user_email = $1;      
+      `, [user_email]);
+      response.rows.forEach(row => {
+        let order = reply.find(o => o.order_id === row.order_id);
+        if (!order) {
+          order = {
+            order_id: row.order_id,
+            order_date: row.order_date,
+            products: []
+          };
+          reply.push(order);
+        }
+        order.products.push({
+          product_id: row.product_id,
+          product_name: row.product_name,
+          product_main_img: row.product_main_img.toString('base64'),
+          product_description: row.product_description,
+          quantity: row.quantity,
+          delivery: row.delivery,
+          warehouse_id: row.warehouse_id,
+          product_date_added: row.product_date_added,
+          current_price: row.current_price,
+          base_price: row.base_price,
+        });
+      });
+      return reply;
+    } catch (error) {
+      console.error("Error getting order history:", error);
+    }
+  },
+  addCartItemsToOrderInfoTable: async function (order_id, user_email) {
+    try {
+        const response = await pool.query(`SELECT * FROM usercart WHERE user_email = $1;`, [user_email]);
+        const currentTime = Math.floor(new Date().getTime() / 1000);
+        let lastObj = response.rows[response.rows.length-1];
+        let string = `INSERT INTO orderinfo (order_id, user_email, product_id, quantity, delivery, warehouse_id, order_date) VALUES (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+        response.rows.pop();
+        while(response.rows.length > 0){
+            lastObj = response.rows[response.rows.length-1];
+            string+=`, (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+            response.rows.pop();
+        }
+        string+=`;`;
+        await pool.query(string);
+      } catch (error) {
+        console.error("Error adding items to order info table:", error);
+      }
+  }
 };
+
 
 module.exports = {
   helpers,

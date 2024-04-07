@@ -153,9 +153,10 @@ app.get("/getProductsByFilters", async (req, res) => {
         current_price: response.current_price,
         tags: response.tags,
         additional_img: response.additional_img,
+        active: response.active
       });
     }
-
+    reply = reply.filter(r => r.active === true);
     return res.status(200).send(reply);
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get products!" });
@@ -608,6 +609,7 @@ app.post("/api/orders/:orderID/capture", async (req, res) => {
     const { user_email } = req.body;
     const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
     if (httpStatusCode === 201) {
+      await helpers.addCartItemsToOrderInfoTable(orderID, user_email);
       await helpers.clearUserCart(user_email);
     }
     res.status(httpStatusCode).json(jsonResponse);
@@ -662,17 +664,6 @@ app.post("/createProductListing", async (req, res) => {
   } catch (error) {
     console.error("Failed to create product:", error);
     res.status(500).json({ error: "Failed to create product." });
-  }
-});
-app.post("/postReviewsByUserEmail", async (req, res) => {
-  try {
-    const { product_id, user_email, comment } = req.body;
-    await helpers.postReviewsByUserEmail(product_id, user_email, comment);
-    console.log("Review Posted Successfully!");
-    res.status(200);
-  } catch (error) {
-    console.error("Failed to create review:", error);
-    res.status(500).json({ error: "Failed to create review." });
   }
 });
 
@@ -741,6 +732,7 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
     res.status(500).json({ error: "Failed to All get warehouse info." });
   }
 });
+
 app.get("/getAllProductTags", async (req, res) => {
   try {
     const tags = await helpers.getAllProductTags();
@@ -750,6 +742,28 @@ app.get("/getAllProductTags", async (req, res) => {
     res.status(500).send({ error: "Failed to fetch product tags" });
   }
 });
+
+app.delete("/deleteProductListingByProductId", async (req, res) => {
+    try {
+        const { product_id } = req.body
+        await helpers.deleteProductListingByProductId(product_id);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed to delete product listing" });
+      }
+  });
+
+  app.get("/getOrderHistoryByEmail/:user_email", async (req, res) => {
+    try {
+        const { user_email } = req.params;
+        await helpers.getOrderHistoryByEmail(user_email);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed to get order History" });
+      }
+  });
 
 // Server initialization
 try {
