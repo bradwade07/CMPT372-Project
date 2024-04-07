@@ -483,7 +483,7 @@ app.patch("/patchWarehouseStock", async (req, res) => {
     const response = await helpers.patchWarehouseStock(
       warehouse_id,
       product_id,
-      quantity,
+      quantity
     );
     if (response === 1) {
       return res
