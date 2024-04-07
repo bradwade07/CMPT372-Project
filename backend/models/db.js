@@ -353,6 +353,7 @@ const helpers = {
           current_price: product.current_price,
           tags: [],
           additional_img: [],
+          active: product.active
         };
         let tagsResponse = await pool.query(
           `
@@ -837,8 +838,8 @@ const helpers = {
       const product_date_added = Math.floor(new Date().getTime() / 1000);
       await pool.query(`BEGIN`);
       let response = await pool.query(
-        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
-            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
+        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating, active)
+            VALUES ($1, $2, $3, $4, $5, $6, $7) returning product_id;`,
         [
           product_name,
           product_images[0],
@@ -846,6 +847,7 @@ const helpers = {
           new Date().getTime(),
           user_email,
           parseFloat((Math.random() * 5).toFixed(1)),
+          true
         ],
       );
       const product_id = response.rows[0].product_id;

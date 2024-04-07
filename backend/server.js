@@ -141,22 +141,23 @@ app.get("/getProductsByFilters", async (req, res) => {
     let reply = [];
     for (id of responseIds) {
       response = await helpers.getProductInfoByPid(id);
-      reply.push({
-        product_id: response.product_id,
-        product_name: response.product_name,
-        product_main_img: response.product_main_img.toString("base64"),
-        product_description: response.product_description,
-        product_date_added: response.product_date_added,
-        product_avg_rating: response.product_avg_rating,
-        user_email: response.user_email,
-        base_price: response.base_price,
-        current_price: response.current_price,
-        tags: response.tags,
-        additional_img: response.additional_img,
-        active: response.active
-      });
+      if(response.active === true){
+        reply.push({
+            product_id: response.product_id,
+            product_name: response.product_name,
+            product_main_img: response.product_main_img.toString("base64"),
+            product_description: response.product_description,
+            product_date_added: response.product_date_added,
+            product_avg_rating: response.product_avg_rating,
+            user_email: response.user_email,
+            base_price: response.base_price,
+            current_price: response.current_price,
+            tags: response.tags,
+            additional_img: response.additional_img,
+            active: response.active
+          });
+      }
     }
-    reply = reply.filter(r => r.active === true);
     return res.status(200).send(reply);
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get products!" });
