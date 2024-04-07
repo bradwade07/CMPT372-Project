@@ -1,4 +1,9 @@
-import { Product, ProductFull, ProductListingCreation } from "./product.types";
+import {
+  OrderHistory,
+  Product,
+  ProductFull,
+  ProductListingCreation,
+} from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
 import { Categories, FiltersType, filtersToQueryString } from "./filters.types";
@@ -144,6 +149,7 @@ export async function createProductListing(formData: ProductListingCreation) {
   }
 }
 
+// gets all available product tags
 export async function getProductTags() {
   try {
     let response = await axios.get<string[]>("getAllProductTags");
@@ -156,6 +162,32 @@ export async function getProductTags() {
       console.error(error);
     }
 
+    return [];
+  }
+}
+
+// gets all of a user's order history
+// TODO: double check returned type from backend
+export async function getUserOrderHistory(): Promise<OrderHistory[]> {
+  const user_email = await getSessionUserEmail();
+  if (user_email) {
+    try {
+      let response = await axios.get<OrderHistory[]>(
+        `/getOrderHistoryByEmail?${user_email}`,
+      );
+
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error(error.response?.data || error.response || error);
+      } else {
+        console.error(error);
+      }
+
+      return [];
+    }
+  } else {
+    console.error("Could not retrieve user order history");
     return [];
   }
 }

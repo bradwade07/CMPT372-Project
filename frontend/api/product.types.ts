@@ -35,3 +35,22 @@ export type ProductListingCreation = {
   warehouse_ids: number[];
   quantities: number[];
 };
+
+export type OrderHistory = {
+  order_id: number;
+  products: [
+    {
+      product_id: number;
+      product_name: string;
+      product_description: string;
+      base_price: number;
+      current_price: number;
+      product_date_added: number;
+      product_main_img: string;
+      quantity: number;
+      warehouse_id: number;
+      delivery: boolean;
+    },
+  ];
+  order_date: number;
+};
