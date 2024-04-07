@@ -1,5 +1,5 @@
 import {
-  OrderHistory,
+  OrderHistoryEntry,
   Product,
   ProductFull,
   ProductListingCreation,
@@ -167,12 +167,11 @@ export async function getProductTags() {
 }
 
 // gets all of a user's order history
-// TODO: double check returned type from backend
-export async function getUserOrderHistory(): Promise<OrderHistory[]> {
+export async function getUserOrderHistory(): Promise<OrderHistoryEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     try {
-      let response = await axios.get<OrderHistory[]>(
+      let response = await axios.get<OrderHistoryEntry[]>(
         `/getOrderHistoryByEmail?${user_email}`,
       );
 

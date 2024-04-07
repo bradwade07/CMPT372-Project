@@ -36,21 +36,21 @@ export type ProductListingCreation = {
   quantities: number[];
 };
 
-export type OrderHistory = {
+export type OrderHistoryEntry = {
   order_id: number;
-  products: [
-    {
-      product_id: number;
-      product_name: string;
-      product_description: string;
-      base_price: number;
-      current_price: number;
-      product_date_added: number;
-      product_main_img: string;
-      quantity: number;
-      warehouse_id: number;
-      delivery: boolean;
-    },
-  ];
+  products: [OrderHistoryProduct];
   order_date: number;
+};
+
+export type OrderHistoryProduct = {
+  product_id: number;
+  product_name: string;
+  product_description: string;
+  base_price: number;
+  current_price: number;
+  product_date_added: number;
+  product_main_img: string;
+  quantity: number;
+  warehouse_id: number;
+  delivery: boolean;
 };

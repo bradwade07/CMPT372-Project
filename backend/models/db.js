@@ -1048,10 +1048,13 @@ const helpers = {
   },
   deleteProductListingByProductId: async function (product_id) {
     try {
-      await pool.query(`
+      await pool.query(
+        `
       UPDATE product
       SET active = false
-      WHERE product_id = $1;`, [product_id]);
+      WHERE product_id = $1;`,
+        [product_id],
+      );
     } catch (error) {
       console.error("Error deleting product listing:", error);
     }
@@ -1059,27 +1062,30 @@ const helpers = {
   getOrderHistoryByEmail: async function (user_email) {
     try {
       let reply = [];
-      const response = await pool.query(`
+      const response = await pool.query(
+        `
       SELECT o.order_id, o.product_id, o.quantity, o.delivery, o.warehouse_id, o.order_date, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.product_avg_rating, p.active, pp.base_price, pp.current_price
       FROM orderinfo o
       JOIN product p ON o.product_id = p.product_id
       JOIN productprice pp ON o.product_id = pp.product_id
       WHERE o.user_email = $1;      
-      `, [user_email]);
-      response.rows.forEach(row => {
-        let order = reply.find(o => o.order_id === row.order_id);
+      `,
+        [user_email],
+      );
+      response.rows.forEach((row) => {
+        let order = reply.find((o) => o.order_id === row.order_id);
         if (!order) {
           order = {
             order_id: row.order_id,
             order_date: row.order_date,
-            products: []
+            products: [],
           };
           reply.push(order);
         }
         order.products.push({
           product_id: row.product_id,
           product_name: row.product_name,
-          product_main_img: row.product_main_img.toString('base64'),
+          product_main_img: row.product_main_img.toString("base64"),
           product_description: row.product_description,
           quantity: row.quantity,
           delivery: row.delivery,
@@ -1096,35 +1102,42 @@ const helpers = {
   },
   addCartItemsToOrderInfoTable: async function (order_id, user_email) {
     try {
-        const response = await pool.query(`SELECT * FROM usercart WHERE user_email = $1;`, [user_email]);
-        const currentTime = Math.floor(new Date().getTime() / 1000);
-        let lastObj = response.rows[response.rows.length-1];
-        let string = `INSERT INTO orderinfo (order_id, user_email, product_id, quantity, delivery, warehouse_id, order_date) VALUES (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+      const response = await pool.query(
+        `SELECT * FROM usercart WHERE user_email = $1;`,
+        [user_email],
+      );
+      const currentTime = Math.floor(new Date().getTime() / 1000);
+      let lastObj = response.rows[response.rows.length - 1];
+      let string = `INSERT INTO orderinfo (order_id, user_email, product_id, quantity, delivery, warehouse_id, order_date) VALUES (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+      response.rows.pop();
+      while (response.rows.length > 0) {
+        lastObj = response.rows[response.rows.length - 1];
+        string += `, (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
         response.rows.pop();
-        while(response.rows.length > 0){
-            lastObj = response.rows[response.rows.length-1];
-            string+=`, (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
-            response.rows.pop();
-        }
-        string+=`;`;
-        await pool.query(string);
-      } catch (error) {
-        console.error("Error adding items to order info table:", error);
       }
+      string += `;`;
+      await pool.query(string);
+    } catch (error) {
+      console.error("Error adding items to order info table:", error);
+    }
   },
   updateProductPriceByProductId: async function (product_id, new_price) {
     try {
-        const response = await pool.query(`
+      const response = await pool.query(
+        `
         UPDATE productprice
         SET current_price = $1
-        WHERE product_id = $2`,[new_price, product_id]);
-      } catch (error) {
-        console.error("Error updating product price in productprice table:", error);
-      }
-  }
-
+        WHERE product_id = $2`,
+        [new_price, product_id],
+      );
+    } catch (error) {
+      console.error(
+        "Error updating product price in productprice table:",
+        error,
+      );
+    }
+  },
 };
-
 
 module.exports = {
   helpers,

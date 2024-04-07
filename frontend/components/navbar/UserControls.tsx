@@ -109,6 +109,9 @@ export function UserControls() {
               My Wishlist
             </DropdownItem>
             {getUserSpecificOptions()}
+            <DropdownItem key="order-history" href="/order-history">
+              My Order History
+            </DropdownItem>
             <DropdownItem
               key="logout"
               as={Link}
