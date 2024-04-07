@@ -127,7 +127,7 @@ const helpers = {
         );`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS orderinfo (
-        order_id INTEGER,
+        order_id VARCHAR(255),
         user_email VARCHAR(255),
         product_id INTEGER,
         quantity INTEGER,
@@ -353,6 +353,7 @@ const helpers = {
           current_price: product.current_price,
           tags: [],
           additional_img: [],
+          active: product.active,
         };
         let tagsResponse = await pool.query(
           `
@@ -837,8 +838,8 @@ const helpers = {
       const product_date_added = Math.floor(new Date().getTime() / 1000);
       await pool.query(`BEGIN`);
       let response = await pool.query(
-        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
-            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
+        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating, active)
+            VALUES ($1, $2, $3, $4, $5, $6, $7) returning product_id;`,
         [
           product_name,
           product_images[0],
@@ -846,6 +847,7 @@ const helpers = {
           new Date().getTime(),
           user_email,
           parseFloat((Math.random() * 5).toFixed(1)),
+          true,
         ],
       );
       const product_id = response.rows[0].product_id;
@@ -1108,15 +1110,43 @@ const helpers = {
       );
       const currentTime = Math.floor(new Date().getTime() / 1000);
       let lastObj = response.rows[response.rows.length - 1];
-      let string = `INSERT INTO orderinfo (order_id, user_email, product_id, quantity, delivery, warehouse_id, order_date) VALUES (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+      let productIdandQuantity = [];
+      let qString = `INSERT INTO orderinfo (order_id, user_email, product_id, quantity, delivery, warehouse_id, order_date) VALUES ('${order_id}', '${user_email}', ${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+      productIdandQuantity.push({
+        product_id: lastObj.product_id,
+        quantity: lastObj.quantity,
+        warehouse_id: lastObj.warehouse_id,
+        delivery: lastObj.delivery,
+      });
       response.rows.pop();
       while (response.rows.length > 0) {
         lastObj = response.rows[response.rows.length - 1];
-        string += `, (${order_id},${user_email},${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+        qString += `, ('${order_id}','${user_email}',${lastObj.product_id}, ${lastObj.quantity}, ${lastObj.delivery}, ${lastObj.warehouse_id}, ${currentTime})`;
+        productIdandQuantity.push({
+          product_id: lastObj.product_id,
+          quantity: lastObj.quantity,
+          warehouse_id: lastObj.warehouse_id,
+          delivery: lastObj.delivery,
+        });
         response.rows.pop();
       }
-      string += `;`;
-      await pool.query(string);
+      qString += `;`;
+      await pool.query(qString);
+      for (let i = 0; i < productIdandQuantity.length; i++) {
+        let { product_id, quantity, warehouse_id, delivery } =
+          productIdandQuantity[i];
+        if (delivery == 0) {
+          let response = await pool.query(
+            `SELECT quantity FROM warehousestock WHERE product_id = $1 AND warehouse_id = $2;`,
+            [product_id, warehouse_id],
+          );
+          helpers.patchWarehouseStock(
+            warehouse_id,
+            product_id,
+            response.rows[0].quantity - quantity,
+          );
+        }
+      }
     } catch (error) {
       console.error("Error adding items to order info table:", error);
     }

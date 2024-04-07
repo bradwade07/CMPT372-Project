@@ -15,9 +15,11 @@ export function PastOrders() {
     <div className="mx-4">
       <div className="max-h-[80vh] overflow-y-auto px-2">
         {data?.map((item) => (
-          <div className="mb-10">
+          <div className="mb-10" key={item.order_id}>
             {item.products.map((product) => (
-              <ProductEntry productEntry={product} />
+              <span key={product.product_id}>
+                <ProductEntry productEntry={product} />
+              </span>
             ))}
             <p>Order Date: {new Date(item.order_date * 1000).toUTCString()}</p>
           </div>

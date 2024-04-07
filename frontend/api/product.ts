@@ -6,7 +6,7 @@ import {
 } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
-import { Categories, FiltersType, filtersToQueryString } from "./filters.types";
+import { FiltersType, filtersToQueryString } from "./filters.types";
 import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
@@ -171,9 +171,12 @@ export async function getUserOrderHistory(): Promise<OrderHistoryEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     try {
+      console.log("stuff");
       let response = await axios.get<OrderHistoryEntry[]>(
-        `/getOrderHistoryByEmail?${user_email}`,
+        `/getOrderHistoryByEmail/${user_email}`,
       );
+
+      console.log(response.data);
 
       return response.data;
     } catch (error) {
