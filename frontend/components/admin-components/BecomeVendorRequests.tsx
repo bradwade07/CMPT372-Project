@@ -8,20 +8,24 @@ import { VendorRequestCard } from "./BecomeVendorRequestCard";
 
 const itemsPerPage = 10;
 
+// Displays all the requests for users to become a vendor, uses pagination if there are too many
 export function VendorRequests() {
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["Vendor Requests"],
     queryFn: getBecomeVendorRequests,
   });
 
+  // controls which page its on
   const [currentPage, setCurrentPage] = useState(1);
 
+  // the total number of pages there are
   const totalPaginationPages = data ? Math.ceil(data.length / itemsPerPage) : 1;
 
-  // Calculate start and end index based on current page and items per page
+  // calculate start and end index based on current page and items per page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
+  // changes the page
   const onPaginationChange = (page: number) => {
     setCurrentPage(page);
   };

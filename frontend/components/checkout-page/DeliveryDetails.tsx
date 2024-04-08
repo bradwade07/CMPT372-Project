@@ -15,6 +15,7 @@ type DeliveryDetailsProps = {
   onInfoEdit: () => void;
 };
 
+// Displays a form for the user to fill out their delivery information, as well as a map showing all the locations to pick up their items
 export function DeliveryDetails({
   data,
   onInfoSubmit,

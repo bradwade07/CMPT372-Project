@@ -1,5 +1,4 @@
-// source: https://codesandbox.io/p/sandbox/multi-range-slider-react-js-forked-4uq1uo?file=%2Fsrc%2Fcomponent%2FmultiRangeSlider%2FMultiRangeSlider.js%3A83%2C24
-
+// Code adapted from: https://codesandbox.io/p/sandbox/multi-range-slider-react-js-forked-4uq1uo?file=%2Fsrc%2Fcomponent%2FmultiRangeSlider%2FMultiRangeSlider.js%3A83%2C24
 "use client";
 
 import React, { useCallback, useEffect, useState, useRef } from "react";
@@ -12,6 +11,7 @@ type RatingFilterProps = {
   onChange: ({ min, max }: { min: number; max: number }) => void;
 };
 
+// Displays a double sided slider to filter the range of ratings
 export const RatingFilter = ({ min, max, onChange }: RatingFilterProps) => {
   const [minVal, setMinVal] = useState(min);
   const [maxVal, setMaxVal] = useState(max);

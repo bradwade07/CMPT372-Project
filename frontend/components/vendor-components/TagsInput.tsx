@@ -10,6 +10,7 @@ type TagsInputProps = {
   errorMessage?: React.ReactNode;
 };
 
+// Displays the input for the user to choose all the tags that apply to the new product
 export default function TagsInput({
   handleInputChange,
   isInvalid,

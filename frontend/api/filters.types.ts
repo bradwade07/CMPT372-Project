@@ -7,7 +7,7 @@ export enum Categories {
   Toys = "Toys",
 }
 
-let categoryImgSrcMap = new Map<Categories, string>();
+const categoryImgSrcMap = new Map<Categories, string>();
 categoryImgSrcMap.set(Categories.Electronics, "/images/electronics.png");
 categoryImgSrcMap.set(Categories.Fashion, "/images/fashion.jpg");
 categoryImgSrcMap.set(Categories.Kitchen, "/images/kitchen.jpg");
@@ -24,6 +24,7 @@ https://www.flickr.com/photos/andrea_44/2922876304/in/photolist-AUh7cY-bz8dKB-RW
 https://www.flickr.com/photos/garryknight/6459495571/
 */
 
+// Given a string, returns the Enum value from the Categories Enum if it exists, is case sensitive
 export function getCategoryEnumVal(uri: string): Categories | undefined {
   const str = decodeURI(uri);
   return Object.values(Categories).find((item) => {
@@ -33,6 +34,7 @@ export function getCategoryEnumVal(uri: string): Categories | undefined {
   });
 }
 
+// Given a Categories Enum value, returns the image source for that category's representative image
 export function getCategoryImg(category: Categories): string {
   let result = categoryImgSrcMap.get(category);
   return result ? result : "/images/grey.jpg";
@@ -50,6 +52,7 @@ export type FiltersType = {
   user_email?: string;
 };
 
+// Transforms a FiltersType object to a query string
 export function filtersToQueryString(filters: FiltersType): string {
   const queryStringParams: string[] = [];
 

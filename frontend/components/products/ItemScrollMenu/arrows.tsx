@@ -1,3 +1,4 @@
+// Code adapted from: https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
 import React from "react";
 import { FaArrowCircleLeft } from "react-icons/fa";
 import { FaArrowCircleRight } from "react-icons/fa";

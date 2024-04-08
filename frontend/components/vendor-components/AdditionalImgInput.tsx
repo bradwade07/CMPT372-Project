@@ -12,6 +12,7 @@ type AdditionalImgInputProps = {
   onAmountDecrease(curAmount: number): void;
 };
 
+// Displays a variable number of file uploads for a vendor to upload additional images for product
 export function AdditionalImgInput({
   handleInputChange,
   onAmountDecrease,
@@ -20,6 +21,7 @@ export function AdditionalImgInput({
 
   const [numOfAdditionalImg, setNumOfAdditionalImg] = useState(0);
 
+  // displays the variable number of file upload inputs, depending on the number of additional images that is set
   const renderAdditonalImgInput = (): React.JSX.Element[] => {
     const elements = [];
     for (let i = 0; i < numOfAdditionalImg; i++) {

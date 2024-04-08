@@ -11,6 +11,7 @@ type FiltersProps = {
   onFiltersSave: (values: FiltersType) => void;
 };
 
+// Displays all of the different filters the user can use to filter what products are displays
 export function Filters({ onFiltersSave }: FiltersProps) {
   const priceFilterRange = { min: 0, max: 300 };
   const ratingFilterRange = { min: 0, max: 5 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 
+// a skeleton for a product card, used when queries are loading and there's no data yet to display
 export function ItemCardSkeleton() {
   return (
     <Card className="py-2 w-60">

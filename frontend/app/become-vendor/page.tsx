@@ -2,6 +2,7 @@ import { BecomeVendorButton } from "@/components/become-vendor-page";
 import { TopNavbar } from "@/components/navbar";
 import React from "react";
 
+// A customer can use this page to apply to become a vendor
 function page() {
   return (
     <>

@@ -2,6 +2,7 @@ import { VendorRequests } from "@/components/admin-components";
 import { TopNavbar } from "@/components/navbar";
 import React from "react";
 
+// This page contains various controls that an admin can use
 function page() {
   return (
     <>

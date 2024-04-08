@@ -3,7 +3,7 @@ import { axios } from "./axios";
 import { ShoppingCartEntry } from "./product.types";
 import { isAxiosError } from "axios";
 
-// gets the current user's shopping cart
+// Returns all the items in the current user's shopping cart
 export async function getShoppingCartProducts(): Promise<ShoppingCartEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
@@ -28,7 +28,9 @@ export async function getShoppingCartProducts(): Promise<ShoppingCartEntry[]> {
   }
 }
 
-// adds a product to the current user's shopping cart
+// Adds an item to the current user's shopping cart
+// item is set to be delivered or not delivered (picked up)
+// if set to be picked up, must have an associated warehouse ID
 export default async function addToShoppingCart(
   product_id: number,
   quantity: number,
@@ -57,7 +59,7 @@ export default async function addToShoppingCart(
   }
 }
 
-// removes a products from the current user's shopping cart
+// Removes an item from the current user's shopping cart
 export async function removeFromShoppingCart(
   product_id: number,
 ): Promise<void> {

@@ -18,6 +18,8 @@ import { ShoppingCartItem } from "./ShoppingCartItem";
 import { useRouter } from "next/navigation";
 import { removeFromShoppingCart } from "@/api/shoppingCart";
 
+// Displays a shopping cart icon that, when clicked, displays a modal containing all the items in a user's shopping cart
+// user can click a button in the modal to go to the checkout page
 export function ShoppingCartModal() {
   const router = useRouter();
 
@@ -26,8 +28,10 @@ export function ShoppingCartModal() {
     queryFn: getShoppingCartProducts,
   });
 
+  // this hook used to control when the shopping cart modal is opened or closed
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  // mutation used to force a refetch of the shopping cart contents when an item is removed
   const removeItemMutation = useMutation({
     mutationFn: removeFromShoppingCart,
     onSuccess: () => refetch(),

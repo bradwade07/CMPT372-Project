@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllWarehouses } from "@/api/warehouse";
 import classNames from "classnames";
 
+// Displays a variable number of warehouse ID and quantity inputs for the user to fill in
 type WarehousesInputProps = {
   handleInputChange(
     event: React.ChangeEvent<
@@ -34,6 +35,7 @@ export function WarehousesInput({
 
   const [numOfWarehouses, setNumOfWarehouses] = useState(1);
 
+  // displays the variable number of warehouse ID and quantity inputs, depending on the number of warehouses that is set
   const renderWarehouseQuantityInput = (): React.JSX.Element[] => {
     const elements = [];
     for (let i = 0; i < numOfWarehouses; i++) {

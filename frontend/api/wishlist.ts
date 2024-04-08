@@ -3,7 +3,7 @@ import { axios } from "./axios";
 import { WishlistEntry } from "./product.types";
 import { isAxiosError } from "axios";
 
-// gets the current user's wishlist
+// Returns all the items in the current user's wishlist
 export async function getWishlistProducts(): Promise<WishlistEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
@@ -28,7 +28,7 @@ export async function getWishlistProducts(): Promise<WishlistEntry[]> {
   }
 }
 
-// adds a product to the current user's wishlist
+// Adds an item to the current user's wishlist
 export async function addToWishlist(
   product_id: number,
   quantity: number,
@@ -53,7 +53,7 @@ export async function addToWishlist(
   }
 }
 
-// removes a products from the current user's wishlist
+// Removes an item from the current user's wishlist
 export async function removeFromWishlist(product_id: number): Promise<void> {
   const user_email = await getSessionUserEmail();
   if (user_email) {

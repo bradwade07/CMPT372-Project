@@ -3,7 +3,7 @@ import { axios } from "./axios";
 import { getSessionUserEmail } from "@/app/auth";
 import { isAxiosError } from "axios";
 
-// Creates a new paypal order
+// Calls backend api to create a new PayPal order
 export async function createOrder() {
   const user_email = await getSessionUserEmail();
 
@@ -31,7 +31,7 @@ export async function createOrder() {
   }
 }
 
-// Gets information after a paypal payment is approved
+// Gets information after a paypal payment is approved/denied
 export async function onTransactionApprove(data: OnApproveData) {
   const user_email = await getSessionUserEmail();
 

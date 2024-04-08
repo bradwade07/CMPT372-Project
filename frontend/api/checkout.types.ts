@@ -1,5 +1,3 @@
-export type AcquisitionMethod = "delivery" | "pickup";
-
 export const PROVINCES = [
   "BC",
   "AB",

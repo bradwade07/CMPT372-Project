@@ -5,18 +5,19 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 
+// Displays a searchbar that the user can use to search up rpoducts by name
 export function NavbarSearchbar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
+  // searches for an item when the user presses "enter"
   const handleKeyPress = (event: { key: string }) => {
-    if (event.key === "Enter") {
-      if (searchQuery != "") {
-        router.push(`/search?query=${searchQuery}`);
-      }
+    if (event.key === "Enter" && searchQuery != "") {
+      router.push(`/search?query=${searchQuery}`);
     }
   };
 
+  // updates the state that stores what the user typed
   const handleChange = (event: {
     target: { value: React.SetStateAction<string> };
   }) => {

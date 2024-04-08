@@ -4,9 +4,8 @@ export enum UserTypes {
   Admin = "Admin",
 }
 
-export function getUserTypeFromString(
-  typeString: string,
-): UserTypes | undefined {
+// Given a string, returns the Enum value from the UserTypes Enum if it exists, is case insensitive
+export function getUserEnumVal(typeString: string): UserTypes | undefined {
   const typeKeys = Object.keys(UserTypes) as (keyof typeof UserTypes)[];
 
   for (const key of typeKeys) {

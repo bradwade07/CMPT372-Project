@@ -5,6 +5,8 @@ type SearchParams = {
   query: string;
 };
 
+// This page lists all of the products that match the searched name
+// User can further filter down the products displays by things like price, rating, other tags
 function page({ searchParams }: { searchParams: SearchParams }) {
   const productQueryString = decodeURI(searchParams.query);
 

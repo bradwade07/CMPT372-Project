@@ -9,7 +9,7 @@ import { isAxiosError } from "axios";
 import { FiltersType, filtersToQueryString } from "./filters.types";
 import { getSessionUserEmail } from "@/app/auth";
 
-// given a product's id, returns all that product's info
+// Given a product's ID, returns all of that product's info
 export async function getProduct(
   product_id: number,
 ): Promise<ProductFull | null> {
@@ -28,7 +28,7 @@ export async function getProduct(
   }
 }
 
-// returns a number of the newest products
+// Returns a limited number of the most newest products
 export async function getNewProducts(limit: number): Promise<Product[]> {
   try {
     let response = await axios.get<Product[]>(
@@ -47,7 +47,7 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
   }
 }
 
-// returns a number of products that are on sale
+// Returns all the products on sale, or a limited number of products if defined
 export async function getSaleProducts(limit?: number): Promise<Product[]> {
   try {
     let limitNum = limit;
@@ -71,7 +71,7 @@ export async function getSaleProducts(limit?: number): Promise<Product[]> {
   }
 }
 
-// returns basic info on all the products that fulfill a set of filters
+// Returns products based on a set of filters
 export async function getFilteredProducts(
   filters: FiltersType,
 ): Promise<Product[]> {
@@ -149,7 +149,7 @@ export async function createProductListing(formData: ProductListingCreation) {
   }
 }
 
-// gets all available product tags
+// Returns all of the available product tags
 export async function getProductTags() {
   try {
     let response = await axios.get<string[]>("getAllProductTags");
@@ -166,7 +166,7 @@ export async function getProductTags() {
   }
 }
 
-// gets all of a user's order history
+// Returns all of a user's order history
 export async function getUserOrderHistory(): Promise<OrderHistoryEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {

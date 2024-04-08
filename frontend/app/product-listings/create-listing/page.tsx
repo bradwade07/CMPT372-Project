@@ -3,6 +3,7 @@ import { CreateListingForm } from "@/components/vendor-components";
 import Link from "next/link";
 import React from "react";
 
+// A vendor can use this page to fill out a form to create a new product listing
 function page() {
   return (
     <>

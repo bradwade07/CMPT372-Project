@@ -1,3 +1,4 @@
+// Code adapted from NextUI documentation: https://nextui.org/docs/components/checkbox-group
 import React from "react";
 import { useCheckbox, Chip, VisuallyHidden, tv } from "@nextui-org/react";
 import CheckIcon from "@mui/icons-material/Check";

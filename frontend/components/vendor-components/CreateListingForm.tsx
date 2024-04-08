@@ -10,6 +10,7 @@ import TagsInput from "./TagsInput";
 import { useRouter } from "next/navigation";
 import AllWarehouseMap from "./AllWarehouseMap";
 
+// Displays a form for a vendor to fill out to create a new product listing
 export function CreateListingForm() {
   const router = useRouter();
 

@@ -12,6 +12,7 @@ type TagsFilterProps = {
   onChange(tags: string[]): void;
 };
 
+// Displays all the different tags a user can choose to filter products by
 export function TagsFilter({ selectedTags, onChange }: TagsFilterProps) {
   const { data } = useQuery({
     queryKey: ["Product Tags"],

@@ -11,8 +11,9 @@ if (!process.env.SECRET_KEY) {
 }
 
 const secretKey = process.env.SECRET_KEY;
-const key = new TextEncoder().encode(secretKey);
+const key = new TextEncoder().encode(secretKey); // Creates a key which is used to encrypt data
 
+// NOTE: currently login session time is limited by Google JWT expiry which is 1 hour
 const cookieLength = 1000 * 60 * 60 * 24; // 24 hours
 
 export type GoogleCredentials = {
@@ -20,7 +21,7 @@ export type GoogleCredentials = {
   picture: string;
 };
 
-// encrypts the payload using the key
+// Encrypts the payload using the key
 export async function encrypt(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -29,7 +30,7 @@ export async function encrypt(payload: any) {
     .sign(key);
 }
 
-// decrypts the input using the key
+// Decrypts the input using the key
 export async function decrypt(input: string): Promise<any> {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ["HS256"],
@@ -114,11 +115,11 @@ export async function login(
 
 // Logs the current user out
 export async function logout() {
-  // Destroy the session
   cookies().set("session", "", { expires: new Date(0) });
 }
 
 // Refreshes the current session, effectively resetting the expiry time
+// TODO: doesn't work still, probably because of google
 export async function updateSession() {
   const session = await getSession();
   if (!session) return;

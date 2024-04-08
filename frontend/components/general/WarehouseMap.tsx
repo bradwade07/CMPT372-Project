@@ -1,9 +1,11 @@
-// NOTE: import this component like so (otherwise there will be an error)
-// import dynamic from "next/dynamic";
-// const WarehouseMap = dynamic(() => import("@/components/general/WarehouseMap"), {
-// 	loading: () => null,
-// 	ssr: false,
-// });
+// NOTE: import this component like so (otherwise there will be an error):
+/*
+import dynamic from "next/dynamic";
+const WarehouseMap = dynamic(() => import("@/components/general/WarehouseMap"), {
+	loading: () => null,
+	ssr: false,
+});
+*/
 
 import L from "leaflet";
 import React from "react";
@@ -14,6 +16,7 @@ type WarehouseMapProps = {
   data: { lat: number; long: number; warehouse_id: number }[] | undefined;
 };
 
+// Displays a Leaflet map with pins showing all the locations of the given warehouses
 export default function WarehouseMap({ data }: WarehouseMapProps) {
   const icon = L.icon({
     iconUrl: "/leaflet/marker-icon.png",

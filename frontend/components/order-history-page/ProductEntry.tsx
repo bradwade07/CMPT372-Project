@@ -6,6 +6,7 @@ type ProductEntryProps = {
   productEntry: OrderHistoryProduct;
 };
 
+// Displays a single item in the user's order history
 export function ProductEntry({ productEntry }: ProductEntryProps) {
   return (
     <div className="h-fit w-full my-2" key={productEntry.product_id}>

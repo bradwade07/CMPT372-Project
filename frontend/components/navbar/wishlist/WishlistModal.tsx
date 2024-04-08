@@ -19,25 +19,30 @@ type WishlistModalProps = {
   onWishlistClose: () => void;
 };
 
+// Displays a modal that contains all the items in a user's wishlist, modal opening and closing are controlled by the component's props
 export function WishlistModal({ open, onWishlistClose }: WishlistModalProps) {
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["Wishlist"],
     queryFn: getWishlistProducts,
   });
 
+  // this hook used to control when the wishlist modal is opened or closed
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  // mutation used to force a refetch of the wishlist contents when an item is removed
   const removeItemMutation = useMutation({
     mutationFn: removeFromWishlist,
     onSuccess: () => refetch(),
   });
 
+  // opens the modal when the open prop is set to true
   useEffect(() => {
     if (open) {
       onOpen();
     }
   }, [open, onOpen]);
 
+  // closes the modal when the user exits out of it
   useEffect(() => {
     if (!isOpen) {
       onWishlistClose();

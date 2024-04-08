@@ -4,10 +4,10 @@ import {
   UserAddress,
   UserTypes,
   BecomeVendorRequest,
-  getUserTypeFromString,
+  getUserEnumVal,
 } from "./user.types";
 
-// creates a new user with the user_email as the type user_type
+// Creates a new user with the user_email as the type user_type
 export async function createNewUser(
   user_email: string,
   user_type: UserTypes,
@@ -26,14 +26,14 @@ export async function createNewUser(
   }
 }
 
-// returns the type of user for the user_email
+// Returns the type of user for the user_email
 export async function getUserType(
   user_email: string,
 ): Promise<UserTypes | null> {
   try {
     let response = await axios.get(`/getUserTypeByUserEmail/${user_email}`);
 
-    const user_type = getUserTypeFromString(response.data.type);
+    const user_type = getUserEnumVal(response.data.type);
 
     if (user_type) {
       return user_type;
@@ -51,7 +51,7 @@ export async function getUserType(
   }
 }
 
-// changes the user type for the user_email to the type user_type
+// Changes the user type for the user_email to the type user_type
 export async function updateUserType(
   user_email: string,
   user_type: UserTypes,
@@ -70,7 +70,7 @@ export async function updateUserType(
   }
 }
 
-// changes the address for the user_email to the new address
+// Changes the address for the user_email to the new address
 export async function updateUserAddress(
   user_email: string,
   address: UserAddress,
@@ -89,7 +89,7 @@ export async function updateUserAddress(
   }
 }
 
-// user with user_email applies to become a vendor account, application stored in database and will be approved/denied by an admin
+// User with user_email applies to become a vendor account, application stored in database and will be approved/denied by an admin later
 export async function applyToBecomeVendor(user_email: string): Promise<void> {
   try {
     axios.post("/postVendorRequestsByUserEmail", {
@@ -104,7 +104,7 @@ export async function applyToBecomeVendor(user_email: string): Promise<void> {
   }
 }
 
-// returns the list of all applications for users to become a vendor
+// Returns the list of all applications for users to become a vendor
 export async function getBecomeVendorRequests(): Promise<
   BecomeVendorRequest[]
 > {
@@ -125,7 +125,7 @@ export async function getBecomeVendorRequests(): Promise<
   }
 }
 
-// removes the application for the user with user_email to become a vendor
+// Removes the application for the user with user_email to become a vendor
 export async function removeVendorRequest(user_email: string): Promise<void> {
   try {
     axios.delete("/deleteVendorRequestByUserEmail", {

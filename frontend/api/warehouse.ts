@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { axios } from "./axios";
 import { Warehouse, WarehouseWithStock } from "./warehouse.types";
 
+// Returns all the warehouses
 export async function getAllWarehouses(): Promise<Warehouse[]> {
   try {
     let response = await axios.get<Warehouse[]>("/getAllWarehouseInfo");
@@ -18,7 +19,7 @@ export async function getAllWarehouses(): Promise<Warehouse[]> {
   }
 }
 
-// returns the warehouse for the given warehouse_id
+// Returns the warehouse for the given warehouse_id
 export async function getWarehouse(
   warehouse_id: number,
 ): Promise<Warehouse | null> {
@@ -39,7 +40,7 @@ export async function getWarehouse(
   }
 }
 
-// returns the list of warehouses that have the product with product_id and quantity specified
+// Returns the warehouses that have a specified product and in the specified quantity
 export async function getInStockWarehouses(
   product_id: number,
   quantity: number,

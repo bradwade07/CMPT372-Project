@@ -1,4 +1,4 @@
-// documentation for ScrollMenu at https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
+// Code adapted from: https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
 "use client";
 
 import React from "react";
@@ -22,8 +22,8 @@ type ItemScrollMenuProps = {
   queryFunctionKey: QueryFunctionKeys;
 };
 
-// using string queryfunctionkeys instead of passing the actual function to this component to keep the possibility of the parent
-// component being a server component, cannot pass functions from server component to client component
+// Specifying which query function to use by passing a string called queryFunctionKey instead of passing the actual function to this
+// component to keep the possibility of the parent component being a server component, cannot pass functions from server component to client component
 type QueryFunctionKeys = "getSaleProducts" | "getNewProducts";
 const queryFunctions: {
   [key: string]: () => Promise<Product[]>;
@@ -41,18 +41,43 @@ export function ItemScrollMenu({
     queryFn: queryFunctions[queryFunctionKey],
   });
 
+  // this hook used to prevent the entire page from being scrolled by the mouse wheel when activated
   const { disableScroll, enableScroll } = usePreventBodyScroll();
+
+  // function used to determine what happens when the user uses the mouse wheel while the mouse is within the scroll menu, must be used
+  // in conjunction with the usePreventBodyScroll hook to prevent the entire page from being scrolled when using the mouse wheel
+  function onWheel(
+    apiObj: scrollVisibilityApiType,
+    ev: React.WheelEvent,
+  ): void {
+    const isThouchpad = Math.abs(ev.deltaX) !== 0 || Math.abs(ev.deltaY) < 15;
+
+    if (isThouchpad) {
+      ev.stopPropagation();
+      return;
+    }
+
+    if (ev.deltaY < 0) {
+      apiObj.scrollNext();
+    } else if (ev.deltaY > 0) {
+      apiObj.scrollPrev();
+    }
+  }
 
   return (
     <>
       <div className="w-full">
         <h3 className="text-large font-bold uppercase">{header}</h3>
-        <div>
+        <div
+        // onMouseEnter={disableScroll}
+        // onMouseLeave={enableScroll}
+        >
           <ScrollMenu
             separatorClassName="mx-1"
             scrollContainerClassName="p-3"
             LeftArrow={LeftArrow}
             RightArrow={RightArrow}
+            // onWheel={onWheel}
           >
             {!(isLoading || error) && data
               ? data.map((item) => (
@@ -74,19 +99,4 @@ export function ItemScrollMenu({
       </div>
     </>
   );
-}
-
-function onWheel(apiObj: scrollVisibilityApiType, ev: React.WheelEvent): void {
-  const isThouchpad = Math.abs(ev.deltaX) !== 0 || Math.abs(ev.deltaY) < 15;
-
-  if (isThouchpad) {
-    ev.stopPropagation();
-    return;
-  }
-
-  if (ev.deltaY < 0) {
-    apiObj.scrollNext();
-  } else if (ev.deltaY > 0) {
-    apiObj.scrollPrev();
-  }
 }

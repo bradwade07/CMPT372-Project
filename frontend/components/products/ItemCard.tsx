@@ -9,6 +9,8 @@ type ItemCardProps = {
   product: Product;
 };
 
+// Displays basic information on an item such as its name, main picture, short description, price, etc.
+// card can be clicked to navigate to the product's page
 export function ItemCard({ isLoading, error, product }: ItemCardProps) {
   const router = useRouter();
 

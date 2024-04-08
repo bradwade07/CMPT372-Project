@@ -6,12 +6,14 @@ import { Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+// User presses this button to apply to become a vendor
 export function BecomeVendorButton() {
   const router = useRouter();
   const [pressState, setPressState] = useState<
     "unpressed" | "success" | "error"
   >("unpressed");
 
+  // Applies the current user to become av endor
   async function apply() {
     const user_email = await getSessionUserEmail();
 

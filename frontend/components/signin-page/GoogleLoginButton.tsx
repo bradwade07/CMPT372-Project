@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { UserTypes } from "@/api/user.types";
 
+// Displays a button that allows the user to log in using their google account
 export function GoogleLoginButton() {
   const router = useRouter();
 
@@ -18,6 +19,8 @@ export function GoogleLoginButton() {
         ).email;
         const user_type = await getUserType(user_email);
 
+        // If the user exists, logs them in
+        // If the user does not exist, creates a new customer account for them and logs them in
         if (user_type) {
           await login(credentialResponse, user_type);
         } else {

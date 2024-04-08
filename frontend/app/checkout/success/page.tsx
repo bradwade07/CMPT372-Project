@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+// This page is displayed when the user successfully checks out and pays for their order
 function page() {
   // TODO: implement
   return (

@@ -10,16 +10,19 @@ type VendorRequestCardProps = {
   refetch: () => void;
 };
 
+// Card containing information on a user's request to become a vendor, and approve/deny buttons
 export function VendorRequestCard({
   request,
   refetch,
 }: VendorRequestCardProps) {
+  // Changes the approved user's type to a vendor and deletes the request
   async function approveRequest() {
     await updateUserType(request.user_email, UserTypes.Vendor);
     await removeVendorRequest(request.user_email);
     refetch();
   }
 
+  // Deletes the request
   async function denyRequest() {
     await removeVendorRequest(request.user_email);
     refetch();

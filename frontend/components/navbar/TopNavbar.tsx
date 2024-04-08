@@ -14,6 +14,7 @@ type TopNavbarProps = {
   highlightLink?: Categories;
 };
 
+// Displays a navbar at the top of the screen that contains various navigational components and links
 export function TopNavbar({ highlightLink }: TopNavbarProps) {
   return (
     <Navbar isBordered shouldHideOnScroll maxWidth="full">

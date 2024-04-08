@@ -1,4 +1,7 @@
+// Code adapted from: https://github.com/asmyshlyaev177/react-horizontal-scrolling-menu?tab=readme-ov-file
 import React from "react";
+
+// These functions used to prevent the entire page from being scrolled by the mouse wheel when activated
 
 const preventDefault = (ev: Event) => {
   if (ev.preventDefault) {

@@ -7,6 +7,7 @@ type OrderTotalProps = {
   deliveryFormSubmitted: boolean;
 };
 
+// Displays a full breakdown of what the user is paying
 export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
   const deliveryPercentage = 0.1;

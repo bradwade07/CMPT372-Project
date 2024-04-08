@@ -1,6 +1,7 @@
 import { TopNavbar } from "@/components/navbar";
 import { ItemScrollMenu } from "@/components/products";
 
+// Home page, displays sale products, and new products
 function Home() {
   return (
     <>

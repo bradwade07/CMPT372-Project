@@ -17,6 +17,8 @@ type SearchParams = {
   product_id: number;
 };
 
+// This page displays all of the information on a certain product
+// From here, the user can add items to their cart or wishlist
 function page({ searchParams }: { searchParams: SearchParams }) {
   const router = useRouter();
   const [selectedQuantity, setSelectedQuantity] = useState(1);

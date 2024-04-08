@@ -7,6 +7,7 @@ type ShoppingCartItemProps = {
   onItemRemove: (product_id: number) => void;
 };
 
+// Displays a card containing information on one item in a user's shopping cart
 export function ShoppingCartItem({
   item,
   onItemRemove,

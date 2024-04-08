@@ -10,16 +10,14 @@ type WishlistItemProps = {
   onItemRemove: (product_id: number) => void;
 };
 
+// Displays a card containing information on one item in a user's shopping cart
+// user can click on an item to go to that item's page
 export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
   const router = useRouter();
 
+  // when the user clicks on an item, navigates to that item's page
   function handleItemClick(event: React.MouseEvent) {
     router.push(`/product?product_id=${item.product_id}`);
-  }
-
-  function handleItemRemove(event: React.MouseEvent) {
-    event.stopPropagation();
-    onItemRemove(item.product_id);
   }
 
   return (
@@ -53,7 +51,7 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
           <div>
             <p
               className="text-blue-600 text-sm cursor-pointer"
-              onClick={handleItemRemove}
+              onClick={() => onItemRemove(item.product_id)}
             >
               Remove
             </p>

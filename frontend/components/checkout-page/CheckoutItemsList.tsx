@@ -5,6 +5,7 @@ type CheckoutItemsListProps = {
   data: undefined | ShoppingCartEntry[];
 };
 
+// Displays all the items that the user is purchasing
 export function CheckoutItemsList({ data }: CheckoutItemsListProps) {
   return (
     <div className="mx-4">

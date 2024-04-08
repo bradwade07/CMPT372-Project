@@ -1,3 +1,4 @@
+// Code adapted from PayPal developer integration builder: https://developer.paypal.com/integration-builder/
 "use client";
 
 import React, { useState } from "react";
@@ -6,7 +7,6 @@ import assert from "assert";
 import { createOrder, onTransactionApprove } from "@/api/checkout";
 import { OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 import { useRouter } from "next/navigation";
-import { AcquisitionMethod } from "@/api/checkout.types";
 
 // Renders errors or successful transactions on the screen.
 function Message({ content }: { content: string }) {
@@ -18,6 +18,7 @@ assert(
   "env variable not set or made publically available: PAYPAL_CLIENT_ID",
 );
 
+// Displays the PayPal buttons that the user clicks on to pay through PayPal
 export function PayPal() {
   const router = useRouter();
 

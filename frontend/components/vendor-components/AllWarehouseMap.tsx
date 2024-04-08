@@ -12,6 +12,7 @@ const WarehouseMap = dynamic(
   },
 );
 
+// Displays a map containing the locations of all the available warehouses
 export default function AllWarehouseMap() {
   const { isLoading, error, data } = useQuery({
     queryKey: ["Warehouses"],

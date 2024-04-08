@@ -25,6 +25,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // user can't be logged in when they go to the sign in page
+  if (request.nextUrl.pathname.startsWith("/signin")) {
+    if (session) {
+      console.log("Cannot go to sign in page when already logged in");
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
   // user must be logged in to checkout and pay
   if (request.nextUrl.pathname.startsWith("/checkout")) {
     if (!session) {

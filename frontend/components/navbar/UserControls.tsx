@@ -25,14 +25,17 @@ export function UserControls() {
   const [userType, setUserType] = useState<UserTypes>(UserTypes.Customer);
   const [wishlistOpen, setWishlistOpen] = useState<boolean>(false);
 
+  // on page load, retrieves the user's google account info and user type
   useEffect(() => {
     retrieveSessionData();
   }, []);
 
+  // sets the wishlist to closed state
   function onWishlistClose() {
     setWishlistOpen(false);
   }
 
+  // retrieves the user's google account info and user type and sets the approriate states
   async function retrieveSessionData() {
     const userInfo = await getSessionUserData();
     const userType = await getSessionUserType();

@@ -1,6 +1,6 @@
 "use client";
 
-import { Warehouse, WarehouseWithStock } from "@/api/warehouse.types";
+import { WarehouseWithStock } from "@/api/warehouse.types";
 import React from "react";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
@@ -13,9 +13,10 @@ const WarehouseMap = dynamic(
 );
 
 type InStockWarehouseMap = {
-  data: Warehouse[] | WarehouseWithStock[] | undefined;
+  data: WarehouseWithStock[] | undefined;
 };
 
+// Displays a map that shows all the warehouses that have a certain product in stock
 export function InStockWarehouseMap({ data }: InStockWarehouseMap) {
   return (
     <div className="flex flex-col text-center gap-y-2 w-full h-full">

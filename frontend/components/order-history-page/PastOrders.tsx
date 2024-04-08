@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { ProductEntry } from "./ProductEntry";
 
+// Displays all of the user's order history, contains each of the items the user ordered grouped by separate orders
 export function PastOrders() {
   const { data } = useQuery({
     queryKey: ["Order History"],

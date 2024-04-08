@@ -10,6 +10,8 @@ type ItemsAndFiltersProps = {
   productName?: string;
 };
 
+// Displays both the filters that the user can set, and the grid of products that match those filters
+// Takes in a category, and/or a product name that is also used to further filter the products
 export function ItemsAndFilters({
   categoryName,
   productName,
@@ -19,6 +21,7 @@ export function ItemsAndFilters({
     product_name: productName,
   });
 
+  // Updates the curFilters state with all the given information
   const updateFilters = useCallback(
     (newFilters: FiltersType) => {
       if (newFilters.tags) {
@@ -37,6 +40,7 @@ export function ItemsAndFilters({
     [categoryName, productName],
   );
 
+  // Updates the current filters whenever any props change
   useEffect(() => {
     updateFilters({});
   }, [categoryName, productName, updateFilters]);

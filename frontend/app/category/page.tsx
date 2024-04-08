@@ -6,6 +6,8 @@ type SearchParams = {
   categoryName: string;
 };
 
+// This page lists all of the products that are in a certain category
+// User can further filter down the products displays by things like price, rating, other tags
 function page({ searchParams }: { searchParams: SearchParams }) {
   const categoryNameEnumVal = getCategoryEnumVal(searchParams.categoryName);
 

@@ -10,10 +10,10 @@ import { updateUserAddress } from "@/api/user";
 import { getSessionUserEmail } from "@/app/auth";
 import { useState } from "react";
 
-// displays 3 "sections"
-// 1) all the items' in the users cart which will be purchased
-// 2) a form asking if a user wanted delivery or pickup, and then displays relevant information
-// 3) the order total amount and paypal payment buttons
+// Displays 3 "sections"
+// 1) all the items in the users cart which will be purchased
+// 2) a form asking for the user's address to deliver their items to, and a map of warehouses to pick up their items at
+// 3) the order total amount and PayPal payment buttons
 export function CheckoutInfo() {
   const [deliveryFormSubmitted, setDeliveryFromSubmitted] = useState(false);
 

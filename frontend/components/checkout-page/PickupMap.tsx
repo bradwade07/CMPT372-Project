@@ -17,9 +17,11 @@ type PickupMapProps = {
   data: ShoppingCartEntry[] | undefined;
 };
 
+// Displays all of the locations the user chose to pick up items at
 export default function PickupMap({ data }: PickupMapProps) {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
+  // gets all of the unique warehouse locations for all the items being picked up
   useEffect(() => {
     let warehouseList: Warehouse[] = [];
 

@@ -1,6 +1,7 @@
 import { GoogleLoginButton } from "@/components/signin-page";
 import Link from "next/link";
 
+// Users can use this page to sign in to the application using their Google account
 function page() {
   return (
     <main className="flex flex-col text-center min-h-screen p-8">
