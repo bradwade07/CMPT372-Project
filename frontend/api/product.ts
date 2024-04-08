@@ -1,7 +1,7 @@
 import { Product, ProductFull, ProductListingCreation } from "./product.types";
 import { axios } from "./axios";
 import { isAxiosError } from "axios";
-import { FiltersType, filtersToQueryString } from "./filters.types";
+import { Categories, FiltersType, filtersToQueryString } from "./filters.types";
 import { getSessionUserEmail } from "@/app/auth";
 
 // given a product's id, returns all that product's info
@@ -10,8 +10,6 @@ export async function getProduct(
 ): Promise<ProductFull | null> {
   try {
     let response = await axios.get<ProductFull>(`/getProduct/${product_id}`);
-
-    console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -31,8 +29,6 @@ export async function getNewProducts(limit: number): Promise<Product[]> {
     let response = await axios.get<Product[]>(
       `/getNewestProductsByLimit/${limit}`,
     );
-
-    console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -106,26 +102,8 @@ export async function createProductListing(formData: ProductListingCreation) {
       ...rest
     } = formData;
 
-    // console.log({
-    //   ...rest,
-    //   user_email: user_email,
-    //   // for each of these attributes below, having a garbage value at the end ensures that there will be at least 2 elements in this array and
-    //   // forces this array to be posted as an array.
-    //   // when there's only 1 item in the array it gets posted as an object instead of a single element array
-    //   product_tags: [...product_tags, "placeholdertag"],
-    //   warehouse_ids: [...warehouse_ids, -1],
-    //   quantities: [...quantities, -1],
-    //   product_images: [
-    //     main_product_img_file,
-    //     ...additional_product_img_files,
-    //     new File([new Blob([], { type: "image/jpeg" })], "placeholder.jpg", {
-    //       type: "image/jpeg",
-    //     }),
-    //   ],
-    // });
-
     try {
-      await axios.post(
+      axios.post(
         `/createProductListing`,
         {
           ...rest,
@@ -163,5 +141,21 @@ export async function createProductListing(formData: ProductListingCreation) {
     }
   } else {
     console.error("Could not create product listing");
+  }
+}
+
+export async function getProductTags() {
+  try {
+    let response = await axios.get<string[]>("getAllProductTags");
+
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+
+    return [];
   }
 }

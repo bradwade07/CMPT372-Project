@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useQuery } from "@tanstack/react-query";
 import { getAllWarehouses } from "@/api/warehouse";
+import classNames from "classnames";
 
 type WarehousesInputProps = {
   handleInputChange(
@@ -14,11 +15,15 @@ type WarehousesInputProps = {
     >,
   ): void;
   onAmountDecrease(curAmount: number): void;
+  isInvalid?: boolean;
+  errorMessage?: React.ReactNode;
 };
 
 export function WarehousesInput({
   handleInputChange,
   onAmountDecrease,
+  isInvalid,
+  errorMessage,
 }: WarehousesInputProps) {
   const MAX_WAREHOUSES = 5;
 
@@ -29,12 +34,11 @@ export function WarehousesInput({
 
   const [numOfWarehouses, setNumOfWarehouses] = useState(1);
 
-  // TODO: error check that each warehouseid is unique
   const renderWarehouseQuantityInput = (): React.JSX.Element[] => {
     const elements = [];
     for (let i = 0; i < numOfWarehouses; i++) {
       elements.push(
-        <div className="flex flex-col w-1/2 mb-2" key={i}>
+        <div className="flex flex-col w-1/2 mb-3" key={i}>
           <Select
             className="mb-4"
             label={`Select Warehouse #${i + 1}`}
@@ -83,7 +87,12 @@ export function WarehousesInput({
   return (
     <>
       <div className="flex justify-between mb-2">
-        <label className="text-lg pb-[6px]">
+        <label
+          className={classNames(
+            "text-lg pb-[6px]",
+            isInvalid && "text-[#F31260]",
+          )}
+        >
           Warehouses (max. {MAX_WAREHOUSES})
         </label>
         <div className="flex text-center align-middle justify-center space-x-2">
@@ -111,7 +120,7 @@ export function WarehousesInput({
         </div>
       </div>
       {renderWarehouseQuantityInput()}
-      {/* TODO: implement warehouse map */}
+      {isInvalid && <p className="text-[#F31260] text-sm">{errorMessage}</p>}
     </>
   );
 }

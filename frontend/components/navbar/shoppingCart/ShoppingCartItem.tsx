@@ -38,6 +38,7 @@ export function ShoppingCartItem({
                 <p>${item.base_price}</p>
               )}
               <p>Quantity: {item.quantity}</p>
+              <p>Delivery Method: {item.delivery ? "Delivery" : "Pickup"}</p>
             </div>
           </div>
           <div>

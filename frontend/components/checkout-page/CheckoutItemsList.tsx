@@ -37,6 +37,12 @@ export function CheckoutItemsList({ data }: CheckoutItemsListProps) {
                       <p>${item.base_price}</p>
                     )}
                     <p>Quantity: {item.quantity}</p>
+                    <p>
+                      Delivery Method: {item.delivery ? "Delivery" : "Pickup"}
+                    </p>
+                    {!item.delivery && (
+                      <p>Pickup Warehouse ID: {item.warehouse_id}</p>
+                    )}
                   </div>
                 </div>
               </CardBody>

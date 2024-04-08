@@ -13,7 +13,7 @@ export async function createNewUser(
   user_type: UserTypes,
 ): Promise<void> {
   try {
-    await axios.post("/postUser", {
+    axios.post("/postUser", {
       user_email: user_email,
       user_type: user_type,
     });
@@ -41,7 +41,6 @@ export async function getUserType(
       return null;
     }
   } catch (error) {
-    console.log(error);
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
     } else {
@@ -58,7 +57,7 @@ export async function updateUserType(
   user_type: UserTypes,
 ): Promise<void> {
   try {
-    await axios.patch("/patchUserType", {
+    axios.patch("/patchUserType", {
       user_email: user_email,
       user_type: user_type,
     });
@@ -77,7 +76,7 @@ export async function updateUserAddress(
   address: UserAddress,
 ): Promise<void> {
   try {
-    await axios.patch("/patchUserAddress", {
+    axios.patch("/patchUserAddress", {
       user_email: user_email,
       ...address,
     });
@@ -93,10 +92,9 @@ export async function updateUserAddress(
 // user with user_email applies to become a vendor account, application stored in database and will be approved/denied by an admin
 export async function applyToBecomeVendor(user_email: string): Promise<void> {
   try {
-    await axios.post("/postVendorRequestsByUserEmail", {
+    axios.post("/postVendorRequestsByUserEmail", {
       user_email: user_email,
     });
-    console.log("test3");
   } catch (error) {
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
@@ -117,7 +115,6 @@ export async function getBecomeVendorRequests(): Promise<
 
     return response.data;
   } catch (error) {
-    console.log(error);
     if (isAxiosError(error)) {
       console.error(error.response?.data || error.response || error);
     } else {
@@ -131,7 +128,7 @@ export async function getBecomeVendorRequests(): Promise<
 // removes the application for the user with user_email to become a vendor
 export async function removeVendorRequest(user_email: string): Promise<void> {
   try {
-    await axios.delete("/deleteVendorRequestByUserEmail", {
+    axios.delete("/deleteVendorRequestByUserEmail", {
       data: {
         user_email: user_email,
       },

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { PriceFilter } from "./PriceFilter";
 import { RatingFilter } from "./RatingFilter";
 import { FiltersType } from "@/api/filters.types";
+import { TagsFilter } from "./TagsFilter";
 
 type FiltersProps = {
   onFiltersSave: (values: FiltersType) => void;
@@ -16,9 +17,10 @@ export function Filters({ onFiltersSave }: FiltersProps) {
 
   const [priceRange, setPriceRange] = useState(priceFilterRange);
   const [ratingRange, setRatingRange] = useState(ratingFilterRange);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
-    <Card className="w-80 h-fit">
+    <Card className="w-80 md:w-[26rem] h-fit">
       <CardBody className="flex flex-col align-middle text-center">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         <PriceFilter
@@ -31,6 +33,7 @@ export function Filters({ onFiltersSave }: FiltersProps) {
           max={ratingFilterRange.max}
           onChange={setRatingRange}
         />
+        <TagsFilter selectedTags={selectedTags} onChange={setSelectedTags} />
         <Button
           onPress={() => {
             const filterVals: FiltersType = {
@@ -50,6 +53,7 @@ export function Filters({ onFiltersSave }: FiltersProps) {
                 ratingRange.max != ratingFilterRange.max
                   ? ratingRange.max
                   : undefined,
+              tags: selectedTags.length > 0 ? selectedTags : undefined,
             };
             onFiltersSave(filterVals);
           }}

@@ -36,7 +36,7 @@ export function ShoppingCartModal() {
   return (
     <>
       <div onClick={onOpen} className="cursor-pointer pt-3">
-        <Badge color="danger" content={data?.length} shape="circle">
+        <Badge color="danger" content={data ? data.length : 0} shape="circle">
           <ShoppingCartIcon />
         </Badge>
       </div>

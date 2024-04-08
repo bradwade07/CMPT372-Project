@@ -7,13 +7,12 @@ import React, { useState } from "react";
 import { WarehousesInput } from "./WarehousesInput";
 import { AdditionalImgInput } from "./AdditionalImgInput";
 import TagsInput from "./TagsInput";
-import dynamic from "next/dynamic";
-const WarehouseMap = dynamic(() => import("./WarehouseMap"), {
-  loading: () => null,
-  ssr: false,
-});
+import { useRouter } from "next/navigation";
+import AllWarehouseMap from "./AllWarehouseMap";
 
 export function CreateListingForm() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<ProductListingCreation>({
     product_name: "",
     product_description: "",
@@ -27,15 +26,29 @@ export function CreateListingForm() {
   });
 
   // error checks, then submits the form
-  // TODO: error check base_price >= current_price
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // console.log(formData);
+    const localFormData = formData;
 
-    createProductListing(formData);
+    // if current price not specified, sets it to base price
+    if (localFormData.base_price >= 0 && localFormData.current_price == 0) {
+      localFormData.current_price = localFormData.base_price;
+    }
+
+    // error checks
+    if (
+      curPriceGeqBasePrice() &&
+      atLeastOneTagSelected() &&
+      allUniqueWarehouseIDs()
+    ) {
+      await createProductListing(localFormData);
+      router.push("/product-listings");
+    } else {
+      alert("Please check for errors in the form");
+    }
   };
 
-  // updates a specific attribute in the user's address whenever they change an input
+  // general input change update function that calls specific functions depending on input change type
   const handleInputChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -106,11 +119,34 @@ export function CreateListingForm() {
     }
   };
 
+  // *** error checking functions ***
+  // check if base price is less than current price
+  const curPriceGeqBasePrice = (): boolean => {
+    return Number(formData.base_price) >= Number(formData.current_price);
+  };
+
+  // check if at least one product tag has been selected
+  const atLeastOneTagSelected = (): boolean => {
+    return formData.product_tags.length > 0;
+  };
+
+  // check if all selected warehouses have unique IDs
+  const allUniqueWarehouseIDs = (): boolean => {
+    const set = new Set<number>();
+    for (const num of formData.warehouse_ids) {
+      if (set.has(num)) {
+        return false;
+      }
+      set.add(num);
+    }
+    return true;
+  };
+
   return (
     <form className="flex flex-col w-1/2" onSubmit={handleSubmit}>
       <Input
         className="mb-4"
-        label="Product Name"
+        label="Product Name (Max. 255 characters)"
         labelPlacement="outside"
         name="product_name"
         placeholder="Enter Product Name..."
@@ -120,7 +156,7 @@ export function CreateListingForm() {
       />
       <Textarea
         className="mb-4"
-        label="Product Description"
+        label="Product Description (Max. 255 characters)"
         labelPlacement="outside"
         name="product_description"
         placeholder="Enter Product Description..."
@@ -140,6 +176,11 @@ export function CreateListingForm() {
         min={0}
         isRequired
         onChange={handleInputChange}
+        isInvalid={!curPriceGeqBasePrice()}
+        errorMessage={
+          !curPriceGeqBasePrice() &&
+          "Base price cannot be less than current price"
+        }
       />
       <Input
         className="mb-4"
@@ -170,6 +211,10 @@ export function CreateListingForm() {
           handleInputChange={(value) => {
             setFormData({ ...formData, product_tags: value });
           }}
+          isInvalid={!atLeastOneTagSelected()}
+          errorMessage={
+            !atLeastOneTagSelected() && "At least one tag must be selected"
+          }
         />
       </div>
       <div className="flex flex-col mb-4 w-fit md:w-1/2 lg:w-5/12 xl:w-1/3">
@@ -207,7 +252,7 @@ export function CreateListingForm() {
       </div>
       <div className="flex flex-col mt-2 mb-4">
         <div className="h-96 mb-16">
-          <WarehouseMap />
+          <AllWarehouseMap />
         </div>
         <WarehousesInput
           handleInputChange={handleInputChange}
@@ -226,6 +271,10 @@ export function CreateListingForm() {
               quantities: newQuantitiesArray,
             });
           }}
+          isInvalid={!allUniqueWarehouseIDs()}
+          errorMessage={
+            !allUniqueWarehouseIDs() && "All warehouse IDs must be unique"
+          }
         />
       </div>
       <Button

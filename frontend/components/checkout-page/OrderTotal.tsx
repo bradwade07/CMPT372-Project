@@ -7,26 +7,40 @@ type OrderTotalProps = {
   deliveryFormSubmitted: boolean;
 };
 
-// TODO: properly display delivery fees for products being delivered
 export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   const taxPercentage = 0.11;
-  const shippingPercentage = 0.1;
+  const deliveryPercentage = 0.1;
 
-  const [totalSubprice, setTotalSubprice] = useState(-1);
-  const [totalPrice, setTotalPrice] = useState(-1);
+  const [pickupSubtotal, setPickupSubtotal] = useState(0);
+  const [deliverySubtotal, setDeliverySubtotal] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [totalPriceVisible, setTotalPriceVisible] = useState(false);
 
-  // whenever props change, calculates the subtotal price, total price, and displays total price is all props are defined
+  // whenever props change, calculates the subtotal of delivered items, subtotal of picked up items, taxes and fees, total price,
+  // then displays total price if the user has submitted their delivery information
   useEffect(() => {
     if (data) {
-      let subtotal = 0;
+      let pickupSubtotal = 0;
+      let deliverySubtotal = 0;
       for (let item of data) {
-        subtotal += item.quantity * item.current_price;
+        if (item.delivery) {
+          deliverySubtotal += item.quantity * item.current_price;
+        } else {
+          pickupSubtotal += item.quantity * item.current_price;
+        }
       }
-      setTotalSubprice(Number(subtotal.toFixed(2)));
+      setPickupSubtotal(pickupSubtotal);
+      setDeliverySubtotal(deliverySubtotal);
 
       if (deliveryFormSubmitted) {
-        setTotalPrice(Number((subtotal * (1 + taxPercentage)).toFixed(2)));
+        const tax = (pickupSubtotal + deliverySubtotal) * taxPercentage;
+        const deliveryFee = deliverySubtotal * deliveryPercentage;
+
+        setTotalPrice(
+          Number(
+            (pickupSubtotal + deliverySubtotal + tax + deliveryFee).toFixed(2),
+          ),
+        );
         setTotalPriceVisible(true);
       } else {
         setTotalPriceVisible(false);
@@ -36,7 +50,8 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
     }
   }, [data, deliveryFormSubmitted]);
 
-  function getSubtotalPrice(): React.JSX.Element {
+  // Displays the price for each item, then the total subprice before taxes and fees
+  function getItemizedPrice(): React.JSX.Element {
     return (
       <div>
         {data?.map((item) => (
@@ -47,19 +62,27 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
             <p>= ${(item.current_price * item.quantity).toFixed(2)}</p>
           </div>
         ))}
-        <p>Total before taxes: ${totalSubprice.toFixed(2)}</p>
+        <p>
+          Total before taxes and fees: $
+          {(pickupSubtotal + deliverySubtotal).toFixed(2)}
+        </p>
       </div>
     );
   }
 
+  // Displays the price of taxes and fees, and the total price
   function getTotalPrice(): React.JSX.Element {
     return (
       <div className="mt-4">
         <p>
           Tax (%{taxPercentage * 100}): $
-          {(totalSubprice * taxPercentage).toFixed(2)}
+          {((pickupSubtotal + deliverySubtotal) * taxPercentage).toFixed(2)}
         </p>
-        <p>Total after tax: ${totalPrice.toFixed(2)}</p>
+        <p>
+          Delivery fees (%{deliveryPercentage * 100} on delivered items&apos;
+          price): ${(deliverySubtotal * deliveryPercentage).toFixed(2)}
+        </p>
+        <p>Total after tax and fees: ${totalPrice.toFixed(2)}</p>
       </div>
     );
   }
@@ -67,7 +90,7 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
   return (
     <div>
       <h3 className="text-xl flex justify-center mb-2">Order Total:</h3>
-      {getSubtotalPrice()}
+      {getItemizedPrice()}
       {totalPriceVisible ? (
         <>
           {getTotalPrice()}

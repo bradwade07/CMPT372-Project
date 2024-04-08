@@ -4,15 +4,9 @@ const { Pool } = require("pg");
 
 //var pool;
 
-// pool = new Pool({
-//   TODO: connection string
-//   user: "postgres",
-//   host: "db",
-//   password: "root"
-// });
 pool = new Pool({
   //TODO: connection string
-  user: "ashrafulislam",
+  user: "postgres",
   host: "localhost",
  // password: "root",
   port: "5432",
@@ -48,6 +42,7 @@ const helpers = {
         product_date_added bigINT,
         user_email VARCHAR(255),
         product_avg_rating FLOAT,
+        active BOOLEAN,
         FOREIGN KEY (user_email) REFERENCES userInfo(user_email)
         );`);
     await pool.query(`
@@ -127,17 +122,6 @@ const helpers = {
         FOREIGN KEY (product_id) REFERENCES product(product_id)
         );`);
     await pool.query(`
-        CREATE TABLE IF NOT EXISTS review (
-        review_id SERIAL,
-        product_id INTEGER,
-        user_email VARCHAR(255),
-        comment VARCHAR(255),
-        rating FLOAT,
-        PRIMARY KEY (review_id),
-        FOREIGN KEY (user_email) REFERENCES userinfo(user_email),
-        FOREIGN KEY (product_id) REFERENCES product(product_id)
-        );`);
-    await pool.query(`
         CREATE TABLE IF NOT EXISTS vendorrequest (
         request_id SERIAL PRIMARY KEY,
         user_email VARCHAR(255),
@@ -145,7 +129,7 @@ const helpers = {
         );`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS orderinfo (
-        order_id SERIAL,
+        order_id VARCHAR(255),
         user_email VARCHAR(255),
         product_id INTEGER,
         quantity INTEGER,
@@ -174,6 +158,16 @@ const helpers = {
       ); //Cameron
     }
 
+    //Placeholder Warehouse
+    response = await pool.query(
+      `SELECT * FROM warehouse WHERE warehouse_id = $1;`,
+      [-1],
+    ); //placeholder warehouse_id
+    if (response.rows.length === 0) {
+      await pool.query(
+        `INSERT INTO warehouse (warehouse_id, lat, long) VALUES (-1, 0.0, 0.0);`,
+      );
+    }
     //Admins
     response = await pool.query(`SELECT * FROM userinfo;`);
     let response1 = await pool.query(`SELECT * FROM users;`);
@@ -199,6 +193,12 @@ const helpers = {
     try {
       await pool.query(`BEGIN`);
       //Tag Table
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Electronics');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Fashion');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Kitchen');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Home');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Garden');`);
+      await pool.query(`INSERT INTO tag (tag_name) VALUES ('Toys');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('New Arrival');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Best Seller');`);
       await pool.query(`INSERT INTO tag (tag_name) VALUES ('Eco-Friendly');`);
@@ -236,65 +236,65 @@ const helpers = {
 
       //warehouse Table
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (34.0522, -118.2437);`,
-      ); // Los Angeles
+        `INSERT INTO warehouse (lat, long) VALUES (43.6532, -79.3832);`,
+      ); // Toronto
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (40.7128, -74.0060);`,
-      ); // New York
+        `INSERT INTO warehouse (lat, long) VALUES (49.2827, -123.1207);`,
+      ); // Vancouver
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (37.7749, -122.4194);`,
-      ); // San Francisco
+        `INSERT INTO warehouse (lat, long) VALUES (45.5017, -73.5673);`,
+      ); // Montreal
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (51.5074, -0.1278);`,
-      ); // London
+        `INSERT INTO warehouse (lat, long) VALUES (51.0447, -114.0719);`,
+      ); // Calgary
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (35.6895, 139.6917);`,
-      ); // Tokyo
+        `INSERT INTO warehouse (lat, long) VALUES (45.4215, -75.6972);`,
+      ); // Ottawa
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (-33.8688, 151.2093);`,
-      ); // Sydney
+        `INSERT INTO warehouse (lat, long) VALUES (53.5461, -113.4938);`,
+      ); // Edmonton
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (48.8566, 2.3522);`,
-      ); // Paris
+        `INSERT INTO warehouse (lat, long) VALUES (49.8951, -97.1384);`,
+      ); // Winnipeg
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (52.5200, 13.4050);`,
-      ); // Berlin
+        `INSERT INTO warehouse (lat, long) VALUES (46.8139, -71.2080);`,
+      ); // Quebec City
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (55.7558, 37.6173);`,
-      ); // Moscow
+        `INSERT INTO warehouse (lat, long) VALUES (52.9399, -106.4509);`,
+      ); // Saskatoon
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (-23.5505, -46.6333);`,
-      ); // Sao Paulo
+        `INSERT INTO warehouse (lat, long) VALUES (50.4452, -104.6189);`,
+      ); // Regina
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (19.4326, -99.1332);`,
-      ); // Mexico City
+        `INSERT INTO warehouse (lat, long) VALUES (44.6488, -63.5752);`,
+      ); // Halifax
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (22.3193, 114.1694);`,
-      ); // Hong Kong
+        `INSERT INTO warehouse (lat, long) VALUES (47.5605, -52.7126);`,
+      ); // St. John's
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (39.9042, 116.4074);`,
-      ); // Beijing
+        `INSERT INTO warehouse (lat, long) VALUES (46.2330, -63.1311);`,
+      ); // Charlottetown
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (28.6139, 77.2090);`,
-      ); // New Delhi
+        `INSERT INTO warehouse (lat, long) VALUES (45.9636, -66.6431);`,
+      ); // Fredericton
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (-34.6037, -58.3816);`,
-      ); // Buenos Aires
+        `INSERT INTO warehouse (lat, long) VALUES (60.7212, -135.0568);`,
+      ); // Whitehorse
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (41.8781, -87.6298);`,
-      ); // Chicago
+        `INSERT INTO warehouse (lat, long) VALUES (62.4540, -114.3718);`,
+      ); // Yellowknife
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (34.6937, 135.5023);`,
-      ); // Osaka
+        `INSERT INTO warehouse (lat, long) VALUES (63.7467, -68.5170);`,
+      ); // Iqaluit
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (30.0444, 31.2357);`,
-      ); // Cairo
+        `INSERT INTO warehouse (lat, long) VALUES (53.1355, -57.6604);`,
+      ); // Labrador City
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (31.2304, 121.4737);`,
-      ); // Shanghai
+        `INSERT INTO warehouse (lat, long) VALUES (49.2673, -123.1456);`,
+      ); // Burnaby
       await pool.query(
-        `INSERT INTO warehouse (lat, long) VALUES (47.6062, -122.3321);`,
-      ); // Seattle
+        `INSERT INTO warehouse (lat, long) VALUES (43.8561, -79.3370);`,
+      ); // Markham
 
       await pool.query(`COMMIT`);
     } catch (error) {
@@ -319,7 +319,6 @@ const helpers = {
       await pool.query(`DROP TABLE IF EXISTS userinfo CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS address CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS image CASCADE;`);
-      await pool.query(`DROP TABLE IF EXISTS review CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS vendorrequest CASCADE;`);
       await pool.query(`DROP TABLE IF EXISTS orderinfo CASCADE;`);
       await pool.query(`COMMIT`);
@@ -334,7 +333,7 @@ const helpers = {
     try {
       let productResponse = await pool.query(
         `
-        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_main_img, p.product_description, p.product_date_added, p.user_email, p.product_avg_rating, p.active, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
         WHERE p.product_id = $1;
@@ -356,6 +355,7 @@ const helpers = {
           current_price: product.current_price,
           tags: [],
           additional_img: [],
+          active: product.active
         };
         let tagsResponse = await pool.query(
           `
@@ -581,10 +581,10 @@ const helpers = {
   getProductsOnSaleByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
-        WHERE pp.current_price < pp.base_price
+        WHERE pp.current_price < pp.base_price AND p.active = true
         ORDER BY pp.current_price DESC
       `;
       if (limit >= 0) {
@@ -609,9 +609,10 @@ const helpers = {
   getNewestProductsByLimit: async function (limit) {
     try {
       let query = `
-        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, pp.base_price, pp.current_price
+        SELECT p.product_id, p.product_name, p.product_description, p.product_main_img, p.product_date_added, p.product_avg_rating, pp.base_price, pp.current_price
         FROM product p
         JOIN productprice pp ON p.product_id = pp.product_id
+        WHERE p.active = true
         ORDER BY p.product_date_added DESC
       `;
       if (limit >= 0) {
@@ -746,10 +747,26 @@ const helpers = {
 
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
-      await pool.query(
-        `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-        [user_email, product_id, quantity],
+      const response = await pool.query(
+        `
+      SELECT *
+      FROM userwishlist
+      WHERE user_email = $1 AND product_id = $2;`,
+        [user_email, product_id],
       );
+      if (response.rows.length > 0) {
+        await pool.query(
+          `UPDATE userwishlist 
+            SET quantity = $1
+            WHERE user_email = $2 AND product_id = $3;`,
+          [response.rows[0].quantity + quantity, user_email, product_id],
+        );
+      } else {
+        await pool.query(
+          `INSERT INTO userwishlist (user_email, product_id, quantity) VALUES($1, $2, $3);`,
+          [user_email, product_id, quantity],
+        );
+      }
     } catch (error) {
       console.error("Error adding item to wish list:", error);
     }
@@ -777,8 +794,8 @@ const helpers = {
         result.rows.forEach((row) => {
           row.product_main_img = row.product_main_img.toString("base64");
         });
-        return result.rows;
-      } else return { message: "No products found in the user's wishlist" };
+      }
+      return result.rows;
     } catch (error) {
       console.error("Error retrieving wish list products by email:", error);
     }
@@ -795,7 +812,13 @@ const helpers = {
     }
   },
 
-  postProductToUserCart: async function (user_email, product_id, quantity) {
+  postProductToUserCart: async function (
+    user_email,
+    product_id,
+    quantity,
+    delivery,
+    warehouse_id,
+  ) {
     try {
       await pool.query(`BEGIN`);
       const response = await pool.query(
@@ -804,14 +827,13 @@ const helpers = {
       );
       if (response.rows.length === 0) {
         await pool.query(
-          `INSERT INTO usercart (user_email, product_id, quantity) VALUES($1, $2, $3);`,
-          [user_email, product_id, quantity],
+          `INSERT INTO usercart (user_email, product_id, quantity, delivery, warehouse_id) VALUES($1, $2, $3, $4, $5);`,
+          [user_email, product_id, quantity, delivery, warehouse_id],
         );
       } else {
         await pool.query(
           `UPDATE usercart SET quantity = $1 WHERE user_email = $2 AND product_id = $3;`,
           [response.rows[0].quantity + quantity, user_email, product_id],
-          [user_email, product_id, quantity],
         );
       }
       await pool.query(`COMMIT`);
@@ -830,7 +852,9 @@ const helpers = {
             product.product_main_img,
             productprice.base_price, 
             productprice.current_price, 
-            usercart.quantity
+            usercart.quantity,
+            usercart.delivery,
+            usercart.warehouse_id
         FROM product
         JOIN usercart ON product.product_id = usercart.product_id
         JOIN productprice ON product.product_id = productprice.product_id
@@ -842,8 +866,8 @@ const helpers = {
         result.rows.forEach((row) => {
           row.product_main_img = row.product_main_img.toString("base64");
         });
-        return result.rows;
-      } else return { message: "No products found in the user's wishlist" };
+      }
+      return result.rows;
     } catch (error) {
       console.error("Error retrieving user cart by email:", error);
     }
@@ -901,15 +925,16 @@ const helpers = {
       const product_date_added = Math.floor(new Date().getTime() / 1000);
       await pool.query(`BEGIN`);
       let response = await pool.query(
-        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating)
-            VALUES ($1, $2, $3, $4, $5, $6) returning product_id;`,
+        `INSERT INTO product (product_name, product_main_img, product_description, product_date_added, user_email, product_avg_rating, active)
+            VALUES ($1, $2, $3, $4, $5, $6, $7) returning product_id;`,
         [
           product_name,
           product_images[0],
           product_description,
           new Date().getTime(),
           user_email,
-          0.0,
+          parseFloat((Math.random() * 5).toFixed(1)),
+          true
         ],
       );
       const product_id = response.rows[0].product_id;
@@ -983,5 +1008,140 @@ const helpers = {
       throw error;
     }
   },
+  handleResponse: async function (response) {
+    try {
+      const jsonResponse = await response.json();
+      return { jsonResponse, httpStatusCode: response.status };
+    } catch (err) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
+    }
+  },
+  postReviewsByUserEmail: async function (product_id, user_email, comment) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+            FROM product
+            WHERE user_email = $1;`,
+        [user_email],
+      );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO review(product_id, user_email, comment, rating)
+                VALUES ($1, $2, $3);`,
+          [product_id, user_email, comment],
+        );
+      }
+    } catch (error) {
+      console.error("Error creating review:", error);
+    }
+  },
+  postVendorRequestsByUserEmail: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `SELECT *
+            FROM vendorrequest
+            WHERE user_email = $1;`,
+        [user_email],
+      );
+      if (response.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO vendorrequest(user_email)
+                VALUES ($1);`,
+          [user_email],
+        );
+      }
+    } catch (error) {
+      console.error("Error creating vendor request:", error);
+    }
+  },
+  getAllVendorRequests: async function () {
+    try {
+      const response = await pool.query(`SELECT *
+            FROM vendorrequest;`);
+      return response.rows;
+    } catch (error) {
+      console.error("Error creating vendor request:", error);
+    }
+  },
+  deleteVendorRequestByUserEmail: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `DELETE FROM vendorrequest
+      WHERE user_email = $1;`,
+        [user_email],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error deleting vendor request:", error);
+    }
+  },
+  getInStockWarehouses: async function (product_id, quantity) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM WarehouseStock
+      WHERE product_id = $1 AND quantity = $2;`,
+        [product_id, quantity],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting warehouse stock:", error);
+    }
+  },
+  getWarehouseInfo: async function (warehouse_id) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM warehouse
+      WHERE warehouse_id = $1;`,
+        [warehouse_id],
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting warehouse info:", error);
+    }
+  },
+  getAllWarehouseInfo: async function () {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM warehouse;`,
+      );
+      return response.rows;
+    } catch (error) {
+      console.error("Error getting all warehouse info:", error);
+    }
+  },
+  getOrderTotal: async function (user_email) {
+    try {
+      const response = await pool.query(
+        `SELECT * 
+      FROM usercart
+      WHERE user_email = $1;`,
+        [user_email],
+      );
+      let total = 0;
+      for (let i = 0; i < response.rows.length; i++) {
+        let { product_id, quantity, delivery } = response.rows[i];
+        let current_price = await pool.query(
+          `SELECT current_price
+        FROM productprice
+        WHERE product_id = $1`,
+          [product_id],
+        );
+        current_price = current_price.rows[0].current_price;
+        if (delivery === 1) {
+          delivery = 1.1; // 10% delivery
+        } else {
+          delivery = 1;
+        }
+        let subTotal = current_price * quantity * delivery * 1.11; //1.11 for taxes
+        total += subTotal;
+      }
+      return total;
+    } catch (error) {
+      console.error("Error getting all warehouse info:", error);
+    }
+  },
 };
-module.exports = { helpers };

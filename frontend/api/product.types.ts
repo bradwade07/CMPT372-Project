@@ -6,12 +6,12 @@ export type Product = {
   current_price: number;
   product_date_added: number;
   product_main_img: string;
+  product_avg_rating: number;
 };
 
 export type ProductFull = {
-  tags: [];
-  additional_img: [];
-  // TODO: reviews?
+  tags: string[];
+  additional_img: string[];
 } & Product;
 
 export type ShoppingCartEntry = {

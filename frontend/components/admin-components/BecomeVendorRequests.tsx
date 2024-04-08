@@ -9,7 +9,7 @@ import { VendorRequestCard } from "./BecomeVendorRequestCard";
 const itemsPerPage = 10;
 
 export function VendorRequests() {
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["Vendor Requests"],
     queryFn: getBecomeVendorRequests,
   });
@@ -33,7 +33,7 @@ export function VendorRequests() {
         {data &&
           data.slice(startIndex, endIndex).map((item, index) => (
             <div key={index} className="w-full mb-2">
-              <VendorRequestCard request={item} />
+              <VendorRequestCard request={item} refetch={refetch} />
             </div>
           ))}
       </div>
