@@ -11,8 +11,15 @@ import { useQuery } from "@tanstack/react-query";
 export function SigninButton() {
   const { isLoading, data: session } = useQuery({
     queryKey: ["session"],
-    queryFn: getSession,
+    queryFn: checkForSession,
   });
+
+  // returns the session if the user is logged in
+  // this function is needed to not cause an error with server actions
+  async function checkForSession() {
+    const session = await getSession();
+    return session;
+  }
 
   return (
     <>

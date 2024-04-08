@@ -231,7 +231,7 @@ export function CreateListingForm() {
           id="main_product_img_file"
           name="main_product_img_file"
           type="file"
-          accept="image/jpeg"
+          accept="image/jpeg, image/png"
           required
           onChange={handleInputChange}
         />

@@ -43,7 +43,7 @@ export function AdditionalImgInput({
             id={`additional_img_${i + 1}`}
             name={`additional_img_${i + 1}`}
             type="file"
-            accept="image/jpeg"
+            accept="image/jpeg, image/png"
             required
             onChange={handleInputChange}
           />
