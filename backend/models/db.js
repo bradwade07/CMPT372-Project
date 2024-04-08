@@ -302,7 +302,9 @@ const helpers = {
       console.error("Failed to insert test data", error);
     }
   },
-
+//This function asynchronously drops all tables from the database, ensuring that all data and schema definitions are removed
+//Parameters: None
+//Returns: None
   deleteAllTables: async function () {
     try {
       await pool.query(`BEGIN`);
@@ -328,6 +330,9 @@ const helpers = {
       console.error("Error deleting tables:", error);
     }
   },
+  // Retrieves detailed information about a product by its product ID.
+  //Parameters:id (Integer)
+  //Returns: An object containing the product's details or an empty object if the product cannot be found.
 
   getProductInfoByPid: async function (id) {
     try {
@@ -388,6 +393,9 @@ const helpers = {
       console.error("Error retrieving product information:", error);
     }
   },
+  //Retrieves the IDs of products matching a specific name.
+  //Parameters:product_name (String)
+  //Returns: An array of objects, each containing the product_id of a product that matches the specified name.
 
   getProductIdByName: async function (product_name) {
     try {
@@ -405,7 +413,9 @@ const helpers = {
       console.error("Error in getProductIdByName:", error);
     }
   },
-
+//Fetches the IDs of products within a specified rating range.
+//Parameters:product_rating_min (Float),   product_rating_max (Float)
+//Returns: An array of objects, each containing the product_id of a product whose average rating falls within the specified range.
   getProductIdByRating: async function (
     product_rating_min,
     product_rating_max,
@@ -424,7 +434,9 @@ const helpers = {
       console.error("Error in getProductIdByRating:", error);
     }
   },
-
+//Retrieves the IDs of products whose price falls within a specified range.
+//Parameters: product_price_min (Float) ,   product_price_max (Float):
+//Returns: An array of objects, each containing the product_id of a product whose current price is within the specified range.
   getProductIdByPrice: async function (product_price_min, product_price_max) {
     try {
       const response = await pool.query(
@@ -440,7 +452,9 @@ const helpers = {
       console.error("Error in getProductIdByPrice:", error);
     }
   },
-
+  // Fetches the IDs of products added to the catalog within a specified date range.
+  //Parameters: product_date_added_after (BigInt),    product_date_added_before (BigInt)
+  //Returns: An array of objects, each containing the product_id of a product that was added to the catalog within the specified date range.
   getProductIdByDateAdded: async function (
     product_date_added_after,
     product_date_added_before,
@@ -459,6 +473,9 @@ const helpers = {
       console.error("Error in getProductIdByDateAdded:", error);
     }
   },
+  //Retrieves product IDs associated with a specific user's email.
+  //Parameters: user_email (String)
+  //Returns: An array of product IDs associated with the given user's email.
 
   getProductIdByUserEmail: async function (user_email) {
     try {
@@ -476,7 +493,9 @@ const helpers = {
       console.error("Error in getProductIdByUserEmail:", error);
     }
   },
-
+//Fetches product IDs that match a list of tags.
+//Parameters: tags (Array<String>)
+//Returns: An array of product objects that match the specified tags. Each object includes product details. If no matching products are found, returns an empty array.
   getProductIdByTags: async function (tags) {
     try {
       const tagResponse = await pool.query(
@@ -510,6 +529,9 @@ const helpers = {
       throw error;
     }
   },
+  //Fetches the user type for a specified email.
+  //Parameters: email (String)
+  //Returns: An array containing the user's type ID and type name. If no type is found, the array will be empty.
   getUserTypeByUserEmail: async function (email) {
     try {
       await pool.query(`BEGIN`);
@@ -527,7 +549,10 @@ const helpers = {
       throw error;
     }
   },
-
+// Retrieves the cart details for a given user's email.
+//Parameters:email (String)
+//Returns: An array of objects, each representing an item in the user's cart. 
+//Each object includes product ID, name, description, image source, base price, current price, and quantity. If the user's cart is empty, returns a message indicating no products found.
   getUserCartByUserEmail: async function (email) {
     try {
         
@@ -557,6 +582,9 @@ const helpers = {
       throw error;
     }
   },
+  //Retrieves the wishlist items for the specified user email.
+  //Parameters:email (String)
+  //Returns: A list of all products in the user's wishlist. If the wishlist is empty, a message indicating "No products found in the user's wishlist" is returned.
 
   getUserWishlistByUserEmail: async function (email) {
     try {
@@ -577,7 +605,9 @@ const helpers = {
       throw error;
     }
   },
-
+//Fetches products currently on sale, up to a specified limit. If the limit is set to a non-positive number, it returns all products on sale.
+//Parameters:limit (Integer)
+//Returns: An array of products on sale, each including product ID, name, description, main image, date added, average rating, base price, and current price. Products are ordered by descending current price.
   getProductsOnSaleByLimit: async function (limit) {
     try {
       let query = `
@@ -605,7 +635,10 @@ const helpers = {
       console.error("Error retrieving products on sale:", error);
     }
   },
-
+//Retrieves the most recently added products, subject to a specified limit. If no limit is provided or if the limit is negative, all products considered active are returned.
+//Parameters:limit (Integer)
+//Returns: An array of the newest products, each including details such as product ID, name, description, main image , date added, average rating,
+// base price, and current price. Products are ordered by their addition date, with the most recent first.
   getNewestProductsByLimit: async function (limit) {
     try {
       let query = `
@@ -633,6 +666,9 @@ const helpers = {
       console.error("Error retrieving newest products:", error);
     }
   },
+  //Fetches all unique product tags from the database.
+  //Parameters: none
+  //Returns: An array of all product tags as strings.
   getAllProductTags: async function() {
     try {
       const result = await pool.query('SELECT tag_name FROM tag;');
@@ -642,7 +678,9 @@ const helpers = {
       throw error;
     }
   },
-
+//Registers a new user along with their address into the database
+//Parameters:street_name, city, province, post_code, country, user_email (Strings),   type_id, addressGiven (Integer)
+//Returns: Nothing
   postUser: async function (
     street_name,
     city,
@@ -676,7 +714,9 @@ const helpers = {
       console.error("Error adding user:", error);
     }
   },
-
+//Inserts a new address into the database and returns its generated unique ID.
+//Parameters:street_name, city, province, post_code, country (Strings)
+//Returns: The unique address_id generated by the database for the newly inserted address.
   postAddress: async function (
     street_name,
     city,
@@ -694,7 +734,9 @@ const helpers = {
       console.error("Error adding address:", error);
     }
   },
-
+//Fetches the user type (e.g., vendor or customer) based on the user's email address.
+//Parameters: user_email (String).
+//Returns: A string representing the user type ("vendor" or "customer").
   getUserTypeByUserEmail: async function (email) {
     try {
       await pool.query(`BEGIN`);
@@ -711,7 +753,9 @@ const helpers = {
       console.error("Error retrieving user by email:", error);
     }
   },
-
+//Updates the user type for a specific user identified by their email
+//Parameters: user_email (String), user_type (String - "vendor" or "customer")
+//Returns: None.
   patchUserType: async function (user_email, type) {
     try {
       await pool.query(`UPDATE users SET type_id = $1 WHERE user_email = $2`, [
@@ -722,7 +766,9 @@ const helpers = {
       console.error("Error updating user type:", error);
     }
   },
-
+//Updates the address information for a specific user. If the user's address is not already in the database, it adds a new address and then updates the user's address ID to link to the newly added address.
+//Parameters: user_email, street_name, city, province, postal code, and country are Strings.
+//Return: None
   patchUserAddress: async function (
     user_email,
     street_name,
@@ -744,7 +790,9 @@ const helpers = {
       console.error("Error updating user address:", error);
     }
   },
-
+//Fetches the wishlist items for a specified user, including product details and prices.
+//Parameters:email (String)
+//Returns: A list of wishlist items, including product details and current prices, or an error message if the operation fails.
   postProductToUserWishlist: async function (user_email, product_id, quantity) {
     try {
       const response = await pool.query(
@@ -771,7 +819,9 @@ const helpers = {
       console.error("Error adding item to wish list:", error);
     }
   },
-
+//Adds a product to a user's wishlist. If the product is already in the wishlist, it updates the quantity instead of adding a new entry.
+//Parameters:user_email, product_id (string), quantity(integer)
+//Return:None
   getUserWishlistByUserEmail: async function (email) {
     try {
       const query = `
@@ -800,7 +850,9 @@ const helpers = {
       console.error("Error retrieving wish list products by email:", error);
     }
   },
-
+//Removes a specific product from a user's wishlist.
+//Parameters:user_email (String), product_id (Integer)
+//Returns: none
   deleteUserWishlistByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
@@ -811,7 +863,8 @@ const helpers = {
       console.error("Error removing item from wish list:", error);
     }
   },
-
+//Adds a specified quantity of a product to a user's cart. If the product is already present, it updates the quantity.
+//parameter: user_email(string), quantity, product_id,, warehouse_id (integer), delivery(boolean)
   postProductToUserCart: async function (
     user_email,
     product_id,
@@ -841,7 +894,9 @@ const helpers = {
       console.error("Error adding item to cart:", error);
     }
   },
-
+//Retrieves the contents of a user's shopping cart, including product details, prices, and quantities.
+//Parameters:email (String)
+//Returns: A list of cart items, including product details, prices, and quantities
   getUserCartByUserEmail: async function (email) {
     try {
       const query = `
@@ -872,7 +927,9 @@ const helpers = {
       console.error("Error retrieving user cart by email:", error);
     }
   },
-
+//Deletes a specific product from a user's cart.
+//Parameters:user_email (String),product_id (Integer)
+//Returns: none
   deleteUserCartByPidUserEmail: async function (user_email, product_id) {
     try {
       await pool.query(
@@ -883,6 +940,12 @@ const helpers = {
       console.error("Error removing item from cart:", error);
     }
   },
+//Updates the stock quantity of a specific product in a warehouse.
+//Parameters:warehouse_id (Integer),product_id (Integer),quantity (Integer)
+//Returns:
+//1 if the operation is successful.
+//-1 if the current quantity is less than the requested quantity.
+//0 if the product is not found in the warehouse.
 
   patchWarehouseStock: async function (warehouse_id, product_id, quantity) {
     try {
@@ -910,6 +973,9 @@ const helpers = {
       console.error("Error adjusting warehouse stock:", error);
     }
   },
+  // Creates a new product listing, including product details, price, associated warehouse stock, images, and tags.
+  //Parameters:product_name (String),product_description (String),base_price (Float),current_price (Float), user_email (String),warehouse_ids (Array of Integers),quantities (Array of Integers),product_images (Array of BYTEA),product_tags (Array of Strings)
+  //Returns:None
   createProductListing: async function (
     product_name,
     product_description,
@@ -996,6 +1062,9 @@ const helpers = {
       console.error("Error creating product listing:", error);
     }
   },
+  //Clears all items from a user's cart.
+  //Parameters:user_email (String)
+  //Returns:None
   clearUserCart: async function (user_email) {
     try {
       await pool.query(
@@ -1008,6 +1077,9 @@ const helpers = {
       throw error;
     }
   },
+  //Processes a response from an HTTP request.
+  //Parameters:response (Response Object)
+  //Returns: An object containing the JSON response and the HTTP status code.
   handleResponse: async function (response) {
     try {
       const jsonResponse = await response.json();
@@ -1017,6 +1089,9 @@ const helpers = {
       throw new Error(errorMessage);
     }
   },
+  //Posts a review for a product by a specific user.
+  //Parameters:product_id (Integer),user_email (String),comment (String)
+  //Returns: None
   postReviewsByUserEmail: async function (product_id, user_email, comment) {
     try {
       const response = await pool.query(
@@ -1036,6 +1111,9 @@ const helpers = {
       console.error("Error creating review:", error);
     }
   },
+  //Submits a request to become a vendor for a specific user.
+  //Parameters:user_email (String)
+  //Returns:None
   postVendorRequestsByUserEmail: async function (user_email) {
     try {
       const response = await pool.query(
@@ -1055,6 +1133,8 @@ const helpers = {
       console.error("Error creating vendor request:", error);
     }
   },
+  //Retrieves all vendor requests.
+//Returns: An array of all vendor requests in the database.
   getAllVendorRequests: async function () {
     try {
       const response = await pool.query(`SELECT *
@@ -1064,6 +1144,9 @@ const helpers = {
       console.error("Error creating vendor request:", error);
     }
   },
+  //Deletes a vendor request for a specific user based on their email.
+  //Parameters:user_email (String)
+  //Returns:None
   deleteVendorRequestByUserEmail: async function (user_email) {
     try {
       const response = await pool.query(
@@ -1076,6 +1159,9 @@ const helpers = {
       console.error("Error deleting vendor request:", error);
     }
   },
+  //Retrieves warehouses that have a specified quantity of a particular product in stock.
+  //Parameters:product_id (Integer),quantity (Integer)
+  //Returns: A list of warehouses meeting the criteria or logs an error if the operation fails.
   getInStockWarehouses: async function (product_id, quantity) {
     try {
       const response = await pool.query(
@@ -1089,6 +1175,9 @@ const helpers = {
       console.error("Error getting warehouse stock:", error);
     }
   },
+  //Fetches detailed information for a specific warehouse by its ID.
+  //Parameters:warehouse_id (Integer)
+  //Returns: Detailed information for the specified warehouse 
   getWarehouseInfo: async function (warehouse_id) {
     try {
       const response = await pool.query(
@@ -1102,6 +1191,9 @@ const helpers = {
       console.error("Error getting warehouse info:", error);
     }
   },
+  // Retrieves information for all warehouses in the database.
+  //Parameters: None.
+  //Returns: A list containing information for all warehouses 
   getAllWarehouseInfo: async function () {
     try {
       const response = await pool.query(
@@ -1113,6 +1205,9 @@ const helpers = {
       console.error("Error getting all warehouse info:", error);
     }
   },
+  //Calculates the total cost of all items in a user's cart, including delivery fees (if applicable) and taxes.
+  //Parameters:user_email (String)
+  //Returns: The total cost of the user's cart . This total includes product costs, delivery fees and taxes.
   getOrderTotal: async function (user_email) {
     try {
       const response = await pool.query(

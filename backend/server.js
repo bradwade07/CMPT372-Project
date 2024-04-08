@@ -60,7 +60,10 @@ app.get("/getProduct/:product_id", async (req, res) => {
     return res.status(500).send({ error: "Server failed to get product!" });
   }
 });
-
+//Method: GET
+// Fetches products based on various filters such as name, rating, price, date added, tags, and the user's email. It supports a wide range of query parameters to allow fine-grained search capabilities.
+//Query Parameters:product_name ,product_avg_rating_min ,product_avg_rating_max ,current_price_min ,current_price_max ,product_date_added_before ,product_date_added_after, tags ,user_email 
+//Response: A JSON array of products that match the filters. 
 app.get("/getProductsByFilters", async (req, res) => {
   const product_name = req.query.product_name
     ? req.query.product_name.trim()
@@ -162,6 +165,12 @@ app.get("/getProductsByFilters", async (req, res) => {
   }
 });
 
+
+
+//Method: GET
+//Retrieves a list of products that are currently on sale, up to a specified limit. If the limit is -1, it fetches all products on sale without any limit.
+// Parameters:limit (required)
+//Response: A JSON array of products on sale. 
 app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
   const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
@@ -176,7 +185,10 @@ app.get("/getProductsOnSaleByLimit/:limit", async (req, res) => {
     return res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-
+//Method: GET
+// Fetches the newest products added to the inventory up to a specified limit. Setting the limit to -1 retrieves all the newest products without any limit.
+// Parameters:limit (required)
+//Response: A JSON array containing the newest products.
 app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
   const limit = req.params.limit ? parseInt(req.params.limit) : -1; //-1 is unlimited
   try {
@@ -191,8 +203,14 @@ app.get("/getNewestProductsByLimit/:limit", async (req, res) => {
     return res.status(500).send({ error: "Server failed to get products!" });
   }
 });
-
-// User info related endpoints
+//Method: POST
+//Adds a new user along with their address details into the database.
+//Body Parameters:street_name,city,province,post_code,country,user_email,user_typ
+//Response:
+//Success: Status 201 with a success message indicating that the user was added successfully.
+//Error:
+//Status 400 for invalid inputs such as missing user_email or invalid user_type.
+//Status 500 for any server errors encountered while adding the user.
 app.post("/postUser", async (req, res) => {
   let {
     street_name,
@@ -243,6 +261,12 @@ app.post("/postUser", async (req, res) => {
     return res.status(500).json({ error: "Server failed to add user!" });
   }
 });
+//Method: GET
+// Retrieves all the product tags from the database.
+//parameter: none
+//Response:
+//Success: Status 200 with an array of tag names.
+//Error: Status 500 with an error message indicating failure to fetch product tags.
 app.get("/getAllProductTags", async (req, res) => {
     try {
       const tags = await helpers.getAllProductTags(); 
@@ -252,6 +276,7 @@ app.get("/getAllProductTags", async (req, res) => {
       res.status(500).send({ error: "Failed to fetch product tags" });
     }
   });
+
 app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
   if (!req.params.user_email.trim())
     return res.status(400).send({ error: "Invalid user email!" });
@@ -595,7 +620,11 @@ const captureOrder = async (orderID) => {
 
   return helpers.handleResponse(response);
 };
-
+//Method: POST
+//Creates a new order with specified details.
+//Parameters:user_email (Body parameter),acquisitionMethod (Body parameter).
+//Returns:Order details and status code if the creation is successful.
+//Error message if the operation fails.
 app.post("/api/orders", async (req, res) => {
   try {
     const { user_email, acquisitionMethod } = req.body;
@@ -609,7 +638,11 @@ app.post("/api/orders", async (req, res) => {
     res.status(500).json({ error: "Failed to create order." });
   }
 });
-
+//Method: POST
+//Captures payment and finalizes the order specified by the order ID.
+//Parameters:orderID (URL parameter),user_email (Body parameter)
+//Returns:Confirmation of the captured order and status code if the operation is successful.
+//Error message if the operation fails.
 app.post("/api/orders/:orderID/capture", async (req, res) => {
   try {
     const { orderID } = req.params;
@@ -625,7 +658,14 @@ app.post("/api/orders/:orderID/capture", async (req, res) => {
     res.status(500).json({ error: "Failed to capture order." });
   }
 });
-
+//Method: POST
+//Creates a new product listing with the given details.
+//Parameters:product_name, product_description, base_price, current_price (Body parameters)
+//user_email (Body parameter)
+//product_images[], warehouse_ids[], quantities[], product_tags[] (Body parameters)
+//Returns:
+//Success message if the product is created successfully.
+//Error message if the operation fails.
 app.post("/createProductListing", async (req, res) => {
   try {
     const {
@@ -673,7 +713,12 @@ app.post("/createProductListing", async (req, res) => {
     res.status(500).json({ error: "Failed to create product." });
   }
 });
-
+//Method:POST
+//Submits a request for a user to become a vendor.
+//Parameters:user_email (Body parameter)
+//Returns:
+//Success message if the vendor request is posted successfully.
+//Error message if the operation fails.
 app.post("/postVendorRequestsByUserEmail", async (req, res) => {
   try {
     const { user_email } = req.body;
@@ -685,7 +730,11 @@ app.post("/postVendorRequestsByUserEmail", async (req, res) => {
     res.status(500).json({ error: "Failed to post vendor request." });
   }
 });
-
+//Method: GET
+//Retrieves all vendor requests submitted.
+//Returns:
+//A list of all vendor requests if successful.
+//Error message if the operation fails.
 app.get("/getAllVendorRequests", async (req, res) => {
   try {
     const response = await helpers.getAllVendorRequests();
@@ -695,7 +744,12 @@ app.get("/getAllVendorRequests", async (req, res) => {
     res.status(500).json({ error: "Failed to get all vendor request." });
   }
 });
-
+//Method:DELETE
+//Deletes a vendor request for the specified user email.
+//Parameters:user_email (Body parameter)
+//Returns:
+//Success message if the vendor request is deleted successfully.
+//Error message if the operation fails.
 app.delete("/deleteVendorRequestByUserEmail", async (req, res) => {
   try {
     const { user_email } = req.body;
@@ -707,7 +761,10 @@ app.delete("/deleteVendorRequestByUserEmail", async (req, res) => {
     res.status(500).json({ error: "Failed to delete vendor request." });
   }
 });
-
+//Method:GET
+//Gets information about warehouses where a specified product is in stock in the desired quantity.
+//Parameters:product_id (URL parameter),quantity (URL parameter)
+//Returns:Warehouse information where the product is in stock in the specified quantity, if successful.
 app.get("/getInStockWarehouses/:product_id/:quantity", async (req, res) => {
   try {
     const { product_id, quantity } = req.params;
@@ -718,7 +775,12 @@ app.get("/getInStockWarehouses/:product_id/:quantity", async (req, res) => {
     res.status(500).json({ error: "Failed to get warehouse stock." });
   }
 });
-
+//Method: GET
+//Fetches information about a specific warehouse by its ID.
+//Parameters:warehouse_id (URL parameter)
+//Returns:
+//Details of the warehouse if successful.
+//Error message if the operation fails.
 app.get("/getWarehouseInfo/:warehouse_id", async (req, res) => {
   try {
     const { warehouse_id } = req.params;
@@ -729,7 +791,11 @@ app.get("/getWarehouseInfo/:warehouse_id", async (req, res) => {
     res.status(500).json({ error: "Failed to get warehouse info." });
   }
 });
-
+//Method:GET
+//Retrieves information for all warehouses in the system.
+//Returns:
+//A list of all warehouses with their information if successful.
+//Error message if the operation fails.
 app.get("/getAllWarehouseInfo", async (req, res) => {
   try {
     const response = await helpers.getAllWarehouseInfo();
@@ -739,7 +805,11 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
     res.status(500).json({ error: "Failed to All get warehouse info." });
   }
 });
-
+//Method:GET
+//Retrieves all product tags available in the system.
+//Returns:
+//An array of all product tags if successful.
+//Error message if the operation fails.
 app.get("/getAllProductTags", async (req, res) => {
   try {
     const tags = await helpers.getAllProductTags();
@@ -749,7 +819,11 @@ app.get("/getAllProductTags", async (req, res) => {
     res.status(500).send({ error: "Failed to fetch product tags" });
   }
 });
-
+//Deletes a product listing identified by its product ID.
+//Parameters:product_id (body parameter)
+//Returns:
+//Confirmation message if the product listing is successfully deleted.
+//Error message if the deletion fails.
 app.delete("/deleteProductListingByProductId", async (req, res) => {
     try {
         const { product_id } = req.body
@@ -760,7 +834,11 @@ app.delete("/deleteProductListingByProductId", async (req, res) => {
         res.status(500).send({ error: "Failed to delete product listing" });
       }
   });
-
+  //Method:GET
+//Fetches the order history for a given user email.
+//Parameters:user_email (path parameter)
+//Returns:A list of orders associated with the given user email if successful.
+//Error message if failed.
   app.get("/getOrderHistoryByEmail/:user_email", async (req, res) => {
     try {
         const { user_email } = req.params;
@@ -771,6 +849,12 @@ app.delete("/deleteProductListingByProductId", async (req, res) => {
         res.status(500).send({ error: "Failed to get order History" });
       }
   });
+  //Method:PATCH
+  //Updates the price of a product identified by its ID.
+  //Parameters:product_id (body parameter) new_price (body parameter)
+  //Returns:
+  //Confirmation message if the product price is successfully updated.
+  //Error message if the update fails.
   app.patch("/updateProductPriceByProductId", async (req, res) => {
     try {
         const { product_id, new_price } = req.body;
