@@ -36,7 +36,12 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     if (selectedQuantity > 0) {
       const session = await getSession();
       if (session) {
-        if((selectedDelivery || (!selectedDelivery && selectedWarehouse != -1 && warehouses.length > 0))){
+        if (
+          selectedDelivery ||
+          (!selectedDelivery &&
+            selectedWarehouse != -1 &&
+            warehouses.length > 0)
+        ) {
           try {
             await addToShoppingCart(
               searchParams.product_id,

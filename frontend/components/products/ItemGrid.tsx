@@ -38,15 +38,15 @@ export function ItemGrid({ filters }: ItemGridProps) {
 
   return (
     <div className="flex flex-col w-full h-fit">
-      <div className="flex flex-wrap gap-y-8 flex-1 justify-items-center items-center">
+      <div className="flex flex-wrap gap-y-8 flex-1 justify-center align-middle">
         {!(isLoading || error) && data
           ? data.slice(startIndex, endIndex).map((item) => (
-              <div key={item.product_id} className="mx-auto">
+              <div key={item.product_id} className="mx-2">
                 <ItemCard isLoading={isLoading} error={error} product={item} />
               </div>
             ))
           : Array.from({ length: itemsPerPage }, (_, index) => (
-              <div key={index} className="mx-auto">
+              <div key={index} className="mx-2">
                 <ItemCardSkeleton />
               </div>
             ))}

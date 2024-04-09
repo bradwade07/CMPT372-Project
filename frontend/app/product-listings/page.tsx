@@ -92,9 +92,8 @@ function page() {
               key={index}
               isPressable
               onClick={() => {
-                  router.push(`/product?product_id=${item.product_id}`);
-                }
-              }
+                router.push(`/product?product_id=${item.product_id}`);
+              }}
             >
               <CardBody className="overflow-visible p-4">
                 <div className="flex justify-center gap-4 items-center">

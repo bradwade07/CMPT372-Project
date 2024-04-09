@@ -19,8 +19,7 @@ export function CheckoutItemsList({ data }: CheckoutItemsListProps) {
                   <img
                     src={`data:image/jpeg;base64, ${item.product_main_img}`}
                     alt={`${item.product_name} image`}
-                    width={50}
-                    height={50}
+                    className="object-contain h-[140px] w-[140px]"
                   />
                   <div>
                     <p>{item.product_name}</p>

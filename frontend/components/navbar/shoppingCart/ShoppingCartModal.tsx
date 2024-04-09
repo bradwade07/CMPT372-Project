@@ -71,6 +71,7 @@ export function ShoppingCartModal() {
                 </Button>
                 <Button
                   color="primary"
+                  className="cursor-pointer"
                   disabled={data && data.length > 0}
                   onPress={() => {
                     router.push("/checkout");
