@@ -28,12 +28,15 @@ export function ItemCard({ isLoading, error, product }: ItemCardProps) {
         <h4 className="font-bold text-xl">{product.product_name}</h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2">
-        <Image
-          alt="Product Image"
-          className="object-cover rounded-xl pb-2 h-[240px]"
-          src={`data:image/jpeg;base64, ${product.product_main_img}`}
-          width={270}
-        />
+        <div className="flex justify-center gap-4 items-center">
+          <Image
+            radius="lg"
+            alt="Product Image"
+            className="object-contain rounded-xl pb-2 h-[240px] w-[240px]"
+            src={`data:image/jpeg;base64, ${product.product_main_img}`}
+            width={270}
+          />
+        </div>
         {product.current_price < product.base_price ? (
           <p>
             <span className="line-through">

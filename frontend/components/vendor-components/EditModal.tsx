@@ -84,13 +84,15 @@ export function EditModal({
               <p>
                 <ul>
                   <li>
-                    <Image
-                      shadow="sm"
-                      radius="lg"
-                      alt={data?.product_name}
-                      className=" object-cover h-[140px] w-[140px]"
-                      src={`data:image/jpeg;base64, ${data?.product_main_img}`}
-                    />
+                    <div className="flex justify-center gap-4 items-center">
+                      <Image
+                        shadow="sm"
+                        radius="lg"
+                        alt={data?.product_name}
+                        className="object-contain h-[140px] w-[140px]"
+                        src={`data:image/jpeg;base64, ${data?.product_main_img}`}
+                      />
+                    </div>
                   </li>
                   <li>
                     <p className="text-default-500">

@@ -34,14 +34,12 @@ export default function ImageSelector({
     <>
       <div className="relative w-full h-[30rem]">
         <Image
-          isZoomed
           src={`data:image/jpeg;base64, ${selectedImage}`}
           alt="Product Image"
           className="object-contain max-w-[40rem] min-w-[40rem] max-h-[40rem] min-h-[40rem]"
         />
       </div>
-      <div className="w-full mt-4">
-        <h2>IMAGE SELECTOR</h2>
+      <div className="w-full mt-[10.5rem]">
         <div className="flex justify-between mt-[10rem]">
           {pictures.map((index: any) => (
             <Image
@@ -50,7 +48,7 @@ export default function ImageSelector({
               key={index}
               src={`data:image/jpeg;base64, ${index}`}
               alt={`grey.jpg`}
-              className={`cursor-pointer max-w-[4rem] min-w-[4rem] max-h-[4rem] min-h-[4rem]`} ////images/image${index}.jpg
+              className={`cursor-pointer object-contain max-w-[4rem] min-w-[4rem] max-h-[4rem] min-h-[4rem]`} ////images/image${index}.jpg
             />
           ))}
         </div>

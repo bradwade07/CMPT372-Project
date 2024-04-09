@@ -8,6 +8,7 @@ import { getFilteredProducts } from "@/api/product";
 import { Product } from "@/api/product.types";
 import { DeleteModal } from "@/components/vendor-components";
 import { EditModal } from "@/components/vendor-components";
+import { useRouter } from "next/navigation";
 
 async function fetchProducts() {
   const user_email = await getSessionUserEmail();
@@ -21,6 +22,8 @@ async function fetchProducts() {
 }
 
 function page() {
+  //const for router
+  const router = useRouter();
   //data used for cards
   const [list, setList] = useState<Product[] | undefined>();
   //functions used for opening and closing delete modal along with setting what item to be deleted
@@ -86,18 +89,19 @@ function page() {
         <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
           {list?.map((item, index) => (
             <Card
-              shadow="sm"
               key={index}
               isPressable
-              onPress={() => console.log("item pressed")}
+              onClick={() => {
+                  router.push(`/product?product_id=${item.product_id}`);
+                }
+              }
             >
               <CardBody className="overflow-visible p-4">
-                <div className="flex gap-4 items-center">
+                <div className="flex justify-center gap-4 items-center">
                   <Image
-                    shadow="sm"
                     radius="lg"
                     alt={item.product_name}
-                    className=" object-cover h-[140px] w-[140px]"
+                    className="object-contain h-[140px] w-[140px]"
                     src={`data:image/jpeg;base64, ${item?.product_main_img}`}
                   />
                   <div className="inline-grid grid-cols-1 grid-rows-2">
