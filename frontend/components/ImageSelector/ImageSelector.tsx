@@ -1,22 +1,16 @@
 import { MouseEventHandler, useState } from "react";
-import { Image } from "@nextui-org/react";
+import { Image, Button } from "@nextui-org/react";
 import { ProductFull } from "@/api/product.types";
 
-export default function ImageSelector({
-  product_main_img,
-  additional_img,
-}: {
-  product_main_img: string;
-  additional_img: string[];
-}) {
+export default function ImageSelector(imageData: ProductFull) {
   const [selectedImage, setSelectedImage] = useState("");
-  const [pictures, setPictures] = useState([product_main_img]);
+  const [pictures, setPictures] = useState([imageData.product_main_img]);
   const [firstTimeRender, setFirstTimeRender] = useState(true);
   if (firstTimeRender) {
-    if (additional_img) {
+    if (imageData.additional_img) {
       let list = pictures;
-      for (let i = 0; i < additional_img.length; i++) {
-        list[i + 1] = additional_img[i];
+      for (let i = 0; i < imageData.additional_img.length; i++) {
+        list[i + 1] = imageData.additional_img[i];
       }
       setPictures(list);
     }
@@ -32,29 +26,25 @@ export default function ImageSelector({
   };
   return (
     <>
-      <div className="relative w-full h-96">
+      <div className="relative w-full h-[30rem]">
         <Image
           isZoomed
-          width={1000}
-          height={1000}
           src={`data:image/jpeg;base64, ${selectedImage}`}
           alt="Product Image"
-          className="object-contain"
+          className="object-contain max-w-[40rem] min-w-[40rem] max-h-[40rem] min-h-[40rem]"
         />
       </div>
       <div className="w-full mt-4">
         <h2>IMAGE SELECTOR</h2>
-        <div className="flex justify-between mt-2">
+        <div className="flex justify-between mt-[10rem]">
           {pictures.map((index: any) => (
             <Image
               onClick={handleSelected(index)}
               isZoomed
               key={index}
-              width={100}
-              height={100}
               src={`data:image/jpeg;base64, ${index}`}
               alt={`grey.jpg`}
-              className={`cursor-pointer `} ////images/image${index}.jpg
+              className={`cursor-pointer max-w-[4rem] min-w-[4rem] max-h-[4rem] min-h-[4rem]`} ////images/image${index}.jpg
             />
           ))}
         </div>

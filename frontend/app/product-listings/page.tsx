@@ -6,6 +6,8 @@ import { Button, Card, CardBody, CardFooter, Image } from "@nextui-org/react";
 import { getSessionUserEmail } from "@/app/auth";
 import { getFilteredProducts } from "@/api/product";
 import { Product } from "@/api/product.types";
+import { DeleteModal } from "@/components/vendor-components/DeleteModal";
+import { EditModal } from "@/components/vendor-components/EditModal";
 
 async function fetchProducts() {
   const user_email = await getSessionUserEmail();
@@ -19,16 +21,56 @@ async function fetchProducts() {
 }
 
 function page() {
+  //data used for cards
   const [list, setList] = useState<Product[] | undefined>();
+  //functions used for opening and closing delete modal along with setting what item to be deleted
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
+  const [deleteId, setDeleteId] = useState<number>(0);
+  //function call for opening editing/closing editing modal along with price/and id
+  const [editOpen, setEditOpen] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>(0);
+  const [editBase, setEditBase] = useState<number>(0);
+  const [editCurrent, setEditCurrent] = useState<number>(0);
+  //functions for closing modal
+  function onDeleteClose() {
+    setDeleteOpen(false);
+  }
+
+  function onEditClose() {
+    setEditOpen(false);
+  }
 
   useEffect(() => {
     fetchProducts().then(setList);
   }, []);
+  //update the page when the modals are closed
+  useEffect(() => {
+    fetchProducts().then(setList);
+  }, [onDeleteClose, onEditClose]);
+  //handle edit function craeted for readablity
+  const handleEdit = (pid: number, pbp: number, pcp: number) => {
+    setEditOpen(true);
+    setEditId(pid); //sets product id
+    setEditBase(pbp); //sets base price
+    setEditCurrent(pcp); //sets curent price
+  };
 
   return (
     <>
       <TopNavbar />
       <main className="flex flex-col items-center mb-16">
+        <DeleteModal
+          open={deleteOpen}
+          onDeleteClose={onDeleteClose}
+          productId={deleteId}
+        />
+        <EditModal
+          open={editOpen}
+          onEditClose={onEditClose}
+          productId={editId}
+          basePrice={editBase}
+          currentPrice={editCurrent}
+        />
         <h3 className="mt-8 mx-4 text-2xl">My Product Listings</h3>
         <div className="flex flex-col flex-1 text-center w-full mb-10 mt-8">
           <Link
@@ -49,15 +91,43 @@ function page() {
               isPressable
               onPress={() => console.log("item pressed")}
             >
-              <CardBody className="overflow-visible p-0">
-                <Image
-                  shadow="sm"
-                  radius="lg"
-                  width={192}
-                  alt={item.product_name}
-                  className="w-full object-cover h-[140px]"
-                  src={`data:image/jpeg;base64, ${item?.product_main_img}`}
-                />
+              <CardBody className="overflow-visible p-4">
+                <div className="flex gap-4 items-center">
+                  <Image
+                    shadow="sm"
+                    radius="lg"
+                    alt={item.product_name}
+                    className=" object-cover h-[140px] w-[140px]"
+                    src={`data:image/jpeg;base64, ${item?.product_main_img}`}
+                  />
+                  <div className="inline-grid grid-cols-1 grid-rows-2">
+                    <Button
+                      color="warning"
+                      className="my-2"
+                      aria-label="Change price of listing"
+                      onClick={() => {
+                        handleEdit(
+                          item.product_id,
+                          item.base_price,
+                          item.current_price,
+                        );
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      color="danger"
+                      className="my-2"
+                      aria-label="Delete listing"
+                      onClick={() => {
+                        setDeleteOpen(true);
+                        setDeleteId(item.product_id);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
               </CardBody>
               <CardFooter className="text-small justify-between">
                 <b>{item.product_name}</b>

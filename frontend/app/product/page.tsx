@@ -30,41 +30,49 @@ function page({ searchParams }: { searchParams: SearchParams }) {
 
   const queryClient = useQueryClient();
 
+  // check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
-    const session = await getSession();
-    if (session) {
-      await addToShoppingCart(
-        searchParams.product_id,
-        selectedQuantity,
-        selectedDilvery,
-        selectedWarehouse,
-      );
-      queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
-    } else {
-      router.push("/signin");
+    if (selectedQuantity > 0) {
+      try {
+        // provide actual "delivery" and "warehouse_id" values teg-should work.
+        await addToShoppingCart(
+          searchParams.product_id,
+          selectedQuantity,
+          selectedDilvery,
+          selectedWarehouse,
+        );
+        queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
+      } catch (error) {
+        router.push("/signin");
+        console.error("Could not add item to shopping cart");
+      }
     }
   }
 
+  // check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
-    const session = await getSession();
-    if (session) {
-      await addToWishlist(searchParams.product_id, selectedQuantity);
-      queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
-    } else {
-      router.push("/signin");
+    if (selectedQuantity > 0) {
+      try {
+        await addToWishlist(searchParams.product_id, selectedQuantity);
+        queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
+      } catch (error) {
+        router.push("/signin");
+        console.error("Could not add item to shopping cart");
+      }
     }
   }
-
+  //checks the quantity being changed and keeps it a whole number
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
       setSelectedQuantity(parseInt(value));
+    } else {
+      setSelectedQuantity(0);
     }
   };
 
   const [selectedDilvery, setSelectedDilvery] = useState(true);
-  const [hasFetched, setHasFetched] = useState(true);
-
+  //handles delivery option
   const handleSelectedDilvery = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -72,19 +80,18 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       setSelectedDilvery(false);
     } else {
       setSelectedDilvery(true);
-      setSelectedWarehouse(-1);
     }
-    setHasFetched(false);
   };
 
   const [warehouses, setWarehouses] = useState<WarehouseWithStock[]>([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState(-1);
 
+  //used to get list of warehouses with the available quantity for the item
   useEffect(() => {
     (async () => {
-      if (!selectedDilvery && data && !hasFetched) {
+      if (Number(selectedQuantity)) {
         const fetchedWarehouses = await getInStockWarehouses(
-          data?.product_id,
+          searchParams.product_id,
           selectedQuantity,
         );
         if (fetchedWarehouses) {
@@ -92,13 +99,12 @@ function page({ searchParams }: { searchParams: SearchParams }) {
         }
         console.log(warehouses);
         console.log(
-          "product id: " + data.product_id,
+          "product id: " + searchParams.product_id,
           "quantity: " + selectedQuantity,
         );
-        setHasFetched(true);
       }
     })();
-  });
+  }, [selectedQuantity]);
 
   const handleWarehouseChange = (event: any) => {
     let num = +event.target.value;
@@ -111,11 +117,19 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       <main className="flex flex-col min-h-screen py-20">
         <div className="container mx-auto flex flex-col md:flex-row">
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
-            <div className="w-full mt-4">
+            <div className="w-full mt-[1rem]">
               {data ? (
                 <ImageSelector
-                  product_main_img={data.product_main_img}
+                  tags={data.tags}
                   additional_img={data.additional_img}
+                  product_id={data.product_date_added}
+                  product_name={data.product_name}
+                  product_description={data.product_description}
+                  base_price={data.base_price}
+                  current_price={data.current_price}
+                  product_date_added={data.product_date_added}
+                  product_main_img={data.product_main_img}
+                  product_avg_rating={data.product_avg_rating}
                 />
               ) : (
                 <div></div>
@@ -174,7 +188,9 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                   type="number"
                   min="0"
                   step="1"
-                  value={selectedQuantity}
+                  value={
+                    selectedQuantity === 0 ? "0" : selectedQuantity.toString()
+                  }
                   onChange={handleQuantityChange}
                 />
               </div>

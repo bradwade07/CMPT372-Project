@@ -95,7 +95,9 @@ export async function getFilteredProducts(
 }
 
 // Creates a new product listing using the submitted form data
-export async function createProductListing(formData: ProductListingCreation) {
+export async function createProductListing(
+  formData: ProductListingCreation,
+): Promise<void> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     const {
@@ -149,6 +151,42 @@ export async function createProductListing(formData: ProductListingCreation) {
   }
 }
 
+// changes the current price of a product to a new price
+export async function updateProductPrice(
+  product_id: number,
+  new_price: number,
+): Promise<void> {
+  try {
+    axios.patch("/updateProductPriceByProductId", {
+      product_id: product_id,
+      new_price: new_price,
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+// deletes the product listing for the product ID
+export async function deleteProductListing(product_id: number): Promise<void> {
+  try {
+    axios.delete("/deleteProductListingByProductId", {
+      data: {
+        product_id: product_id,
+      },
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data || error.response || error);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
 // Returns all of the available product tags
 export async function getProductTags() {
   try {
@@ -171,12 +209,9 @@ export async function getUserOrderHistory(): Promise<OrderHistoryEntry[]> {
   const user_email = await getSessionUserEmail();
   if (user_email) {
     try {
-      console.log("stuff");
       let response = await axios.get<OrderHistoryEntry[]>(
         `/getOrderHistoryByEmail/${user_email}`,
       );
-
-      console.log(response.data);
 
       return response.data;
     } catch (error) {
