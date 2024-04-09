@@ -47,8 +47,7 @@ export function DeleteModal({open, onDeleteClose, productId}: DeleteModalProps) 
 
     const handleSubmit = async () => {
 
-          await deleteProductListing(productId);
-          router.push("/product-listings");
+        await deleteProductListing(productId);
       };
 
     return (
@@ -66,8 +65,8 @@ export function DeleteModal({open, onDeleteClose, productId}: DeleteModalProps) 
                         <Button color="default" variant="light" onPress={onClose}>
                             Close
                         </Button>
-                        <Button color="danger" variant="light" onPress={handleSubmit}>
-                            delete
+                        <Button color="danger" variant="light" onPress={()=>{handleSubmit().then(onClose)}}>
+                            Delete
                         </Button>
                     </ModalFooter>
                     </>

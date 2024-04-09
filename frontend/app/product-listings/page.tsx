@@ -4,9 +4,10 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Button, Card, CardBody, CardFooter, Image  } from "@nextui-org/react";
 import { getSessionUserEmail } from "@/app/auth";
-import { getFilteredProducts, deleteProductListing } from "@/api/product";
+import { getFilteredProducts } from "@/api/product";
 import { Product } from "@/api/product.types";
 import { DeleteModal } from "@/components/vendor-components/DeleteModal";
+import { EditModal } from "@/components/vendor-components/EditModal";
 
 
 async function fetchProducts() {
@@ -22,12 +23,21 @@ async function fetchProducts() {
 
 
 function page() {
+  //data used for cards
   const [list, setList] = useState<Product[] | undefined>();
+  //functions used for opening and closing delete modal along with setting what item to be deleted
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [deleteId, setDeleteId] = useState<number>(0);
+  //function call for opening editing/closing editing modal along with price/and id
+  const [editOpen, setEditOpen] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>(0);
 
   function onDeleteClose(){
     setDeleteOpen(false);
+  }
+
+  function onEditClose(){
+    setEditOpen(false);
   }
 
   useEffect(() => {
@@ -35,11 +45,13 @@ function page() {
   }, []);
 
 
+
   return (
     <>
       <TopNavbar />
       <main className="flex flex-col items-center mb-16">
       <DeleteModal open={deleteOpen} onDeleteClose={onDeleteClose} productId={deleteId} />
+      <EditModal open={editOpen} onEditClose={onEditClose} productId={editId}/>
         <h3 className="mt-8 mx-4 text-2xl">My Product Listings</h3>
         <div className="flex flex-col flex-1 text-center w-full mb-10 mt-8">
           <Link
@@ -68,7 +80,7 @@ function page() {
                     src={`data:image/jpeg;base64, ${item?.product_main_img}`}
                   />
                   <div className="inline-grid grid-cols-1 grid-rows-2">
-                    <Button color="warning" className="my-2" aria-label="Change price of listing">Edit</Button>
+                    <Button color="warning" className="my-2" aria-label="Change price of listing" onClick={()=> {setEditOpen(true); setEditId(item.product_id)}}>Edit</Button>
                     <Button color="danger" className="my-2" aria-label="Delete listing" onClick={()=> {setDeleteOpen(true); setDeleteId(item.product_id)}}>Delete</Button>
                   </div>
                 </div>

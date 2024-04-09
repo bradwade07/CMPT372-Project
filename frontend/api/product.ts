@@ -195,7 +195,7 @@ export async function updateProductPrice(
 // deletes the product listing for the product ID
 export async function deleteProductListing(product_id: number): Promise<void> {
   try {
-    await axios.delete("/deleteProductListingByProductId", {
+    axios.delete("/deleteProductListingByProductId", {
       data: {
         product_id: product_id,
       },
