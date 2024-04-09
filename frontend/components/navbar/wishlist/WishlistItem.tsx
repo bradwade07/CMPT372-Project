@@ -20,6 +20,12 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
     router.push(`/product?product_id=${item.product_id}`);
   }
 
+  // removes an item from the wishliist
+  function handleItemRemove(event: React.MouseEvent) {
+    event.stopPropagation();
+    onItemRemove(item.product_id);
+  }
+
   return (
     <div className="h-fit w-full">
       <Card className="h-auto w-full" isPressable onClick={handleItemClick}>
@@ -50,7 +56,7 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
           <div>
             <p
               className="text-blue-600 text-sm cursor-pointer"
-              onClick={() => onItemRemove(item.product_id)}
+              onClick={handleItemRemove}
             >
               Remove
             </p>
