@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { getInStockWarehouses } from "@/api/warehouse";
 import { WarehouseWithStock } from "@/api/warehouse.types";
 import { InStockWarehouseMap } from "@/components/product-page";
+import { getSession } from "../auth";
 
 type SearchParams = {
   product_id: number;
@@ -27,40 +28,52 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     queryFn: () => getProduct(searchParams.product_id),
   });
 
+  // query client used to invalidate queries and force a refetch of shopping cart or wishlist
   const queryClient = useQueryClient();
 
-  // check if valid session, otherwise router.push("/signin")
+  // if the user is logged in, adds an item to their shopping cart, otherwise redirects them to log in
   async function addItemToShoppingCart() {
     if (selectedQuantity > 0) {
-      try {
-        // provide actual "delivery" and "warehouse_id" values teg-should work.
-        await addToShoppingCart(
-          searchParams.product_id,
-          selectedQuantity,
-          selectedDilvery,
-          selectedWarehouse,
-        );
-        queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
-      } catch (error) {
+      const session = await getSession();
+      if (
+        session &&
+        (selectedDelivery || (!selectedDelivery && selectedWarehouse != -1))
+      ) {
+        try {
+          await addToShoppingCart(
+            searchParams.product_id,
+            selectedQuantity,
+            selectedDelivery,
+            selectedWarehouse,
+          );
+          queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
+        } catch (error) {
+          console.error("Could not add item to shopping cart");
+        }
+      } else {
         router.push("/signin");
-        console.error("Could not add item to shopping cart");
       }
     }
   }
 
-  // check if valid session, otherwise router.push("/signin")
+  // if the user is logged in, adds an item to their wishlist, otherwise redirects them to log in
   async function addItemToWishlist() {
     if (selectedQuantity > 0) {
-      try {
-        await addToWishlist(searchParams.product_id, selectedQuantity);
-        queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
-      } catch (error) {
+      const session = await getSession();
+      if (session) {
+        try {
+          await addToWishlist(searchParams.product_id, selectedQuantity);
+          queryClient.invalidateQueries({ queryKey: ["Wishlist"] });
+        } catch (error) {
+          console.error("Could not add item to shopping cart");
+        }
+      } else {
         router.push("/signin");
-        console.error("Could not add item to shopping cart");
       }
     }
   }
   //checks the quantity being changed and keeps it a whole number
+  // TODO: handle case where user selects a warehouse, but then increases the quantity beyond the warehouses' stock. currently they can still add to cart in this case
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
@@ -70,15 +83,15 @@ function page({ searchParams }: { searchParams: SearchParams }) {
     }
   };
 
-  const [selectedDilvery, setSelectedDilvery] = useState(true);
+  const [selectedDelivery, setSelectedDelivery] = useState(true);
   //handles delivery option
   const handleSelectedDilvery = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.value === "false") {
-      setSelectedDilvery(false);
+      setSelectedDelivery(false);
     } else {
-      setSelectedDilvery(true);
+      setSelectedDelivery(true);
     }
   };
 
@@ -96,14 +109,9 @@ function page({ searchParams }: { searchParams: SearchParams }) {
         if (fetchedWarehouses) {
           setWarehouses(fetchedWarehouses);
         }
-        console.log(warehouses);
-        console.log(
-          "product id: " + searchParams.product_id,
-          "quantity: " + selectedQuantity,
-        );
       }
     })();
-  }, [selectedQuantity]);
+  }, [selectedQuantity, searchParams]);
 
   const handleWarehouseChange = (event: any) => {
     let num = +event.target.value;
@@ -113,7 +121,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   return (
     <>
       <TopNavbar />
-      <main className="flex flex-col min-h-screen py-20">
+      <main className="flex flex-col min-h-screen py-10">
         <div className="container mx-auto flex flex-col md:flex-row">
           <div className="flex flex-col justify-center items-center text-center md:w-2/5">
             <div className="w-full mt-[1rem]">
@@ -142,9 +150,9 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                 <Radio value="false">Pick Up</Radio>
               </RadioGroup>
             </div>
-            {selectedDilvery === false && (
+            {selectedDelivery === false && (
               <div className="my-2">
-                <RadioGroup label="select delivery location">
+                <RadioGroup label="select pickup location">
                   {warehouses.map((warehouse) => (
                     <div key={warehouse.warehouse_id}>
                       <Radio
@@ -155,7 +163,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                         onChange={handleWarehouseChange}
                       >
                         {" "}
-                        Location : {warehouse.warehouse_id} has{" "}
+                        Warehouse ID: {warehouse.warehouse_id} has{" "}
                         {warehouse.quantity} in stock.
                       </Radio>
                     </div>
@@ -167,7 +175,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
               <Button
                 className="bg-blue-500 hover:bg-blue-700 text-white"
                 onClick={addItemToShoppingCart}
-                disabled={!selectedDilvery && selectedWarehouse == -1}
+                disabled={!selectedDelivery && selectedWarehouse == -1}
               >
                 ADD TO CART
               </Button>

@@ -71,7 +71,10 @@ export function ShoppingCartModal() {
                 </Button>
                 <Button
                   color="primary"
-                  onPress={() => router.push("/checkout")}
+                  disabled={data && data.length > 0}
+                  onPress={() => {
+                    router.push("/checkout");
+                  }}
                 >
                   Check Out
                 </Button>
