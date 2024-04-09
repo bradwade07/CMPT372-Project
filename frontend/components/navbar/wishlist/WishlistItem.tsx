@@ -24,12 +24,11 @@ export function WishlistItem({ item, onItemRemove }: WishlistItemProps) {
     <div className="h-fit w-full">
       <Card className="h-auto w-full" isPressable onClick={handleItemClick}>
         <CardBody className="flex flex-row justify-between items-end">
-          <div className="flex items-center">
+          <div className="flex items-center justify-center gap-4">
             <img
               src={`data:image/jpeg;base64, ${item.product_main_img}`}
               alt={`${item.product_name} image`}
-              width={50}
-              height={50}
+              className="object-contain h-[140px] w-[140px]"
             />
             <div>
               <p>{item.product_name}</p>

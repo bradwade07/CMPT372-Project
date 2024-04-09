@@ -35,19 +35,20 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   async function addItemToShoppingCart() {
     if (selectedQuantity > 0) {
       const session = await getSession();
-      if (
-        session &&
-        (selectedDelivery || (!selectedDelivery && selectedWarehouse != -1))
-      ) {
-        try {
-          await addToShoppingCart(
-            searchParams.product_id,
-            selectedQuantity,
-            selectedDelivery,
-            selectedWarehouse,
-          );
-          queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
-        } catch (error) {
+      if (session) {
+        if((selectedDelivery || (!selectedDelivery && selectedWarehouse != -1 && warehouses.length > 0))){
+          try {
+            await addToShoppingCart(
+              searchParams.product_id,
+              selectedQuantity,
+              selectedDelivery,
+              selectedWarehouse,
+            );
+            queryClient.invalidateQueries({ queryKey: ["Shopping Cart"] });
+          } catch (error) {
+            console.error("Could not add item to shopping cart");
+          }
+        } else {
           console.error("Could not add item to shopping cart");
         }
       } else {
