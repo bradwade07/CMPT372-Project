@@ -45,12 +45,10 @@ export function DeleteModal({open, onDeleteClose, productId}: DeleteModalProps) 
     //router to push back to listing page
     const router = useRouter();
 
-    const handleDelete = () => {
-    
-        deleteProductListing(productId).then(() =>{
+    const handleSubmit = async () => {
+
+          await deleteProductListing(productId);
           router.push("/product-listings");
-          }
-        );
       };
 
     return (
@@ -68,7 +66,7 @@ export function DeleteModal({open, onDeleteClose, productId}: DeleteModalProps) 
                         <Button color="default" variant="light" onPress={onClose}>
                             Close
                         </Button>
-                        <Button color="danger" variant="light" onPress={()=>{deleteProductListing(productId).then(onClose)}}>
+                        <Button color="danger" variant="light" onPress={handleSubmit}>
                             delete
                         </Button>
                     </ModalFooter>
