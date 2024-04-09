@@ -1299,15 +1299,7 @@ const helpers = {
         let { product_id, quantity, warehouse_id, delivery } =
           productIdandQuantity[i];
         if (delivery == 0) {
-          let response = await pool.query(
-            `SELECT quantity FROM warehousestock WHERE product_id = $1 AND warehouse_id = $2;`,
-            [product_id, warehouse_id],
-          );
-          helpers.patchWarehouseStock(
-            warehouse_id,
-            product_id,
-            response.rows[0].quantity - quantity,
-          );
+          helpers.patchWarehouseStock(warehouse_id, product_id, quantity);
         }
       }
     } catch (error) {
