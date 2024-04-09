@@ -2,3 +2,4 @@ Github URL: https://github.com/cameronlee101/CMPT372-Project
 Github commits note: Sometimes commits don't get carried over when we were merging branches together. If some members' commits are noticeably missing from the main branch, check their own branches' commits
 
 Project URL: https://cmpt372-project-frontend-image-k3yu47pw6q-wl.a.run.app
+NOTE: you have to visit the backend at this URL and trust the certificate for the website to work: https://34.28.152.154
