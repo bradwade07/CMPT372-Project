@@ -47,15 +47,21 @@ function page() {
               isPressable
               onPress={() => console.log("item pressed")}
             >
-              <CardBody className="overflow-visible p-0">
-                <Image
-                  shadow="sm"
-                  radius="lg"
-                  width={192}
-                  alt={item.product_name}
-                  className="w-full object-cover h-[140px]"
-                  src={`data:image/jpeg;base64, ${item?.product_main_img}`}
-                />
+              <CardBody className="overflow-visible p-4">
+                
+                <div className="flex gap-4 items-center">
+                  <Image
+                    shadow="sm"
+                    radius="lg"
+                    alt={item.product_name}
+                    className=" object-cover h-[140px] w-[140px]"
+                    src={`data:image/jpeg;base64, ${item?.product_main_img}`}
+                  />
+                  <div className="inline-grid grid-cols-1 grid-rows-2">
+                    <Button color="warning" className="my-2" aria-label="Change price of listing">Edit</Button>
+                    <Button color="danger" className="my-2" aria-label="Delete listing">Delete</Button>
+                  </div>
+                </div>
               </CardBody>
               <CardFooter className="text-small justify-between">
                 <b>{item.product_name}</b>
