@@ -27,11 +27,11 @@ function page({ searchParams }: { searchParams: SearchParams }) {
 
   const queryClient = useQueryClient()
 
-  // TODO: check if valid session, otherwise router.push("/signin")
+  // check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
     if(selectedQuantity>0){
       try {
-      // TODO: provide actual "delivery" and "warehouse_id" values teg-should work.
+      // provide actual "delivery" and "warehouse_id" values teg-should work.
       await addToShoppingCart(
         searchParams.product_id,
         selectedQuantity,
@@ -46,7 +46,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   }
   }
 
-  // TODO: check if valid session, otherwise router.push("/signin")
+  // check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
     if(selectedQuantity>0){
       try {
@@ -58,7 +58,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       }
     }
   }
-
+  //checks the quantity being changed and keeps it a whole number
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
@@ -69,7 +69,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   }
 
   const [selectedDilvery, setSelectedDilvery] = useState(true)
-
+//handles delivery option
   const handleSelectedDilvery = (event: React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.value === 'false'){
       setSelectedDilvery(false);
@@ -83,7 +83,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
   const [warehouses, setWarehouses] = useState<WarehouseWithStock[]>([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState(1);
 
-
+//used to get list of warehouses with the available quantity for the item
     useEffect(()=>{
       (async () =>{
         if(Number(selectedQuantity)){

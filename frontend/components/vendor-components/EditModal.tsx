@@ -9,8 +9,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Input,
-  Textarea
+  Input
 } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
 import { getProduct, updateProductPrice } from "@/api/product"
@@ -20,9 +19,11 @@ type EditModalProps = {
     open: boolean
     onEditClose: () => void
     productId: number
+    basePrice: number
+    currentPrice: number
 }
 
-export function EditModal({open, onEditClose, productId}: EditModalProps) {
+export function EditModal({open, onEditClose, productId, basePrice, currentPrice}: EditModalProps) {
     //query the product
     const { isLoading, error, data } = useQuery({
         queryKey: ["Product", productId],
@@ -46,30 +47,25 @@ export function EditModal({open, onEditClose, productId}: EditModalProps) {
 
 
       //new price value
-    const [newPrice, setNewPrice] = useState<number>(0)
-    const [basePrice, setBasePrice] = useState<number>(0);
+    const [newPrice, setNewPrice] = useState<number>(currentPrice)
 
     const handleSubmit = async () => {
 
         await updateProductPrice(productId, newPrice);
       };
 
-      const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      //makes sure integer/valid values are inserted
+      const handlePriceChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
-        if (/^\d*$/.test(value) &&parseInt(value) <= basePrice ) {
-            setNewPrice(parseInt(value));
-        } else if(parseInt(value) > basePrice){
-            setNewPrice(basePrice)
-        } else {
+        if (Number(value) < 0 ) {
             setNewPrice(0);
+        } else if(Number(value) > basePrice){
+            setNewPrice(basePrice);
+        } else {
+            setNewPrice(Number(value));
         }
       }
 
-      useEffect(() => {
-        if(data){
-            setBasePrice(data.base_price);
-        }
-      }, []);
 
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -91,14 +87,15 @@ export function EditModal({open, onEditClose, productId}: EditModalProps) {
                                 <li><p className="text-default-500">base price: ${data?.base_price.toFixed(2)}</p></li>
                                 <li><p className="text-default-500">current price:  ${data?.current_price.toFixed(2)}</p></li>
                                 <li><p className="text-default-500">new price (must be equal to or less than base price): </p>
-                                <input
-                                    className="rounded-md max-w-12 bg-slate-100 ring-2 ring-blue-500"
+                                <Input
+                                    className="rounded-md bg-slate-100 ring-2 ring-blue-500"
                                     type="number"
-                                    
                                     min="0"
-                                    max = {data?.base_price}
-                                    step="1"
-                                    value={newPrice === 0 ? '0' : newPrice.toString()}
+                                    max = {basePrice}
+                                    placeholder={basePrice.toString()}
+                                    step="1"    
+                                    pattern="^\d*(\.\d{0,2})?$"
+                                    value={newPrice.toString()}
                                     onChange={handlePriceChange}
                                     />
                                 </li>

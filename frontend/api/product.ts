@@ -179,7 +179,7 @@ export async function updateProductPrice(
   new_price: number,
 ): Promise<void> {
   try {
-    await axios.patch("/updateProductPriceByProductId", {
+    axios.patch("/updateProductPriceByProductId", {
       product_id: product_id,
       new_price: new_price,
     });

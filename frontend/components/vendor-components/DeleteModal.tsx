@@ -12,7 +12,6 @@ import {
 } from "@nextui-org/react"
 import { useQuery } from "@tanstack/react-query"
 import { getProduct, deleteProductListing } from "@/api/product"
-import { useRouter } from "next/navigation"
 
 type DeleteModalProps = {
     open: boolean
@@ -42,9 +41,7 @@ export function DeleteModal({open, onDeleteClose, productId}: DeleteModalProps) 
         }
       }, [isOpen, onDeleteClose])
 
-    //router to push back to listing page
-    const router = useRouter();
-
+//sends the request to delete
     const handleSubmit = async () => {
 
         await deleteProductListing(productId);
