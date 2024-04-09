@@ -6,8 +6,8 @@ import { Button, Card, CardBody, CardFooter, Image } from "@nextui-org/react";
 import { getSessionUserEmail } from "@/app/auth";
 import { getFilteredProducts } from "@/api/product";
 import { Product } from "@/api/product.types";
-import { DeleteModal } from "@/components/vendor-components/DeleteModal";
-import { EditModal } from "@/components/vendor-components/EditModal";
+import { DeleteModal } from "@/components/vendor-components";
+import { EditModal } from "@/components/vendor-components";
 
 async function fetchProducts() {
   const user_email = await getSessionUserEmail();

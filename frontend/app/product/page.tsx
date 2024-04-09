@@ -2,7 +2,7 @@
 import { getProduct } from "@/api/product";
 import addToShoppingCart from "@/api/shoppingCart";
 import { addToWishlist } from "@/api/wishlist";
-import ImageSelector from "@/components/ImageSelector/ImageSelector";
+import ImageSelector from "@/components/product-page/ImageSelector";
 import { TopNavbar } from "@/components/navbar";
 import { Button, RadioGroup, Radio } from "@nextui-org/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,8 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { getInStockWarehouses } from "@/api/warehouse";
 import { WarehouseWithStock } from "@/api/warehouse.types";
-import { getSession } from "../auth";
-import { InStockWarehouseMap } from "@/components/ImageSelector";
+import { InStockWarehouseMap } from "@/components/product-page";
 
 type SearchParams = {
   product_id: number;
@@ -120,16 +119,8 @@ function page({ searchParams }: { searchParams: SearchParams }) {
             <div className="w-full mt-[1rem]">
               {data ? (
                 <ImageSelector
-                  tags={data.tags}
-                  additional_img={data.additional_img}
-                  product_id={data.product_date_added}
-                  product_name={data.product_name}
-                  product_description={data.product_description}
-                  base_price={data.base_price}
-                  current_price={data.current_price}
-                  product_date_added={data.product_date_added}
                   product_main_img={data.product_main_img}
-                  product_avg_rating={data.product_avg_rating}
+                  additional_img={data.additional_img}
                 />
               ) : (
                 <div></div>

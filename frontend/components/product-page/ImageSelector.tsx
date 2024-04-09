@@ -1,16 +1,22 @@
 import { MouseEventHandler, useState } from "react";
-import { Image, Button } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
 import { ProductFull } from "@/api/product.types";
 
-export default function ImageSelector(imageData: ProductFull) {
+export default function ImageSelector({
+  product_main_img,
+  additional_img,
+}: {
+  product_main_img: string;
+  additional_img: string[];
+}) {
   const [selectedImage, setSelectedImage] = useState("");
-  const [pictures, setPictures] = useState([imageData.product_main_img]);
+  const [pictures, setPictures] = useState([product_main_img]);
   const [firstTimeRender, setFirstTimeRender] = useState(true);
   if (firstTimeRender) {
-    if (imageData.additional_img) {
+    if (additional_img) {
       let list = pictures;
-      for (let i = 0; i < imageData.additional_img.length; i++) {
-        list[i + 1] = imageData.additional_img[i];
+      for (let i = 0; i < additional_img.length; i++) {
+        list[i + 1] = additional_img[i];
       }
       setPictures(list);
     }
