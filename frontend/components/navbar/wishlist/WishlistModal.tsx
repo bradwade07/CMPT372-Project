@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect } from "react"
 import {
   Modal,
   ModalContent,
@@ -9,40 +9,40 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { WishlistItem } from "./WishlistItem";
-import { getWishlistProducts, removeFromWishlist } from "@/api/wishlist";
+} from "@nextui-org/react"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { WishlistItem } from "./WishlistItem"
+import { getWishlistProducts, removeFromWishlist } from "@/api/wishlist"
 
 type WishlistModalProps = {
-  open: boolean;
-  onWishlistClose: () => void;
-};
+  open: boolean
+  onWishlistClose: () => void
+}
 
 export function WishlistModal({ open, onWishlistClose }: WishlistModalProps) {
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["Wishlist"],
     queryFn: getWishlistProducts,
-  });
+  })
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
   const removeItemMutation = useMutation({
     mutationFn: removeFromWishlist,
     onSuccess: () => refetch(),
-  });
+  })
 
   useEffect(() => {
     if (open) {
-      onOpen();
+      onOpen()
     }
-  }, [open, onOpen]);
+  }, [open, onOpen])
 
   useEffect(() => {
     if (!isOpen) {
-      onWishlistClose();
+      onWishlistClose()
     }
-  }, [isOpen, onWishlistClose]);
+  }, [isOpen, onWishlistClose])
 
   return (
     <Modal
@@ -78,5 +78,5 @@ export function WishlistModal({ open, onWishlistClose }: WishlistModalProps) {
         )}
       </ModalContent>
     </Modal>
-  );
+  )
 }

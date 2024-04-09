@@ -97,9 +97,7 @@ app.get("/getProductsByFilters", async (req, res) => {
     req.query.product_date_added_after !== ""
       ? parseInt(req.query.product_date_added_after)
       : 0;
-  const tags = req.query.tags
-    ? req.query.tags.trim().toLowerCase().split(",")
-    : [];
+  const tags = req.query.tags ? req.query.tags.trim().split(",") : [];
   const user_email = req.query.user_email ? req.query.user_email.trim() : "";
 
   let responseIds = [];
@@ -143,21 +141,23 @@ app.get("/getProductsByFilters", async (req, res) => {
     let reply = [];
     for (id of responseIds) {
       response = await helpers.getProductInfoByPid(id);
-      reply.push({
-        product_id: response.product_id,
-        product_name: response.product_name,
-        product_main_img: response.product_main_img.toString("base64"),
-        product_description: response.product_description,
-        product_date_added: response.product_date_added,
-        product_avg_rating: response.product_avg_rating,
-        user_email: response.user_email,
-        base_price: response.base_price,
-        current_price: response.current_price,
-        tags: response.tags,
-        additional_img: response.additional_img,
-      });
+      if(response.active === true){
+        reply.push({
+            product_id: response.product_id,
+            product_name: response.product_name,
+            product_main_img: response.product_main_img.toString("base64"),
+            product_description: response.product_description,
+            product_date_added: response.product_date_added,
+            product_avg_rating: response.product_avg_rating,
+            user_email: response.user_email,
+            base_price: response.base_price,
+            current_price: response.current_price,
+            tags: response.tags,
+            additional_img: response.additional_img,
+            active: response.active
+          });
+      }
     }
-
     return res.status(200).send(reply);
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get products!" });
@@ -263,8 +263,6 @@ app.get("/getUserTypeByUserEmail/:user_email", async (req, res) => {
   }
 });
 
-// FIXME: user types comes in as "Customer", or "Vendor", or "Admin". i've added the ".toLowerCase()" to make it all lowercase
-// also there is more than just 2 types so can't do "let type_id = type === "vendor" ? 1 : 2"
 app.patch("/patchUserType", async (req, res) => {
   let { user_email, user_type } = req.body;
   if (!user_email) {
@@ -281,7 +279,7 @@ app.patch("/patchUserType", async (req, res) => {
     return res.status(400).send({ error: "Invalid type2!" });
   }
 
-  let type_id = user_type === "vendor" ? 1 : 2; // FIXME: type to type_id logic
+  let type_id = user_type === "vendor" ? 1 : 2;
 
   try {
     await helpers.patchUserType(user_email, type_id);
@@ -342,7 +340,6 @@ app.patch("/patchUserAddress", async (req, res) => {
 
 // User wishlist related endpoints
 app.post("/postProductToUserWishlist", async (req, res) => {
-  //TODO: missing the fucntionality where if a product already exists in a wishlist, then just add up the quantity
   let { user_email, product_id, quantity } = req.body;
 
   if (!user_email)
@@ -372,11 +369,7 @@ app.get("/getUserWishlistByUserEmail/:user_email", async (req, res) => {
 
   try {
     const products = await helpers.getUserWishlistByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).send({ error: "User wishlist not found!" });
-    }
+    res.json(products);
   } catch (error) {
     return res
       .status(500)
@@ -408,7 +401,7 @@ app.delete("/deleteUserWishlistByPidUserEmail", async (req, res) => {
 
 // User shopping cart related endpoints
 app.post("/postProductToUserCart", async (req, res) => {
-  let { user_email, product_id, quantity } = req.body;
+  let { user_email, product_id, quantity, delivery, warehouse_id } = req.body;
 
   if (!user_email)
     return res.status(400).send({ error: "Invalid user email!" });
@@ -418,7 +411,13 @@ app.post("/postProductToUserCart", async (req, res) => {
   quantity = parseInt(quantity);
 
   try {
-    await helpers.postProductToUserCart(user_email, product_id, quantity);
+    await helpers.postProductToUserCart(
+      user_email,
+      product_id,
+      quantity,
+      delivery,
+      warehouse_id,
+    );
     return res
       .status(200)
       .send({ success: "Item added to user cart successfully!" });
@@ -437,11 +436,7 @@ app.get("/getUserCartByUserEmail/:user_email", async (req, res) => {
 
   try {
     const products = await helpers.getUserCartByUserEmail(user_email);
-    if (products.length > 0) {
-      res.json(products);
-    } else {
-      return res.status(404).json({ error: "User cart not found!" });
-    }
+    res.json(products);
   } catch (error) {
     return res.status(500).send({ error: "Server failed to get user cart!" });
   }
@@ -471,7 +466,6 @@ app.delete("/deleteUserCartByPidUserEmail", async (req, res) => {
 
 // Warehouse related endpoints
 app.patch("/patchWarehouseStock", async (req, res) => {
-  //TODO: we need to first see if the product_id and warehouse_id combo exists, if yes then swap the quantities. if not then create and then add.
   let { warehouse_id, product_id, quantity } = req.body;
 
   if (!warehouse_id)
@@ -489,7 +483,7 @@ app.patch("/patchWarehouseStock", async (req, res) => {
     const response = await helpers.patchWarehouseStock(
       warehouse_id,
       product_id,
-      quantity,
+      quantity
     );
     if (response === 1) {
       return res
@@ -616,6 +610,7 @@ app.post("/api/orders/:orderID/capture", async (req, res) => {
     const { user_email } = req.body;
     const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
     if (httpStatusCode === 201) {
+      await helpers.addCartItemsToOrderInfoTable(orderID, user_email);
       await helpers.clearUserCart(user_email);
     }
     res.status(httpStatusCode).json(jsonResponse);
@@ -670,17 +665,6 @@ app.post("/createProductListing", async (req, res) => {
   } catch (error) {
     console.error("Failed to create product:", error);
     res.status(500).json({ error: "Failed to create product." });
-  }
-});
-app.post("/postReviewsByUserEmail", async (req, res) => {
-  try {
-    const { product_id, user_email, comment } = req.body;
-    await helpers.postReviewsByUserEmail(product_id, user_email, comment);
-    console.log("Review Posted Successfully!");
-    res.status(200);
-  } catch (error) {
-    console.error("Failed to create review:", error);
-    res.status(500).json({ error: "Failed to create review." });
   }
 });
 
@@ -749,6 +733,48 @@ app.get("/getAllWarehouseInfo", async (req, res) => {
     res.status(500).json({ error: "Failed to All get warehouse info." });
   }
 });
+
+app.get("/getAllProductTags", async (req, res) => {
+  try {
+    const tags = await helpers.getAllProductTags();
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({ error: "Failed to fetch product tags" });
+  }
+});
+
+app.delete("/deleteProductListingByProductId", async (req, res) => {
+    try {
+        const { product_id } = req.body
+        await helpers.deleteProductListingByProductId(product_id);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed to delete product listing" });
+      }
+  });
+
+  app.get("/getOrderHistoryByEmail/:user_email", async (req, res) => {
+    try {
+        const { user_email } = req.params;
+        await helpers.getOrderHistoryByEmail(user_email);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed to get order History" });
+      }
+  });
+  app.patch("/updateProductPriceByProductId", async (req, res) => {
+    try {
+        const { product_id, new_price } = req.body;
+        await helpers.updateProductPriceByProductId(product_id, new_price);
+        res.status(200);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send({ error: "Failed updating product price in productprice table" });
+      }
+  });
 
 // Server initialization
 try {
