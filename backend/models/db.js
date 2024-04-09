@@ -1115,7 +1115,6 @@ const helpers = {
         await pool.query(qString);
         for(let i =0; i < productIdandQuantity.length; i++){
             let { product_id, quantity, warehouse_id, delivery } = productIdandQuantity[i];
-            console.log(`SELECT quantity FROM warehousestock WHERE product_id = ${product_id} AND warehouse_id = ${warehouse_id};`);
             if(delivery == 0){
                 let response = await pool.query(`SELECT quantity FROM warehousestock WHERE product_id = $1 AND warehouse_id = $2;`,[product_id, warehouse_id])
                 helpers.patchWarehouseStock(warehouse_id, product_id, response.rows[0].quantity - quantity);
