@@ -29,7 +29,8 @@ function page({ searchParams }: { searchParams: SearchParams }) {
 
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToShoppingCart() {
-    try {
+    if(selectedQuantity>0){
+      try {
       // TODO: provide actual "delivery" and "warehouse_id" values teg-should work.
       await addToShoppingCart(
         searchParams.product_id,
@@ -43,36 +44,38 @@ function page({ searchParams }: { searchParams: SearchParams }) {
       console.error("Could not add item to shopping cart")
     }
   }
+  }
 
   // TODO: check if valid session, otherwise router.push("/signin")
   async function addItemToWishlist() {
-    try {
-      await addToWishlist(searchParams.product_id, selectedQuantity)
-      queryClient.invalidateQueries({ queryKey: ["Wishlist"] })
-    } catch (error) {
-      router.push("/signin")
-      console.error("Could not add item to shopping cart")
+    if(selectedQuantity>0){
+      try {
+        await addToWishlist(searchParams.product_id, selectedQuantity)
+        queryClient.invalidateQueries({ queryKey: ["Wishlist"] })
+      } catch (error) {
+        router.push("/signin")
+        console.error("Could not add item to shopping cart")
+      }
     }
   }
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value;
     if (/^\d*$/.test(value)) {
-      setSelectedQuantity(parseInt(value))
+      setSelectedQuantity(parseInt(value));
+    } else {
+      setSelectedQuantity(0);
     }
   }
 
   const [selectedDilvery, setSelectedDilvery] = useState(true)
-  const [hasFetched, setHasFetched] = useState(true)
 
   const handleSelectedDilvery = (event: React.ChangeEvent<HTMLInputElement>) => {
     if(event.target.value === 'false'){
       setSelectedDilvery(false);
     }else{
       setSelectedDilvery(true);
-    }
-    setHasFetched(false);
-    
+    }  
   }
 
    
@@ -83,17 +86,16 @@ function page({ searchParams }: { searchParams: SearchParams }) {
 
     useEffect(()=>{
       (async () =>{
-        if( !selectedDilvery && data && !hasFetched){
-          const fetchedWarehouses = await getInStockWarehouses(data?.product_id, selectedQuantity); 
+        if(Number(selectedQuantity)){
+          const fetchedWarehouses = await getInStockWarehouses(searchParams.product_id, selectedQuantity); 
           if(fetchedWarehouses){
             setWarehouses(fetchedWarehouses);
           }
           console.log(warehouses);
-          console.log("product id: " + data.product_id, "quantity: " + selectedQuantity);
-          setHasFetched(true);
+          console.log("product id: " + searchParams.product_id, "quantity: " + selectedQuantity);
         } 
       })();
-    });
+    },[selectedQuantity]);
   
     const handleWarehouseChange = (event: any) => {
       let num =+ event.target.value;
@@ -166,7 +168,7 @@ function page({ searchParams }: { searchParams: SearchParams }) {
                   type="number"
                   min="0"
                   step="1"
-                  value={selectedQuantity}
+                  value={selectedQuantity === 0 ? '0' : selectedQuantity.toString()}
                   onChange={handleQuantityChange}
                 />
               </div>
