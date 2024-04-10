@@ -400,9 +400,10 @@ const helpers = {
       let response;
       let queryStr = `SELECT product_id FROM product `;
       if (product_name !== "") {
-        response = await pool.query((queryStr += `WHERE product_name = $1;`), [
-          product_name,
-        ]);
+        response = await pool.query(
+          (queryStr += `WHERE product_name ILIKE $1;`),
+          [`%${product_name}%`],
+        );
       } else {
         response = await pool.query((queryStr += `;`));
       }
