@@ -76,11 +76,11 @@ export function OrderTotal({ data, deliveryFormSubmitted }: OrderTotalProps) {
     return (
       <div className="mt-4">
         <p>
-          Tax (%{taxPercentage * 100}): $
+          Tax ({taxPercentage * 100}%): $
           {((pickupSubtotal + deliverySubtotal) * taxPercentage).toFixed(2)}
         </p>
         <p>
-          Delivery fees (%{deliveryPercentage * 100} on delivered items&apos;
+          Delivery fees ({deliveryPercentage * 100}% on delivered items&apos;
           price): ${(deliverySubtotal * deliveryPercentage).toFixed(2)}
         </p>
         <p>Total after tax and fees: ${totalPrice.toFixed(2)}</p>
